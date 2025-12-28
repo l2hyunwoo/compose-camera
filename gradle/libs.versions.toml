@@ -23,7 +23,10 @@ kmpNativeCoroutines = "1.0.0"
 spotless = "6.25.0"
 
 # Binary Compatibility Validator
-binaryCompatibilityValidator = "0.18.1"
+binaryCompatibilityValidator = "0.17.0"
+
+# KSP
+ksp = "2.3.4"
 
 # ML Kit
 mlkit-barcode-scanning = "17.3.0"
@@ -34,9 +37,6 @@ androidx-core-ktx = "1.17.0"
 
 # Coil
 coil3 = "3.3.0"
-
-# KSP
-ksp = "2.3.4"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
