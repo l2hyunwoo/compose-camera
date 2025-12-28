@@ -58,7 +58,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.androidx.lifecycle.runtime)
             implementation("androidx.activity:activity-compose:1.9.3")
-            implementation("androidx.core:core-ktx:1.15.0")
+            implementation("androidx.core:core-ktx:1.17.0")
             implementation("io.coil-kt.coil3:coil-compose:3.0.4")
             implementation("io.coil-kt.coil3:coil-video:3.0.4")
         }
