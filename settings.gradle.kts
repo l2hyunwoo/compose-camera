@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "compose-camera"
 include(":library")
+include(":sample")
