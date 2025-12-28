@@ -7,17 +7,15 @@ plugins {
     alias(libs.plugins.vanniktech.mavenPublish)
 }
 
-group = "io.github.kotlin"
-version = "1.0.0"
+group = "io.github.l2hyunwoo.compose.camera"
+version = "1.0.0-alpha01"
 
 kotlin {
-    jvm()
     androidLibrary {
-        namespace = "org.jetbrains.kotlinx.multiplatform.library.template"
+        namespace = "io.github.l2hyunwoo.compose.camera"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
-        withJava() // enable java compilation support
         withHostTestBuilder {}.configure {}
         withDeviceTestBuilder {
             sourceSetTreeName = "test"
@@ -25,20 +23,18 @@ kotlin {
 
         compilations.configureEach {
             compilerOptions.configure {
-                jvmTarget.set(
-                    JvmTarget.JVM_11
-                )
+                jvmTarget.set(JvmTarget.JVM_11)
             }
         }
     }
+    
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    linuxX64()
 
     sourceSets {
         commonMain.dependencies {
-            //put your multiplatform dependencies here
+            // Compose Multiplatform dependencies will be added here
         }
 
         commonTest.dependencies {
@@ -47,36 +43,35 @@ kotlin {
     }
 }
 
+// Maven publishing configuration - TODO: Set up later when tokens/accounts are ready
 mavenPublishing {
     publishToMavenCentral()
-
     signAllPublications()
-
-    coordinates(group.toString(), "library", version.toString())
+    coordinates(group.toString(), "compose-camera", version.toString())
 
     pom {
-        name = "My library"
-        description = "A library."
+        name = "Compose Camera"
+        description = "A camera library for Compose Multiplatform supporting Android and iOS"
         inceptionYear = "2024"
-        url = "https://github.com/kotlin/multiplatform-library-template/"
+        url = "https://github.com/l2hyunwoo/compose-camera/"
         licenses {
             license {
-                name = "XXX"
-                url = "YYY"
-                distribution = "ZZZ"
+                name = "Apache License 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0"
+                distribution = "repo"
             }
         }
         developers {
             developer {
-                id = "XXX"
-                name = "YYY"
-                url = "ZZZ"
+                id = "l2hyunwoo"
+                name = "Hyunwoo Lee"
+                url = "https://github.com/l2hyunwoo"
             }
         }
         scm {
-            url = "XXX"
-            connection = "YYY"
-            developerConnection = "ZZZ"
+            url = "https://github.com/l2hyunwoo/compose-camera"
+            connection = "scm:git:git://github.com/l2hyunwoo/compose-camera.git"
+            developerConnection = "scm:git:ssh://git@github.com/l2hyunwoo/compose-camera.git"
         }
     }
 }
