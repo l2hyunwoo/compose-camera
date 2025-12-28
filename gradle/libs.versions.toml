@@ -19,6 +19,12 @@ coroutines = "1.10.2"
 # KMP-NativeCoroutines
 kmpNativeCoroutines = "1.0.0"
 
+# Spotless
+spotless = "6.25.0"
+
+# Binary Compatibility Validator
+binaryCompatibilityValidator = "0.17.0"
+
 # KSP
 ksp = "2.3.4"
 
@@ -54,3 +60,5 @@ compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-m
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kmpNativeCoroutines = { id = "com.rickclephas.kmp.nativecoroutines", version.ref = "kmpNativeCoroutines" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binaryCompatibilityValidator" }

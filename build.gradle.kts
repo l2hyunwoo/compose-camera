@@ -8,4 +8,28 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.kmpNativeCoroutines) apply false
     alias(libs.plugins.vanniktech.mavenPublish) apply false
+    alias(libs.plugins.spotless) apply false
+    alias(libs.plugins.binaryCompatibilityValidator) apply false
+}
+
+subprojects {
+    apply(plugin = "com.diffplug.spotless")
+
+    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        kotlin {
+            target("**/*.kt")
+            targetExclude("**/build/**/*.kt")
+            ktlint().editorConfigOverride(mapOf("indent_size" to "2", "continuation_indent_size" to "2"))
+            licenseHeaderFile(rootProject.file("spotless/copyright.kt"))
+            trimTrailingWhitespace()
+            endWithNewline()
+        }
+        format("kts") {
+            target("**/*.kts")
+            targetExclude("**/build/**/*.kts")
+            licenseHeaderFile(rootProject.file("spotless/copyright.kt"), "(^(?![\\/ ]\\*).*$)")
+            trimTrailingWhitespace()
+            endWithNewline()
+        }
+    }
 }
