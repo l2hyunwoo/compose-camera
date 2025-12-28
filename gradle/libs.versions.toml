@@ -23,7 +23,7 @@ kmpNativeCoroutines = "1.0.0"
 spotless = "6.25.0"
 
 # Binary Compatibility Validator
-binaryCompatibilityValidator = "0.17.0"
+binaryCompatibilityValidator = "0.18.1"
 
 # KSP
 ksp = "2.3.4"
