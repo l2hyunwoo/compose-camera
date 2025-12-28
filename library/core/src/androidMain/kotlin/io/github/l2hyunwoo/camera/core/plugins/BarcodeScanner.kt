@@ -28,6 +28,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.google.mlkit.vision.barcode.common.Barcode as MlKitBarcode
 
+/**
+ * Android implementation of barcode scanner using Google ML Kit.
+ * Detects barcodes and QR codes from camera frames.
+ */
 actual class BarcodeScanner actual constructor() : CameraPlugin {
   override val id: String = "BarcodeScanner"
 

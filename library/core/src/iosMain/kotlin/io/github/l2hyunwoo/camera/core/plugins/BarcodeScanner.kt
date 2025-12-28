@@ -27,6 +27,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import platform.CoreMedia.CMSampleBufferRef
 import platform.Vision.*
 
+/**
+ * iOS implementation of barcode scanner using Apple Vision framework.
+ * Detects barcodes and QR codes from camera frames.
+ */
 actual class BarcodeScanner actual constructor() : CameraPlugin {
   override val id: String = "BarcodeScanner"
 

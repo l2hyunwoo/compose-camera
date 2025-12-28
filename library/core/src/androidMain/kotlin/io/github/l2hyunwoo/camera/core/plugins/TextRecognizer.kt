@@ -28,6 +28,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+/**
+ * Android implementation of text recognizer (OCR) using Google ML Kit.
+ * Recognizes text from camera frames in real-time.
+ */
 actual class TextRecognizer actual constructor() : CameraPlugin {
   override val id: String = "TextRecognizer"
 

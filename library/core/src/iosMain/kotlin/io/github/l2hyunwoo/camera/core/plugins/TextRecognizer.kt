@@ -27,6 +27,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import platform.CoreMedia.CMSampleBufferRef
 import platform.Vision.*
 
+/**
+ * iOS implementation of text recognizer (OCR) using Apple Vision framework.
+ * Recognizes text from camera frames in real-time.
+ */
 actual class TextRecognizer actual constructor() : CameraPlugin {
   override val id: String = "TextRecognizer"
 

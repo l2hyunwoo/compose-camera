@@ -331,33 +331,10 @@ internal class AndroidCameraController(
         return@setAnalyzer
       }
 
-      // Invoke all analyzers
-      // Note: This is simplified. Real-world usage might require chaining or copying
-      // if analyzers are asynchronous and need the image open.
-      // For now, we assume sequential execution or independent processing
-      // where the last one closes the image, or we close it here after loop (risk!)
-
-      // Better approach for ML Kit: Clone logic or use ReferenceCounting (complex)
-      // Strategy: Pass generic proxy wrapper that counts references?
-
-      // Pragmatic approach:
-      // Currently we only support ONE analyzer effectively or assume analyzers are synchronous.
-      // ML Kit analyzers usually are asynchronous but can copy data via InputImage.fromMediaImage
-      // The InputImage holds a reference.
-
+      // Each analyzer is responsible for closing the imageProxy after processing.
+      // Note: Currently supports single analyzer effectively; multiple analyzers
+      // require the last one to close the proxy.
       analyzers.forEach { it.analyze(imageProxy) }
-
-      // We do NOT close the image here because ML Kit analyzers might need it.
-      // Paradox: If we don't close, stream stalls. If we close, ML Kit crashes.
-      //
-      // Solution: Analyzers MUST be responsible for closing the proxy if they consume it.
-      // BUT, if we have multiple analyzers, only the last one should close.
-      //
-      // Current Compromise: We only really support 1 active analyzer comfortably without
-      // a sophisticated cleanup mechanism.
-
-      // However, to support the "empty" case (no plugins), we closed it above.
-      // If plugins function correctly, they should handle closing or we need a wrapper.
     }
   }
 
