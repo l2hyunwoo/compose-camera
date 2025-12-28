@@ -95,4 +95,3 @@ class CameraConfigurationTest {
     assertEquals("plugin-2", withoutOne.plugins.first().id)
   }
 }
-
