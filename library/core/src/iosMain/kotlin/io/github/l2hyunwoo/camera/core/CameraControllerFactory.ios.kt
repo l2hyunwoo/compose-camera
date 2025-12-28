@@ -22,12 +22,15 @@ import platform.AVFoundation.AVCaptureSession
 /**
  * iOS implementation of [rememberCameraController].
  * Creates and remembers an [IOSCameraController] instance.
+ *
+ * Note: The controller is created once and configuration updates
+ * should be applied via [CameraController.updateConfiguration].
  */
 @Composable
 actual fun rememberCameraController(
   configuration: CameraConfiguration,
 ): CameraController {
-  return remember(configuration) {
+  return remember {
     IOSCameraController(initialConfiguration = configuration)
   }
 }

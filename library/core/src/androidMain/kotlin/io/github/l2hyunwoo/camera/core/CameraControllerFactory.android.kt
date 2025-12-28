@@ -25,6 +25,9 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * Android implementation of [rememberCameraController].
  * Creates and remembers an [AndroidCameraController] instance.
+ *
+ * Note: The controller is created once and configuration updates
+ * should be applied via [CameraController.updateConfiguration].
  */
 @Composable
 actual fun rememberCameraController(
@@ -33,7 +36,7 @@ actual fun rememberCameraController(
   val context = LocalContext.current
   val lifecycleOwner = LocalLifecycleOwner.current
 
-  return remember(configuration) {
+  return remember {
     AndroidCameraController(
       context = context,
       lifecycleOwner = lifecycleOwner,
