@@ -20,7 +20,7 @@ coroutines = "1.10.2"
 kmpNativeCoroutines = "1.0.0"
 
 # Spotless
-spotless = "6.25.0"
+spotless = "8.1.0"
 
 # Binary Compatibility Validator
 binaryCompatibilityValidator = "0.18.1"
