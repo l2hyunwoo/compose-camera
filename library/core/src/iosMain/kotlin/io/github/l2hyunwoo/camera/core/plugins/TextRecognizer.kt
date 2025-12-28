@@ -15,11 +15,11 @@
  */
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 
-package io.github.l2hyunwoo.compose.camera.plugins
+package io.github.l2hyunwoo.camera.core.plugins
 
-import io.github.l2hyunwoo.compose.camera.CameraController
-import io.github.l2hyunwoo.compose.camera.IOSCameraController
-import io.github.l2hyunwoo.compose.camera.plugin.CameraPlugin
+import io.github.l2hyunwoo.camera.core.CameraController
+import io.github.l2hyunwoo.camera.core.IOSCameraController
+import io.github.l2hyunwoo.camera.core.plugin.CameraPlugin
 import kotlinx.cinterop.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

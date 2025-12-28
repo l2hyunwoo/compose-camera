@@ -31,7 +31,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import io.github.l2hyunwoo.compose.camera.*
+import io.github.l2hyunwoo.camera.compose.*
+import io.github.l2hyunwoo.camera.core.*
 import kotlinx.coroutines.launch
 
 /**

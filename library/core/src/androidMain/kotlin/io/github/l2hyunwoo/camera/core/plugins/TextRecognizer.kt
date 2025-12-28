@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.l2hyunwoo.compose.camera.plugins
+package io.github.l2hyunwoo.camera.core.plugins
 
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -21,9 +21,9 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import io.github.l2hyunwoo.compose.camera.AndroidCameraController
-import io.github.l2hyunwoo.compose.camera.CameraController
-import io.github.l2hyunwoo.compose.camera.plugin.CameraPlugin
+import io.github.l2hyunwoo.camera.core.AndroidCameraController
+import io.github.l2hyunwoo.camera.core.CameraController
+import io.github.l2hyunwoo.camera.core.plugin.CameraPlugin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

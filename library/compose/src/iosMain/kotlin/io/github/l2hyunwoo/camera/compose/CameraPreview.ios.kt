@@ -15,7 +15,7 @@
  */
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 
-package io.github.l2hyunwoo.compose.camera
+package io.github.l2hyunwoo.camera.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect

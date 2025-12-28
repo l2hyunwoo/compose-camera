@@ -24,7 +24,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import io.github.l2hyunwoo.compose.camera.rememberCameraPermissionManager
+import io.github.l2hyunwoo.camera.core.rememberCameraPermissionManager
 
 /**
  * Sample app entry point composable.

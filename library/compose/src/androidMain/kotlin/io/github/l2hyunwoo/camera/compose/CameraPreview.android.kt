@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.l2hyunwoo.compose.camera
+package io.github.l2hyunwoo.camera.compose
 
 import androidx.camera.compose.CameraXViewfinder
 import androidx.compose.foundation.layout.Box
