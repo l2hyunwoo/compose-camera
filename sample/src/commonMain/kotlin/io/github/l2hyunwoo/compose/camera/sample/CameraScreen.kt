@@ -15,23 +15,22 @@
  */
 package io.github.l2hyunwoo.compose.camera.sample
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.clickable
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import io.github.l2hyunwoo.compose.camera.*
 import kotlinx.coroutines.launch
 
@@ -59,7 +58,7 @@ fun CameraScreen(
       Box(
         modifier = Modifier
           .fillMaxSize()
-          .padding(paddingValues)
+          .padding(paddingValues),
       ) {
         // Camera Preview
         CameraPreview(
@@ -88,20 +87,20 @@ fun CameraScreen(
               Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
               ) {
                 Icon(
                   imageVector = Icons.Default.Warning,
                   contentDescription = "Error",
                   tint = MaterialTheme.colorScheme.error,
-                  modifier = Modifier.size(48.dp)
+                  modifier = Modifier.size(48.dp),
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                   text = state.exception.message ?: "Unknown error",
                   color = Color.White,
                   style = MaterialTheme.typography.bodyLarge,
-                  textAlign = TextAlign.Center
+                  textAlign = TextAlign.Center,
                 )
               }
             }
@@ -117,8 +116,8 @@ fun CameraScreen(
             .fillMaxWidth()
             .background(
               brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                colors = listOf(Color.Black.copy(alpha = 0.5f), Color.Transparent)
-              )
+                colors = listOf(Color.Black.copy(alpha = 0.5f), Color.Transparent),
+              ),
             )
             .statusBarsPadding()
             .padding(16.dp)
@@ -136,7 +135,7 @@ fun CameraScreen(
               }
               cameraConfig = cameraConfig.copy(flashMode = newFlashMode)
               cameraController?.setFlashMode(newFlashMode)
-            }
+            },
           ) {
             val iconAndTint = when (cameraConfig.flashMode) {
               FlashMode.OFF -> Icons.Filled.FlashOff to Color.White
@@ -147,7 +146,7 @@ fun CameraScreen(
             Icon(
               imageVector = iconAndTint.first,
               contentDescription = "Flash Mode",
-              tint = iconAndTint.second
+              tint = iconAndTint.second,
             )
           }
 
@@ -160,12 +159,12 @@ fun CameraScreen(
               }
               cameraConfig = cameraConfig.copy(lens = newLens)
               cameraController?.setLens(newLens)
-            }
+            },
           ) {
             Icon(
               imageVector = Icons.Filled.Cameraswitch,
               contentDescription = "Switch Camera",
-              tint = Color.White
+              tint = Color.White,
             )
           }
         }
@@ -195,8 +194,8 @@ fun CameraScreen(
             .align(Alignment.BottomCenter)
             .background(
               brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.8f))
-              )
+                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.8f)),
+              ),
             )
             .navigationBarsPadding()
             .padding(bottom = 32.dp, top = 20.dp),
@@ -209,13 +208,13 @@ fun CameraScreen(
             // Gallery button
             IconButton(
               onClick = onGalleryClick,
-              modifier = Modifier.size(56.dp)
+              modifier = Modifier.size(56.dp),
             ) {
               Icon(
                 imageVector = Icons.Default.PhotoLibrary,
                 contentDescription = "Gallery",
                 tint = Color.White,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(32.dp),
               )
             }
 
@@ -241,58 +240,58 @@ fun CameraScreen(
                         }
                       }
                     }
-                  }
-                )
-                  // Long click for video recording could be added here
+                  },
+                ),
+              // Long click for video recording could be added here
             ) {
               // Inner visualization
-               Box(
+              Box(
                 modifier = Modifier
                   .size(if (isRecording) 40.dp else 64.dp)
                   .clip(if (isRecording) MaterialTheme.shapes.small else CircleShape)
                   .background(if (isRecording) Color.Red else Color.White)
-                  .animateContentSize()
+                  .animateContentSize(),
               )
             }
-             // Separate Video Button for clarity in this sample
-              IconButton(
-                onClick = {
-                  scope.launch {
-                    if (isRecording && currentRecording != null) {
-                      // Stop recording
-                      when (val result = currentRecording?.stop()) {
-                         is VideoRecordingResult.Success -> {
-                           lastCaptureResult = "Recorded ${result.durationMs / 1000}s"
-                         }
-                         is VideoRecordingResult.Error -> {
-                           lastCaptureResult = "Error: ${result.exception.message}"
-                         }
-                         null -> {}
+            // Separate Video Button for clarity in this sample
+            IconButton(
+              onClick = {
+                scope.launch {
+                  if (isRecording && currentRecording != null) {
+                    // Stop recording
+                    when (val result = currentRecording?.stop()) {
+                      is VideoRecordingResult.Success -> {
+                        lastCaptureResult = "Recorded ${result.durationMs / 1000}s"
                       }
-                      currentRecording = null
-                    } else {
-                      // Start recording
-                      try {
-                        currentRecording = cameraController?.startRecording()
-                        lastCaptureResult = "Recording started..."
-                      } catch (e: Exception) {
-                        lastCaptureResult = "Error: ${e.message}"
+                      is VideoRecordingResult.Error -> {
+                        lastCaptureResult = "Error: ${result.exception.message}"
                       }
+                      null -> {}
+                    }
+                    currentRecording = null
+                  } else {
+                    // Start recording
+                    try {
+                      currentRecording = cameraController?.startRecording()
+                      lastCaptureResult = "Recording started..."
+                    } catch (e: Exception) {
+                      lastCaptureResult = "Error: ${e.message}"
                     }
                   }
-                },
-                 modifier = Modifier.size(56.dp)
-              ) {
-                 Icon(
-                  imageVector = if (isRecording) Icons.Default.StopCircle else Icons.Default.Videocam,
-                  contentDescription = "Record Video",
-                  tint = if (isRecording) Color.Red else Color.White,
-                  modifier = Modifier.size(32.dp)
-                 )
-              }
+                }
+              },
+              modifier = Modifier.size(56.dp),
+            ) {
+              Icon(
+                imageVector = if (isRecording) Icons.Default.StopCircle else Icons.Default.Videocam,
+                contentDescription = "Record Video",
+                tint = if (isRecording) Color.Red else Color.White,
+                modifier = Modifier.size(32.dp),
+              )
+            }
           }
         }
       }
-    }
+    },
   )
 }

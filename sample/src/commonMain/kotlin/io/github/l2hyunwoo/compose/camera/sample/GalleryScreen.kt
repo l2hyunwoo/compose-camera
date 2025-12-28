@@ -15,26 +15,21 @@
  */
 package io.github.l2hyunwoo.compose.camera.sample
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 
 /**
@@ -66,7 +61,7 @@ fun GalleryScreen(
           IconButton(onClick = onBack) {
             Icon(
               imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-              contentDescription = "Back"
+              contentDescription = "Back",
             )
           }
         },
@@ -78,11 +73,11 @@ fun GalleryScreen(
                 mediaItems = mediaLoader.loadMedia()
                 isLoading = false
               }
-            }
+            },
           ) {
             Icon(
               imageVector = Icons.Filled.Refresh,
-              contentDescription = "Refresh"
+              contentDescription = "Refresh",
             )
           }
         },
@@ -90,11 +85,11 @@ fun GalleryScreen(
           containerColor = Color.Black,
           titleContentColor = Color.White,
           navigationIconContentColor = Color.White,
-          actionIconContentColor = Color.White
-        )
+          actionIconContentColor = Color.White,
+        ),
       )
     },
-    containerColor = Color.Black
+    containerColor = Color.Black,
   ) { paddingValues ->
     if (isLoading) {
       Box(
@@ -113,13 +108,13 @@ fun GalleryScreen(
         contentAlignment = Alignment.Center,
       ) {
         Column(
-          horizontalAlignment = Alignment.CenterHorizontally
+          horizontalAlignment = Alignment.CenterHorizontally,
         ) {
           Icon(
             imageVector = Icons.Filled.ImageNotSupported,
             contentDescription = null,
             tint = Color.Gray,
-            modifier = Modifier.size(64.dp)
+            modifier = Modifier.size(64.dp),
           )
           Spacer(modifier = Modifier.height(16.dp))
           Text(
@@ -163,17 +158,17 @@ private fun MediaThumbnail(
       item = item,
       modifier = Modifier.fillMaxSize(),
     )
-    
+
     // Video indicator
     if (item.isVideo) {
-        Icon(
-            imageVector = Icons.Filled.PlayCircle,
-            contentDescription = "Video",
-            tint = Color.White.copy(alpha = 0.8f),
-            modifier = Modifier
-                .align(Alignment.Center)
-                .size(32.dp)
-        )
+      Icon(
+        imageVector = Icons.Filled.PlayCircle,
+        contentDescription = "Video",
+        tint = Color.White.copy(alpha = 0.8f),
+        modifier = Modifier
+          .align(Alignment.Center)
+          .size(32.dp),
+      )
     }
   }
 }
