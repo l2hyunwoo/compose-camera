@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.l2hyunwoo.camera.core.plugins
+package io.github.l2hyunwoo.camera.plugin.mlkit.text
 
 import io.github.l2hyunwoo.camera.core.plugin.CameraPlugin
 import kotlinx.coroutines.flow.StateFlow

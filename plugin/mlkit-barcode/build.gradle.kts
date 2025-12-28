@@ -18,10 +18,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
-    alias(libs.plugins.compose.multiplatform)
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.kmpNativeCoroutines)
     alias(libs.plugins.vanniktech.mavenPublish)
     alias(libs.plugins.binaryCompatibilityValidator)
 }
@@ -31,14 +27,9 @@ version = "1.0.0"
 
 kotlin {
     androidLibrary {
-        namespace = "io.github.l2hyunwoo.camera.core"
+        namespace = "io.github.l2hyunwoo.camera.plugin.mlkit.barcode"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
-
-        withHostTestBuilder {}.configure {}
-        withDeviceTestBuilder {
-            sourceSetTreeName = "test"
-        }
 
         compilations.configureEach {
             compilerOptions.configure {
@@ -53,23 +44,12 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            api(project(":library:core"))
             implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.kmp.nativecoroutines.annotations)
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.ui)
         }
 
         androidMain.dependencies {
-            implementation(libs.kotlinx.coroutines.android)
-            implementation(libs.androidx.lifecycle.runtime)
-            implementation(libs.androidx.activity.compose)
-
-            // CameraX
-            implementation(libs.camerax.core)
-            implementation(libs.camerax.camera2)
-            implementation(libs.camerax.lifecycle)
-            implementation(libs.camerax.video)
+            implementation(libs.mlkit.barcode.scanning)
         }
 
         commonTest.dependencies {
@@ -81,11 +61,11 @@ kotlin {
 mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
-    coordinates(group.toString(), "camera-core", version.toString())
+    coordinates(group.toString(), "camera-plugin-mlkit-barcode", version.toString())
 
     pom {
-        name = "Compose Camera Core"
-        description = "Core logic for Compose Camera library"
+        name = "Compose Camera MLKit Barcode Plugin"
+        description = "Barcode scanning plugin for Compose Camera library using Google ML Kit"
         inceptionYear = "2025"
         url = "https://github.com/l2hyunwoo/compose-camera/"
         licenses {

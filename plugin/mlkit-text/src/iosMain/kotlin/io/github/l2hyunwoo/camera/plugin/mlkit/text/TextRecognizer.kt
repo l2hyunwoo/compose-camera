@@ -15,41 +15,60 @@
  */
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 
-package io.github.l2hyunwoo.camera.core.plugins
+package io.github.l2hyunwoo.camera.plugin.mlkit.text
 
 import io.github.l2hyunwoo.camera.core.CameraController
 import io.github.l2hyunwoo.camera.core.IOSCameraController
 import io.github.l2hyunwoo.camera.core.plugin.CameraPlugin
-import kotlinx.cinterop.*
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import platform.CoreMedia.CMSampleBufferRef
-import platform.Vision.*
+import platform.Vision.VNImageRequestHandler
+import platform.Vision.VNRecognizeTextRequest
+import platform.Vision.VNRecognizedText
+import platform.Vision.VNRecognizedTextObservation
+import platform.Vision.VNRequestTextRecognitionLevelAccurate
 
 /**
- * iOS implementation of barcode scanner using Apple Vision framework.
- * Detects barcodes and QR codes from camera frames.
+ * iOS implementation of text recognizer (OCR) using Apple Vision framework.
+ * Recognizes text from camera frames in real-time.
  */
-actual class BarcodeScanner actual constructor() : CameraPlugin {
-  override val id: String = "BarcodeScanner"
+actual class TextRecognizer actual constructor() : CameraPlugin {
+  override val id: String = "TextRecognizer"
 
-  private val _barcodes = MutableStateFlow<List<Barcode>>(emptyList())
-  actual val barcodes: StateFlow<List<Barcode>> = _barcodes.asStateFlow()
+  private val _text = MutableStateFlow<TextResult?>(null)
+  actual val text: StateFlow<TextResult?> = _text.asStateFlow()
 
   private var iosController: IOSCameraController? = null
 
-  private val request: VNDetectBarcodesRequest = VNDetectBarcodesRequest(completionHandler = { request, error ->
+  private val request: VNRecognizeTextRequest = VNRecognizeTextRequest(completionHandler = { request, error ->
     if (error == null) {
-      val observations = request?.results as? List<VNBarcodeObservation>
-      val detected = observations?.map { observation ->
-        Barcode(
-          rawValue = observation.payloadStringValue ?: "",
-          displayValue = observation.payloadStringValue,
-          format = mapSymbology(observation.symbology ?: ""),
+      val observations = request?.results as? List<VNRecognizedTextObservation>
+      if (observations != null) {
+        // Combine all text for simplicity
+        val fullText = StringBuilder()
+        val blocks = observations.map { observation ->
+          val topCandidate = observation.topCandidates(1u).firstOrNull() as? VNRecognizedText
+          val blockText = topCandidate?.string ?: ""
+          fullText.append(blockText).append("\n")
+
+          // Vision doesn't provide generic Block/Line/Element hierarchy directly like ML Kit
+          // It gives Observations (roughly lines or blocks depending on settings)
+          TextBlock(
+            text = blockText,
+            lines = listOf(TextLine(blockText, listOf(TextElement(blockText)))),
+          )
+        }
+
+        _text.value = TextResult(
+          text = fullText.toString().trim(),
+          blocks = blocks,
         )
-      } ?: emptyList()
-      _barcodes.value = detected
+      } else {
+        _text.value = null
+      }
     }
   })
 
@@ -57,6 +76,10 @@ actual class BarcodeScanner actual constructor() : CameraPlugin {
     if (buffer != null) {
       processFrame(buffer)
     }
+  }
+
+  init {
+    request.recognitionLevel = VNRequestTextRecognitionLevelAccurate
   }
 
   override fun onAttach(controller: CameraController) {
@@ -78,23 +101,6 @@ actual class BarcodeScanner actual constructor() : CameraPlugin {
       handler.performRequests(listOf(request), null)
     } catch (e: Exception) {
       // Handle error
-    }
-  }
-
-  private fun mapSymbology(symbology: String): BarcodeFormat {
-    return when (symbology) {
-      VNBarcodeSymbologyQR -> BarcodeFormat.QR_CODE
-      VNBarcodeSymbologyAztec -> BarcodeFormat.AZTEC
-      VNBarcodeSymbologyDataMatrix -> BarcodeFormat.DATA_MATRIX
-      VNBarcodeSymbologyPDF417 -> BarcodeFormat.PDF417
-      VNBarcodeSymbologyEAN13 -> BarcodeFormat.EAN_13
-      VNBarcodeSymbologyEAN8 -> BarcodeFormat.EAN_8
-      VNBarcodeSymbologyUPCE -> BarcodeFormat.UPC_E
-      VNBarcodeSymbologyCode39 -> BarcodeFormat.CODE_39
-      VNBarcodeSymbologyCode93 -> BarcodeFormat.CODE_93
-      VNBarcodeSymbologyCode128 -> BarcodeFormat.CODE_128
-      VNBarcodeSymbologyITF14 -> BarcodeFormat.ITF
-      else -> BarcodeFormat.UNKNOWN
     }
   }
 }
