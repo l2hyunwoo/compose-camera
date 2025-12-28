@@ -28,6 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,74 +57,84 @@ fun GalleryScreen(
     isLoading = false
   }
 
-  Column(
-    modifier = modifier
-      .fillMaxSize()
-      .background(Color.Black)
-      .statusBarsPadding(),
-  ) {
-    // Top bar
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Button(
-        onClick = onBack,
-        colors = ButtonDefaults.buttonColors(
-          containerColor = Color.White.copy(alpha = 0.2f),
-        ),
-      ) {
-        Text("← 뒤로", color = Color.White)
-      }
-
-      Text(
-        text = "갤러리 (${mediaItems.size})",
-        color = Color.White,
-        fontSize = 18.sp,
-      )
-
-      // Refresh button
-      Button(
-        onClick = {
-          scope.launch {
-            isLoading = true
-            mediaItems = mediaLoader.loadMedia()
-            isLoading = false
+  Scaffold(
+    topBar = {
+      @OptIn(ExperimentalMaterial3Api::class)
+      CenterAlignedTopAppBar(
+        title = { Text("Gallery (${mediaItems.size})") },
+        navigationIcon = {
+          IconButton(onClick = onBack) {
+            Icon(
+              imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+              contentDescription = "Back"
+            )
           }
         },
-        colors = ButtonDefaults.buttonColors(
-          containerColor = Color.White.copy(alpha = 0.2f),
-        ),
-      ) {
-        Text("🔄", color = Color.White)
-      }
-    }
-
+        actions = {
+          IconButton(
+            onClick = {
+              scope.launch {
+                isLoading = true
+                mediaItems = mediaLoader.loadMedia()
+                isLoading = false
+              }
+            }
+          ) {
+            Icon(
+              imageVector = Icons.Filled.Refresh,
+              contentDescription = "Refresh"
+            )
+          }
+        },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+          containerColor = Color.Black,
+          titleContentColor = Color.White,
+          navigationIconContentColor = Color.White,
+          actionIconContentColor = Color.White
+        )
+      )
+    },
+    containerColor = Color.Black
+  ) { paddingValues ->
     if (isLoading) {
       Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+          .fillMaxSize()
+          .padding(paddingValues),
         contentAlignment = Alignment.Center,
       ) {
         CircularProgressIndicator(color = Color.White)
       }
     } else if (mediaItems.isEmpty()) {
       Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+          .fillMaxSize()
+          .padding(paddingValues),
         contentAlignment = Alignment.Center,
       ) {
-        Text(
-          text = "촬영한 사진/영상이 없습니다",
-          color = Color.Gray,
-          textAlign = TextAlign.Center,
-        )
+        Column(
+          horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+          Icon(
+            imageVector = Icons.Filled.ImageNotSupported,
+            contentDescription = null,
+            tint = Color.Gray,
+            modifier = Modifier.size(64.dp)
+          )
+          Spacer(modifier = Modifier.height(16.dp))
+          Text(
+            text = "No photos or videos yet",
+            color = Color.Gray,
+            textAlign = TextAlign.Center,
+          )
+        }
       }
     } else {
       LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        contentPadding = PaddingValues(4.dp),
+        columns = GridCells.Adaptive(minSize = 128.dp),
+        contentPadding = paddingValues,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
         modifier = Modifier.fillMaxSize(),
       ) {
         items(mediaItems) { item ->
@@ -142,13 +156,24 @@ private fun MediaThumbnail(
   Box(
     modifier = Modifier
       .aspectRatio(1f)
-      .padding(2.dp)
-      .clip(RoundedCornerShape(4.dp))
+      .fillMaxWidth()
       .clickable(onClick = onClick),
   ) {
     MediaThumbnailImage(
       item = item,
       modifier = Modifier.fillMaxSize(),
     )
+    
+    // Video indicator
+    if (item.isVideo) {
+        Icon(
+            imageVector = Icons.Filled.PlayCircle,
+            contentDescription = "Video",
+            tint = Color.White.copy(alpha = 0.8f),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .size(32.dp)
+        )
+    }
   }
 }
