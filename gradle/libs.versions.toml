@@ -25,6 +25,16 @@ spotless = "6.25.0"
 # Binary Compatibility Validator
 binaryCompatibilityValidator = "0.18.1"
 
+# ML Kit
+mlkit-barcode-scanning = "17.3.0"
+mlkit-text-recognition = "16.0.1"
+
+# AndroidX
+androidx-core-ktx = "1.17.0"
+
+# Coil
+coil3 = "3.3.0"
+
 # KSP
 ksp = "2.3.4"
 
@@ -50,6 +60,15 @@ camerax-compose = { module = "androidx.camera:camera-compose", version.ref = "an
 androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" } 
+
+# Coil
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3" }
+coil-video = { module = "io.coil-kt.coil3:coil-video", version.ref = "coil3" }
+
+# ML Kit
+mlkit-barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkit-barcode-scanning" }
+mlkit-text-recognition = { module = "com.google.mlkit:text-recognition", version.ref = "mlkit-text-recognition" }
 [plugins]
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 android-application = { id = "com.android.application", version.ref = "agp" }
