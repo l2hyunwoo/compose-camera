@@ -11,7 +11,7 @@ compose-multiplatform = "1.9.3"
 # CameraX
 androidx-camerax = "1.5.2"
 androidx-lifecycle = "2.10.0"
-androidx-activity = "1.10.1"
+androidx-activity = "1.12.2"
 
 # Coroutines
 coroutines = "1.10.2"
