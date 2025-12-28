@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun CameraScreen(
   onGalleryClick: () -> Unit = {},
+  onBarcodeScannerClick: () -> Unit = {},
   modifier: Modifier = Modifier,
 ) {
   var cameraController by remember { mutableStateOf<CameraController?>(null) }
@@ -165,6 +166,15 @@ fun CameraScreen(
             Icon(
               imageVector = Icons.Filled.Cameraswitch,
               contentDescription = "Switch Camera",
+              tint = Color.White,
+            )
+          }
+
+          // Barcode scanner button
+          IconButton(onClick = onBarcodeScannerClick) {
+            Icon(
+              imageVector = Icons.Filled.QrCodeScanner,
+              contentDescription = "Barcode Scanner",
               tint = Color.White,
             )
           }

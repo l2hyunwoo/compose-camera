@@ -48,6 +48,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":library:core"))
             implementation(project(":library:compose"))
+            implementation(project(":plugin:mlkit-barcode"))
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)

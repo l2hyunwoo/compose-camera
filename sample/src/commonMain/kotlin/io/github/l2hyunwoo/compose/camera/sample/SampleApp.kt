@@ -35,7 +35,7 @@ fun SampleApp() {
   val permissionManager = rememberCameraPermissionManager()
   var hasPermission by remember { mutableStateOf(false) }
   var permissionChecked by remember { mutableStateOf(false) }
-  var showGallery by remember { mutableStateOf(false) }
+  var currentScreen by remember { mutableStateOf(Screen.Camera) }
 
   LaunchedEffect(Unit) {
     val result = permissionManager.requestCameraPermissions()
@@ -57,18 +57,30 @@ fun SampleApp() {
         }
       }
       hasPermission -> {
-        if (showGallery) {
-          BackHandler(enabled = true) {
-            showGallery = false
+        when (currentScreen) {
+          Screen.Camera -> {
+            CameraScreen(
+              onGalleryClick = { currentScreen = Screen.Gallery },
+              onBarcodeScannerClick = { currentScreen = Screen.BarcodeScanner },
+            )
           }
-          GalleryScreen(
-            onBack = { showGallery = false },
-            onItemClick = { /* TODO: Show media detail */ },
-          )
-        } else {
-          CameraScreen(
-            onGalleryClick = { showGallery = true },
-          )
+          Screen.Gallery -> {
+            BackHandler(enabled = true) {
+              currentScreen = Screen.Camera
+            }
+            GalleryScreen(
+              onBack = { currentScreen = Screen.Camera },
+              onItemClick = { /* TODO: Show media detail */ },
+            )
+          }
+          Screen.BarcodeScanner -> {
+            BackHandler(enabled = true) {
+              currentScreen = Screen.Camera
+            }
+            BarcodeScannerScreen(
+              onBack = { currentScreen = Screen.Camera },
+            )
+          }
         }
       }
       else -> {
@@ -84,4 +96,10 @@ fun SampleApp() {
       }
     }
   }
+}
+
+private enum class Screen {
+  Camera,
+  Gallery,
+  BarcodeScanner,
 }
