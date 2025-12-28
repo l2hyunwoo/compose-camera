@@ -15,6 +15,7 @@
  */
 package io.github.l2hyunwoo.camera.core
 
+import io.github.l2hyunwoo.camera.core.plugin.CameraPlugin
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -57,7 +58,7 @@ class CameraConfigurationTest {
   @Test
   fun testWithPlugin() {
     val config = CameraConfiguration()
-    val plugin = object : io.github.l2hyunwoo.compose.camera.plugin.CameraPlugin {
+    val plugin = object : CameraPlugin {
       override val id = "test-plugin"
       override fun onAttach(controller: CameraController) {}
       override fun onDetach() {}
@@ -72,12 +73,12 @@ class CameraConfigurationTest {
 
   @Test
   fun testWithoutPlugin() {
-    val plugin1 = object : io.github.l2hyunwoo.compose.camera.plugin.CameraPlugin {
+    val plugin1 = object : CameraPlugin {
       override val id = "plugin-1"
       override fun onAttach(controller: CameraController) {}
       override fun onDetach() {}
     }
-    val plugin2 = object : io.github.l2hyunwoo.compose.camera.plugin.CameraPlugin {
+    val plugin2 = object : CameraPlugin {
       override val id = "plugin-2"
       override fun onAttach(controller: CameraController) {}
       override fun onDetach() {}
@@ -94,3 +95,4 @@ class CameraConfigurationTest {
     assertEquals("plugin-2", withoutOne.plugins.first().id)
   }
 }
+
