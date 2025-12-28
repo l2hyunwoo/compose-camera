@@ -58,6 +58,9 @@ fun SampleApp() {
       }
       hasPermission -> {
         if (showGallery) {
+          BackHandler(enabled = true) {
+            showGallery = false
+          }
           GalleryScreen(
             onBack = { showGallery = false },
             onItemClick = { /* TODO: Show media detail */ },
