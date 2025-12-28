@@ -25,8 +25,8 @@ plugins {
     alias(libs.plugins.binaryCompatibilityValidator)
 }
 
-group = "io.github.l2hyunwoo.camera.compose"
-version = "1.0.0-alpha01"
+group = "io.github.l2hyunwoo"
+version = "1.0.0"
 
 kotlin {
     androidLibrary {
@@ -77,7 +77,7 @@ mavenPublishing {
     pom {
         name = "Compose Camera UI"
         description = "Compose UI components for Compose Camera library"
-        inceptionYear = "2024"
+        inceptionYear = "2025"
         url = "https://github.com/l2hyunwoo/compose-camera/"
         licenses {
             license {
