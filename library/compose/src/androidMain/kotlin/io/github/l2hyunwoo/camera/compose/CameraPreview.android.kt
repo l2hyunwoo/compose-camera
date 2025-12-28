@@ -22,10 +22,12 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import io.github.l2hyunwoo.camera.core.CameraConfiguration
+import io.github.l2hyunwoo.camera.core.CameraController
+import io.github.l2hyunwoo.camera.core.initialize
+import io.github.l2hyunwoo.camera.core.rememberCameraController
+import io.github.l2hyunwoo.camera.core.surfaceRequestFlow
 
 /**
  * Android implementation of CameraPreview using CameraX Compose Viewfinder.
@@ -36,17 +38,7 @@ actual fun CameraPreview(
   configuration: CameraConfiguration,
   onCameraControllerReady: (CameraController) -> Unit,
 ) {
-  val context = LocalContext.current
-  val lifecycleOwner = LocalLifecycleOwner.current
-
-  // Create and remember the camera controller
-  val controller = remember(configuration) {
-    AndroidCameraController(
-      context = context,
-      lifecycleOwner = lifecycleOwner,
-      initialConfiguration = configuration,
-    )
-  }
+  val controller = rememberCameraController(configuration)
 
   // Initialize camera
   LaunchedEffect(controller) {
@@ -54,8 +46,7 @@ actual fun CameraPreview(
     onCameraControllerReady(controller)
   }
 
-  // Collect surface request
-  val surfaceRequest by controller.surfaceRequest.collectAsState()
+  val surfaceRequest by controller.surfaceRequestFlow.collectAsState()
 
   // Cleanup on dispose
   DisposableEffect(controller) {

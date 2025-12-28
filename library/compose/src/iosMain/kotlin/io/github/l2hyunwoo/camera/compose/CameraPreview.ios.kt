@@ -20,12 +20,18 @@ package io.github.l2hyunwoo.camera.compose
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitView
+import io.github.l2hyunwoo.camera.core.CameraConfiguration
+import io.github.l2hyunwoo.camera.core.CameraController
+import io.github.l2hyunwoo.camera.core.captureSession
+import io.github.l2hyunwoo.camera.core.initialize
+import io.github.l2hyunwoo.camera.core.rememberCameraController
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.cValue
 import platform.AVFoundation.AVCaptureVideoPreviewLayer
 import platform.AVFoundation.AVLayerVideoGravityResizeAspectFill
+import platform.CoreGraphics.CGRectZero
 import platform.QuartzCore.CATransaction
 import platform.UIKit.UIView
 
@@ -39,10 +45,7 @@ actual fun CameraPreview(
   configuration: CameraConfiguration,
   onCameraControllerReady: (CameraController) -> Unit,
 ) {
-  // Create and remember the camera controller
-  val controller = remember(configuration) {
-    IOSCameraController(initialConfiguration = configuration)
-  }
+  val controller = rememberCameraController(configuration)
 
   // Initialize camera
   LaunchedEffect(controller) {
@@ -57,7 +60,7 @@ actual fun CameraPreview(
     }
   }
 
-  // Create UIKit view with preview layer
+  // Create UIKit view with preview layer using extension
   UIKitView(
     modifier = modifier,
     factory = {
@@ -73,7 +76,7 @@ actual fun CameraPreview(
 @OptIn(ExperimentalForeignApi::class)
 private class CameraView(
   private val captureSession: platform.AVFoundation.AVCaptureSession,
-) : UIView(frame = kotlinx.cinterop.cValue { platform.CoreGraphics.CGRectZero }) {
+) : UIView(frame = cValue { CGRectZero }) {
 
   private val previewLayer = AVCaptureVideoPreviewLayer(session = captureSession).apply {
     videoGravity = AVLayerVideoGravityResizeAspectFill

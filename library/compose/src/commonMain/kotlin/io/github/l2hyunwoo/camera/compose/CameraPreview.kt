@@ -17,6 +17,8 @@ package io.github.l2hyunwoo.camera.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import io.github.l2hyunwoo.camera.core.CameraConfiguration
+import io.github.l2hyunwoo.camera.core.CameraController
 
 /**
  * Camera preview composable.
