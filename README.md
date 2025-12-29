@@ -33,8 +33,8 @@ Add the following dependencies to your `build.gradle.kts`:
 compose-camera = "1.0.0"
 
 [libraries]
-compose-camera-core = { module = "io.github.l2hyunwoo:camera-core", version.ref = "compose-camera" }
-compose-camera-compose = { module = "io.github.l2hyunwoo:camera-compose", version.ref = "compose-camera" }
+compose-camera-core = { module = "io.github.l2hyunwoo:compose-camera-core", version.ref = "compose-camera" }
+compose-camera-ui = { module = "io.github.l2hyunwoo:compose-camera-ui", version.ref = "compose-camera" }
 ```
 
 ```kotlin
@@ -43,7 +43,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.compose.camera.core)
-            implementation(libs.compose.camera.compose)
+            implementation(libs.compose.camera.ui)
         }
     }
 }
@@ -56,16 +56,16 @@ kotlin {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("io.github.l2hyunwoo:camera-core:1.0.0")
-            implementation("io.github.l2hyunwoo:camera-compose:1.0.0")
+            implementation("io.github.l2hyunwoo:compose-camera-core:1.0.0")
+            implementation("io.github.l2hyunwoo:compose-camera-ui:1.0.0")
         }
     }
 }
 ```
 
 > 📦 **Modules**:
-> - `camera-core`: Core camera logic, controllers, and models
-> - `camera-compose`: Compose UI components (CameraPreview)
+> - `compose-camera-core`: Core camera logic, controllers, and models
+> - `compose-camera-ui`: Compose UI components (CameraPreview)
 
 ## Setup
 
@@ -103,7 +103,7 @@ Add usage descriptions and high-refresh rate support:
 Use the platform-independent `rememberCameraPermissionManager` to handle permissions easily.
 
 ```kotlin
-import io.github.l2hyunwoo.camera.core.rememberCameraPermissionManager
+import io.github.l2hyunwoo.compose.camera.core.rememberCameraPermissionManager
 
 @Composable
 fun CameraScreen() {
@@ -124,8 +124,8 @@ fun CameraScreen() {
 ### 2. Camera Preview & Controls
 
 ```kotlin
-import io.github.l2hyunwoo.camera.core.*
-import io.github.l2hyunwoo.camera.compose.CameraPreview
+import io.github.l2hyunwoo.compose.camera.core.*
+import io.github.l2hyunwoo.compose.camera.ui.CameraPreview
 
 @Composable
 fun MyCameraScreen() {
