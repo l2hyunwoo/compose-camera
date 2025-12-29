@@ -95,15 +95,17 @@ actual fun CameraPreview(
             detectTapGestures { offset ->
               tapPosition = offset
               // Calculate normalized point (0..1)
-              // Assuming CENTER_CROP scaling (FILL_CENTER) which is typical for Viewfinder
+              // NOTE: This assumes a CENTER_CROP / FILL_CENTER style preview where the camera
+              // output fully fills the composable bounds without letterboxing or padding.
+              // If the preview uses a different scale type or aspect ratio (e.g. is not full-screen
+              // or has black bars), this simple normalization will NOT accurately map to the
+              // camera sensor coordinates and tap-to-focus may target the wrong region.
+              //
+              // For configurations where accurate mapping is required regardless of aspect ratio
+              // or scaling behavior, a full Matrix-based coordinate transformation such as
+              // CameraX's CoordinateTransformer (preview <-> sensor coordinates) should be used.
               val viewWidth = size.width.toFloat()
               val viewHeight = size.height.toFloat()
-
-              // Normalize coordinates assuming the surface fills the view
-              // This acts as a simplified transformation which is sufficient for simple center-crop
-              // For perfect accuracy given different aspect ratios, full Matrix transformation
-              // like CoordinateTransformer would be needed, but simple normalization usually works
-              // well enough for tap-to-focus on full-screen type previews.
               val normalizedPoint = Offset(
                 x = offset.x / viewWidth,
                 y = offset.y / viewHeight,
