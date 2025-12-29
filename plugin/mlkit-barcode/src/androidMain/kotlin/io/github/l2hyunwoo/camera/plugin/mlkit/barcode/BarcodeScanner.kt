@@ -20,9 +20,9 @@ import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
-import io.github.l2hyunwoo.camera.core.AndroidCameraController
-import io.github.l2hyunwoo.camera.core.CameraController
-import io.github.l2hyunwoo.camera.core.plugin.CameraPlugin
+import io.github.l2hyunwoo.compose.camera.core.AndroidCameraController
+import io.github.l2hyunwoo.compose.camera.core.CameraController
+import io.github.l2hyunwoo.compose.camera.core.plugin.CameraPlugin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

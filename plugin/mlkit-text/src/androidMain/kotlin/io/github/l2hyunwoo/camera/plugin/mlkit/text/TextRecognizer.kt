@@ -21,9 +21,9 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import io.github.l2hyunwoo.camera.core.AndroidCameraController
-import io.github.l2hyunwoo.camera.core.CameraController
-import io.github.l2hyunwoo.camera.core.plugin.CameraPlugin
+import io.github.l2hyunwoo.compose.camera.core.AndroidCameraController
+import io.github.l2hyunwoo.compose.camera.core.CameraController
+import io.github.l2hyunwoo.compose.camera.core.plugin.CameraPlugin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

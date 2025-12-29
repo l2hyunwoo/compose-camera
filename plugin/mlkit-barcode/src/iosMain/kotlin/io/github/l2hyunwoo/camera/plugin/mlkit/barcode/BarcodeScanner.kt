@@ -17,9 +17,9 @@
 
 package io.github.l2hyunwoo.camera.plugin.mlkit.barcode
 
-import io.github.l2hyunwoo.camera.core.CameraController
-import io.github.l2hyunwoo.camera.core.IOSCameraController
-import io.github.l2hyunwoo.camera.core.plugin.CameraPlugin
+import io.github.l2hyunwoo.compose.camera.core.CameraController
+import io.github.l2hyunwoo.compose.camera.core.IOSCameraController
+import io.github.l2hyunwoo.compose.camera.core.plugin.CameraPlugin
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
