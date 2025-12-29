@@ -358,12 +358,13 @@ class AndroidCameraController(
     val clampedEV = exposureValue.coerceIn(range.lower * step, range.upper * step)
     val index = (clampedEV / step).toInt()
 
+    val appliedEV = index * step
     cameraControl.setExposureCompensationIndex(index)
-    _exposureCompensationFlow.value = clampedEV
+    _exposureCompensationFlow.value = appliedEV
 
     val currentState = _cameraState.value
     if (currentState is CameraState.Ready) {
-      _cameraState.value = currentState.copy(exposureCompensation = clampedEV)
+      _cameraState.value = currentState.copy(exposureCompensation = appliedEV)
     }
   }
 

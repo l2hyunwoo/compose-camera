@@ -32,6 +32,11 @@ sealed class CameraState {
     val flashMode: FlashMode,
     val isRecording: Boolean = false,
     val zoomRatio: Float = 1.0f,
+    /**
+     * Current exposure compensation value in EV (Exposure Value).
+     * Typical range is [-2.0, 2.0] or [-3.0, 3.0] depending on the device.
+     * 0.0f means no exposure adjustment (auto-exposure).
+     */
     val exposureCompensation: Float = 0.0f,
   ) : CameraState()
 

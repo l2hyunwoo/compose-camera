@@ -41,10 +41,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import io.github.l2hyunwoo.compose.camera.core.*
 import io.github.l2hyunwoo.compose.camera.ui.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.max
+import kotlin.math.round
 
 /**
  * Sample camera screen demonstrating the Compose Camera library.
@@ -260,13 +264,13 @@ fun CameraScreen(
                   onClick = {
                     scope.launch {
                       cameraController?.let { controller ->
-                        when (val result = controller.takePicture()) {
+                        lastCaptureResult = when (val result = controller.takePicture()) {
                           is ImageCaptureResult.Success -> {
-                            lastCaptureResult = "Captured ${result.width}x${result.height}"
+                            "Captured ${result.width}x${result.height}"
                           }
 
                           is ImageCaptureResult.Error -> {
-                            lastCaptureResult = "Error: ${result.exception.message}"
+                            "Error: ${result.exception.message}"
                           }
                         }
                       }
@@ -331,6 +335,9 @@ fun CameraScreen(
             .width(40.dp)
             .fillMaxHeight()
             .align(Alignment.CenterEnd)
+            .semantics(mergeDescendants = true) {
+              contentDescription = "Swipe to adjust exposure"
+            }
             .pointerInput(Unit) {
               detectHorizontalDragGestures { _, dragAmount ->
                 if (dragAmount < -10) {
@@ -417,7 +424,7 @@ private fun ExposureSliderPanel(
       )
 
       // Current EV value
-      val formattedEV = kotlin.math.round(sliderValue * 10) / 10
+      val formattedEV = round(sliderValue * 10) / 10
       Text(
         text = if (sliderValue >= 0) "+$formattedEV" else "$formattedEV",
         color = Color.Yellow,
@@ -438,14 +445,20 @@ private fun ExposureSliderPanel(
             onExposureChange(it)
           },
           valueRange = exposureRange.first..exposureRange.second,
-          steps = ((exposureRange.second - exposureRange.first) / 0.5f).toInt() - 1,
+          steps = max(
+            0,
+            ((exposureRange.second - exposureRange.first) / 0.5f).toInt() - 1,
+          ),
           modifier = Modifier
             .graphicsLayer {
               rotationZ = -90f
             }
             .width(200.dp)
             .height(48.dp)
-            .offset(x = (-76).dp),
+            .offset(x = (-76).dp)
+            .semantics {
+              contentDescription = "Exposure Compensation"
+            },
           colors = SliderDefaults.colors(
             thumbColor = Color.Yellow,
             activeTrackColor = Color.Yellow,

@@ -429,15 +429,15 @@ class IOSCameraController(
           device.minExposureTargetBias.toFloat(),
           device.maxExposureTargetBias.toFloat(),
         )
-        device.setExposureTargetBias(clampedEV) { _ -> }
-        device.unlockForConfiguration()
+        device.setExposureTargetBias(clampedEV) { _ ->
+          _exposureCompensationFlow.value = clampedEV
 
-        _exposureCompensationFlow.value = clampedEV
-
-        val currentState = _cameraState.value
-        if (currentState is CameraState.Ready) {
-          _cameraState.value = currentState.copy(exposureCompensation = clampedEV)
+          val currentState = _cameraState.value
+          if (currentState is CameraState.Ready) {
+            _cameraState.value = currentState.copy(exposureCompensation = clampedEV)
+          }
         }
+        device.unlockForConfiguration()
       } catch (_: Exception) {
         // Ignore exposure errors
       }
