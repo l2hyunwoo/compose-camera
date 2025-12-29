@@ -13,6 +13,7 @@ A robust, feature-rich camera library for Compose Multiplatform supporting Andro
 - 🎥 **Video Recording**: Record videos with audio
 - 🔄 **Lens Control**: Switch between Front and Back cameras
 - 🔦 **Flash Control**: Torch, On, Off, Auto modes
+- 🔍 **Pinch Zoom**: Native pinch-to-zoom gesture and zoom ratio control
 - ✋ **Permission Handling**: Built-in, platform-independent permission manager
 - 🧩 **Plugin Architecture**: Extensible design for frame processing and custom features
 
