@@ -1,0 +1,58 @@
+public final class io/github/l2hyunwoo/camera/plugin/mlkit/text/TextBlock {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/l2hyunwoo/camera/plugin/mlkit/text/TextBlock;
+	public static synthetic fun copy$default (Lio/github/l2hyunwoo/camera/plugin/mlkit/text/TextBlock;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/l2hyunwoo/camera/plugin/mlkit/text/TextBlock;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLines ()Ljava/util/List;
+	public final fun getText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/l2hyunwoo/camera/plugin/mlkit/text/TextElement {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/l2hyunwoo/camera/plugin/mlkit/text/TextElement;
+	public static synthetic fun copy$default (Lio/github/l2hyunwoo/camera/plugin/mlkit/text/TextElement;Ljava/lang/String;ILjava/lang/Object;)Lio/github/l2hyunwoo/camera/plugin/mlkit/text/TextElement;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/l2hyunwoo/camera/plugin/mlkit/text/TextLine {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/l2hyunwoo/camera/plugin/mlkit/text/TextLine;
+	public static synthetic fun copy$default (Lio/github/l2hyunwoo/camera/plugin/mlkit/text/TextLine;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/l2hyunwoo/camera/plugin/mlkit/text/TextLine;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getElements ()Ljava/util/List;
+	public final fun getText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/l2hyunwoo/camera/plugin/mlkit/text/TextRecognizer : io/github/l2hyunwoo/camera/core/plugin/CameraPlugin {
+	public fun <init> ()V
+	public fun getId ()Ljava/lang/String;
+	public final fun getText ()Lkotlinx/coroutines/flow/StateFlow;
+	public fun onAttach (Lio/github/l2hyunwoo/camera/core/CameraController;)V
+	public fun onDetach ()V
+}
+
+public final class io/github/l2hyunwoo/camera/plugin/mlkit/text/TextResult {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/l2hyunwoo/camera/plugin/mlkit/text/TextResult;
+	public static synthetic fun copy$default (Lio/github/l2hyunwoo/camera/plugin/mlkit/text/TextResult;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/l2hyunwoo/camera/plugin/mlkit/text/TextResult;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBlocks ()Ljava/util/List;
+	public final fun getText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+

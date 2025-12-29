@@ -1,0 +1,44 @@
+public final class io/github/l2hyunwoo/camera/plugin/mlkit/barcode/Barcode {
+	public fun <init> (Ljava/lang/String;Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;Ljava/lang/String;)Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/Barcode;
+	public static synthetic fun copy$default (Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/Barcode;Ljava/lang/String;Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;Ljava/lang/String;ILjava/lang/Object;)Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/Barcode;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDisplayValue ()Ljava/lang/String;
+	public final fun getFormat ()Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public final fun getRawValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat : java/lang/Enum {
+	public static final field AZTEC Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public static final field CODABAR Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public static final field CODE_128 Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public static final field CODE_39 Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public static final field CODE_93 Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public static final field DATA_MATRIX Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public static final field EAN_13 Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public static final field EAN_8 Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public static final field ITF Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public static final field PDF417 Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public static final field QR_CODE Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public static final field UNKNOWN Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public static final field UPC_A Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public static final field UPC_E Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+	public static fun values ()[Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
+}
+
+public final class io/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeScanner : io/github/l2hyunwoo/camera/core/plugin/CameraPlugin {
+	public fun <init> ()V
+	public final fun getBarcodes ()Lkotlinx/coroutines/flow/StateFlow;
+	public fun getId ()Ljava/lang/String;
+	public fun onAttach (Lio/github/l2hyunwoo/camera/core/CameraController;)V
+	public fun onDetach ()V
+}
+

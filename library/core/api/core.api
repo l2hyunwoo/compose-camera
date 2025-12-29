@@ -1,3 +1,20 @@
+public final class io/github/l2hyunwoo/camera/core/AndroidCameraController : io/github/l2hyunwoo/camera/core/CameraController {
+	public static final field $stable I
+	public fun <init> (Landroid/content/Context;Landroidx/lifecycle/LifecycleOwner;Lio/github/l2hyunwoo/camera/core/CameraConfiguration;)V
+	public final fun addAnalyzer (Landroidx/camera/core/ImageAnalysis$Analyzer;)V
+	public fun focus-k-4lQ0M (J)V
+	public fun getCameraState ()Lkotlinx/coroutines/flow/StateFlow;
+	public fun getConfiguration ()Lio/github/l2hyunwoo/camera/core/CameraConfiguration;
+	public fun release ()V
+	public final fun removeAnalyzer (Landroidx/camera/core/ImageAnalysis$Analyzer;)V
+	public fun setFlashMode (Lio/github/l2hyunwoo/camera/core/FlashMode;)V
+	public fun setLens (Lio/github/l2hyunwoo/camera/core/CameraLens;)V
+	public fun setZoom (F)V
+	public fun startRecording (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun takePicture (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun updateConfiguration (Lio/github/l2hyunwoo/camera/core/CameraConfiguration;)V
+}
+
 public final class io/github/l2hyunwoo/camera/core/CameraConfiguration {
 	public static final field $stable I
 	public fun <init> ()V
