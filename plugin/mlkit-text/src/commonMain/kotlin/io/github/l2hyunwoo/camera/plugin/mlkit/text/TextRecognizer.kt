@@ -15,6 +15,7 @@
  */
 package io.github.l2hyunwoo.camera.plugin.mlkit.text
 
+import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
 import io.github.l2hyunwoo.compose.camera.core.CameraController
 import io.github.l2hyunwoo.compose.camera.core.plugin.CameraPlugin
 import kotlinx.coroutines.flow.StateFlow
@@ -83,5 +84,6 @@ expect class TextRecognizer() : CameraPlugin {
   /**
    * Stream of recognized text.
    */
+  @NativeCoroutinesState
   val text: StateFlow<TextResult?>
 }

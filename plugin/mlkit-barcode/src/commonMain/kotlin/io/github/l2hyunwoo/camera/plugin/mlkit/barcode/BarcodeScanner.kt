@@ -15,6 +15,7 @@
  */
 package io.github.l2hyunwoo.camera.plugin.mlkit.barcode
 
+import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
 import io.github.l2hyunwoo.compose.camera.core.CameraController
 import io.github.l2hyunwoo.compose.camera.core.plugin.CameraPlugin
 import kotlinx.coroutines.flow.StateFlow
@@ -71,5 +72,6 @@ expect class BarcodeScanner() : CameraPlugin {
    * Stream of detected barcodes.
    * Emits a list of barcodes detected in the current frame.
    */
+  @NativeCoroutinesState
   val barcodes: StateFlow<List<Barcode>>
 }
