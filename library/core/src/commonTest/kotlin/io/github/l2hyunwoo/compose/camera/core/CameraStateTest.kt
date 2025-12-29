@@ -75,4 +75,41 @@ class CameraStateTest {
     assertEquals(original.flashMode, zoomed.flashMode)
     assertEquals(original.isRecording, zoomed.isRecording)
   }
+
+  @Test
+  fun testReadyStateWithExposureCompensation() {
+    val state = CameraState.Ready(
+      currentLens = CameraLens.BACK,
+      flashMode = FlashMode.OFF,
+      exposureCompensation = 1.5f,
+    )
+
+    assertEquals(1.5f, state.exposureCompensation)
+  }
+
+  @Test
+  fun testDefaultExposureCompensation() {
+    val state = CameraState.Ready(
+      currentLens = CameraLens.BACK,
+      flashMode = FlashMode.OFF,
+    )
+
+    assertEquals(0.0f, state.exposureCompensation)
+  }
+
+  @Test
+  fun testCopyStateWithNewExposureCompensation() {
+    val original = CameraState.Ready(
+      currentLens = CameraLens.FRONT,
+      flashMode = FlashMode.ON,
+      exposureCompensation = 0.0f,
+    )
+
+    val adjusted = original.copy(exposureCompensation = -1.5f)
+
+    assertEquals(-1.5f, adjusted.exposureCompensation)
+    assertEquals(original.currentLens, adjusted.currentLens)
+    assertEquals(original.flashMode, adjusted.flashMode)
+    assertEquals(original.zoomRatio, adjusted.zoomRatio)
+  }
 }
