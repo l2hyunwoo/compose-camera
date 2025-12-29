@@ -17,7 +17,6 @@ package io.github.l2hyunwoo.compose.camera.ui
 
 import android.Manifest
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.rule.GrantPermissionRule
 import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
 import org.junit.Rule

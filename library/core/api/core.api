@@ -5,6 +5,9 @@ public final class io/github/l2hyunwoo/compose/camera/core/AndroidCameraControll
 	public fun focus-k-4lQ0M (J)V
 	public fun getCameraState ()Lkotlinx/coroutines/flow/StateFlow;
 	public fun getConfiguration ()Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
+	public fun getMaxZoomRatio ()F
+	public fun getMinZoomRatio ()F
+	public fun getZoomRatioFlow ()Lkotlinx/coroutines/flow/StateFlow;
 	public fun release ()V
 	public final fun removeAnalyzer (Landroidx/camera/core/ImageAnalysis$Analyzer;)V
 	public fun setFlashMode (Lio/github/l2hyunwoo/compose/camera/core/FlashMode;)V
@@ -50,6 +53,9 @@ public abstract interface class io/github/l2hyunwoo/compose/camera/core/CameraCo
 	public abstract fun focus-k-4lQ0M (J)V
 	public abstract fun getCameraState ()Lkotlinx/coroutines/flow/StateFlow;
 	public abstract fun getConfiguration ()Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
+	public abstract fun getMaxZoomRatio ()F
+	public abstract fun getMinZoomRatio ()F
+	public abstract fun getZoomRatioFlow ()Lkotlinx/coroutines/flow/StateFlow;
 	public abstract fun release ()V
 	public abstract fun setFlashMode (Lio/github/l2hyunwoo/compose/camera/core/FlashMode;)V
 	public abstract fun setLens (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;)V
