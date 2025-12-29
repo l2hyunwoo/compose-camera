@@ -384,7 +384,7 @@ class IOSCameraController(
       try {
         device.lockForConfiguration(null)
 
-        // Optimize focus
+        // Set focus point
         if (device.isFocusPointOfInterestSupported()) {
           device.focusPointOfInterest = cValue {
             x = point.x.toDouble()
@@ -393,7 +393,7 @@ class IOSCameraController(
           device.focusMode = AVCaptureFocusModeAutoFocus
         }
 
-        // Optimize exposure
+        // Set exposure point
         if (device.isExposurePointOfInterestSupported()) {
           device.exposurePointOfInterest = cValue {
             x = point.x.toDouble()

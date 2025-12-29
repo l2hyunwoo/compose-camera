@@ -36,6 +36,7 @@ import io.github.l2hyunwoo.compose.camera.core.CameraController
 import io.github.l2hyunwoo.compose.camera.core.initialize
 import io.github.l2hyunwoo.compose.camera.core.rememberCameraController
 import io.github.l2hyunwoo.compose.camera.core.surfaceRequestFlow
+import kotlinx.coroutines.delay
 
 /**
  * Android implementation of CameraPreview using CameraX Compose Viewfinder.
@@ -54,6 +55,14 @@ actual fun CameraPreview(
   LaunchedEffect(controller) {
     controller.initialize()
     onCameraControllerReady(controller)
+  }
+
+  // Auto-dismiss focus indicator
+  LaunchedEffect(tapPosition) {
+    if (tapPosition != Offset.Unspecified) {
+      delay(2500)
+      tapPosition = Offset.Unspecified
+    }
   }
 
   val surfaceRequest by controller.surfaceRequestFlow.collectAsState()
