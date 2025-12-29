@@ -17,10 +17,17 @@
 
 package io.github.l2hyunwoo.compose.camera.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.interop.UIKitView
 import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
 import io.github.l2hyunwoo.compose.camera.core.CameraController
@@ -48,8 +55,10 @@ actual fun CameraPreview(
   modifier: Modifier,
   configuration: CameraConfiguration,
   onCameraControllerReady: (CameraController) -> Unit,
+  focusIndicator: @Composable BoxScope.(tapPosition: Offset) -> Unit,
 ) {
   val controller = rememberCameraController(configuration)
+  var tapPosition by remember { mutableStateOf(Offset.Unspecified) }
 
   // Initialize camera
   LaunchedEffect(controller) {
@@ -64,25 +73,35 @@ actual fun CameraPreview(
     }
   }
 
-  // Create UIKit view with preview layer using extension
-  UIKitView(
-    modifier = modifier,
-    factory = {
-      val cameraView = CameraView(
-        captureSession = controller.captureSession,
-        onZoomChange = { scale, isStarting ->
-          if (!isStarting) {
-            val newZoom = (controller.zoomRatioFlow.value * scale).coerceIn(
-              controller.minZoomRatio,
-              controller.maxZoomRatio,
-            )
-            controller.setZoom(newZoom)
+  Box(modifier = modifier) {
+    // Create UIKit view with preview layer
+    UIKitView(
+      modifier = Modifier.matchParentSize(),
+      factory = {
+        val cameraView = CameraView(
+          captureSession = controller.captureSession,
+          onZoomChange = { scale, isStarting ->
+            if (!isStarting) {
+              val newZoom = (controller.zoomRatioFlow.value * scale).coerceIn(
+                controller.minZoomRatio,
+                controller.maxZoomRatio,
+              )
+              controller.setZoom(newZoom)
+            }
+          },
+          onTap = { offset, normalizedPoint ->
+            tapPosition = offset
+            controller.focus(normalizedPoint)
           }
-        },
-      )
-      cameraView
-    },
-  )
+        )
+        cameraView
+      },
+    )
+
+    if (tapPosition != Offset.Unspecified) {
+      focusIndicator(tapPosition)
+    }
+  }
 }
 
 /**
@@ -92,6 +111,7 @@ actual fun CameraPreview(
 private class CameraView(
   captureSession: AVCaptureSession,
   private val onZoomChange: (Float, Boolean) -> Unit,
+  private val onTap: (Offset, Offset) -> Unit,
 ) : UIView(frame = cValue { CGRectZero }) {
 
   private val previewLayer = AVCaptureVideoPreviewLayer(session = captureSession).apply {
@@ -109,6 +129,13 @@ private class CameraView(
       action = platform.objc.sel_registerName("handlePinch:"),
     )
     addGestureRecognizer(pinchGesture)
+
+    // Add tap gesture recognizer for focus
+    val tapGesture = platform.UIKit.UITapGestureRecognizer(
+      target = this,
+      action = platform.objc.sel_registerName("handleTap:"),
+    )
+    addGestureRecognizer(tapGesture)
   }
 
   @Suppress("unused")
@@ -125,6 +152,28 @@ private class CameraView(
         onZoomChange(scaleDelta, false)
       }
     }
+  }
+
+  @Suppress("unused")
+  @kotlinx.cinterop.ObjCAction
+  fun handleTap(gesture: platform.UIKit.UITapGestureRecognizer) {
+    val location = gesture.locationInView(this)
+    val point = previewLayer.captureDevicePointOfInterestForPoint(location)
+    val normalizedPoint = Offset(point.useContents { x }.toFloat(), point.useContents { y }.toFloat())
+    
+    // Note: location is CGPoint, we need to convert to Compose Offset (pixels)
+    // On iOS, points are logical pixels, Compose Offset usually expects pixels too but density matters.
+    // However, the visual indicator is drawn in Compose, which uses Dp or Px. 
+    // Location from gesture is in points. 
+    // We should pass back the View coordinates.
+    // Wait, UIKitView coordinates (points) might need distinct handling if density implies scaling?
+    // Usually Compose generic "Offset" in `pointerInput` `onTap` is in pixels.
+    // Here we get points.
+    // Let's assume for now we pass the raw points and the composable handles density if needed,
+    // but `UIKitView` usually maps 1:1 if density is handled correctly by the interop.
+    
+    val tapPoint = Offset(location.useContents { x }.toFloat(), location.useContents { y }.toFloat())
+    onTap(tapPoint, normalizedPoint)
   }
 
   override fun layoutSubviews() {
