@@ -109,6 +109,15 @@ class IOSCameraController(
   override val maxZoomRatio: Float
     get() = currentDevice?.maxAvailableVideoZoomFactor?.toFloat() ?: 1.0f
 
+  private val _exposureCompensationFlow = MutableStateFlow(0.0f)
+  override val exposureCompensationFlow: StateFlow<Float> = _exposureCompensationFlow.asStateFlow()
+
+  override val exposureCompensationRange: Pair<Float, Float>
+    get() {
+      val device = currentDevice ?: return Pair(-2.0f, 2.0f)
+      return Pair(device.minExposureTargetBias.toFloat(), device.maxExposureTargetBias.toFloat())
+    }
+
   private var _configuration = initialConfiguration
   override val configuration: CameraConfiguration get() = _configuration
 
@@ -405,6 +414,29 @@ class IOSCameraController(
         device.unlockForConfiguration()
       } catch (_: Exception) {
         // Ignore focus errors
+      }
+    }
+  }
+
+  override fun setExposureCompensation(exposureValue: Float) {
+    currentDevice?.let { device ->
+      try {
+        device.lockForConfiguration(null)
+        val clampedEV = exposureValue.coerceIn(
+          device.minExposureTargetBias.toFloat(),
+          device.maxExposureTargetBias.toFloat(),
+        )
+        device.setExposureTargetBias(clampedEV) { _ -> }
+        device.unlockForConfiguration()
+
+        _exposureCompensationFlow.value = clampedEV
+
+        val currentState = _cameraState.value
+        if (currentState is CameraState.Ready) {
+          _cameraState.value = currentState.copy(exposureCompensation = clampedEV)
+        }
+      } catch (_: Exception) {
+        // Ignore exposure errors
       }
     }
   }
