@@ -52,7 +52,7 @@ import kotlin.coroutines.resume
 /**
  * Android implementation of [CameraController] using CameraX.
  */
-internal class AndroidCameraController(
+class AndroidCameraController(
   private val context: Context,
   private val lifecycleOwner: LifecycleOwner,
   initialConfiguration: CameraConfiguration,
@@ -314,12 +314,12 @@ internal class AndroidCameraController(
   private val analyzers = mutableListOf<androidx.camera.core.ImageAnalysis.Analyzer>()
   private var imageAnalysis: androidx.camera.core.ImageAnalysis? = null
 
-  internal fun addAnalyzer(analyzer: androidx.camera.core.ImageAnalysis.Analyzer) {
+  fun addAnalyzer(analyzer: androidx.camera.core.ImageAnalysis.Analyzer) {
     analyzers.add(analyzer)
     updateImageAnalysis()
   }
 
-  internal fun removeAnalyzer(analyzer: androidx.camera.core.ImageAnalysis.Analyzer) {
+  fun removeAnalyzer(analyzer: androidx.camera.core.ImageAnalysis.Analyzer) {
     analyzers.remove(analyzer)
     updateImageAnalysis()
   }

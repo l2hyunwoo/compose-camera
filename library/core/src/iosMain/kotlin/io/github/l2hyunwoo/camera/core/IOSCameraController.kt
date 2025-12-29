@@ -36,7 +36,7 @@ import platform.posix.memcpy
  * iOS implementation of [CameraController] using AVFoundation.
  */
 @OptIn(ExperimentalForeignApi::class)
-internal class IOSCameraController(
+class IOSCameraController(
   initialConfiguration: CameraConfiguration,
 ) : CameraController {
 
@@ -77,11 +77,11 @@ internal class IOSCameraController(
   private var videoDataOutput: AVCaptureVideoDataOutput? = null
   private val frameListeners = mutableListOf<(CMSampleBufferRef?) -> Unit>()
 
-  internal fun addFrameListener(listener: (CMSampleBufferRef?) -> Unit) {
+  fun addFrameListener(listener: (CMSampleBufferRef?) -> Unit) {
     frameListeners.add(listener)
   }
 
-  internal fun removeFrameListener(listener: (CMSampleBufferRef?) -> Unit) {
+  fun removeFrameListener(listener: (CMSampleBufferRef?) -> Unit) {
     frameListeners.remove(listener)
   }
 
