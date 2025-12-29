@@ -2,15 +2,26 @@ name: Publish
 on:
   workflow_dispatch:
     inputs:
-      module:
-        description: 'Module to publish'
-        required: true
-        default: 'all'
-        type: choice
-        options:
-          - all
-          - core
-          - compose
+      publish_core:
+        description: 'Publish Core Module'
+        required: false
+        type: boolean
+        default: false
+      publish_compose:
+        description: 'Publish Compose Module'
+        required: false
+        type: boolean
+        default: false
+      publish_mlkit_barcode:
+        description: 'Publish MLKit Barcode Plugin'
+        required: false
+        type: boolean
+        default: false
+      publish_mlkit_text:
+        description: 'Publish MLKit Text Plugin'
+        required: false
+        type: boolean
+        default: false
 jobs:
   publish:
     name: Release build and publish
@@ -25,12 +36,32 @@ jobs:
           java-version: 17
       - name: Publish to MavenCentral
         run: |
-          if [ "${{ inputs.module }}" == "all" ]; then
-            ./gradlew publishToMavenCentral --no-configuration-cache
-          elif [ "${{ inputs.module }}" == "core" ]; then
+          if [ "${{ inputs.publish_core }}" != "true" ] && \
+             [ "${{ inputs.publish_compose }}" != "true" ] && \
+             [ "${{ inputs.publish_mlkit_barcode }}" != "true" ] && \
+             [ "${{ inputs.publish_mlkit_text }}" != "true" ]; then
+            echo "Error: No modules selected for publication."
+            exit 1
+          fi
+
+          if [ "${{ inputs.publish_core }}" == "true" ]; then
+            echo "Publishing Core Module..."
             ./gradlew :library:core:publishToMavenCentral --no-configuration-cache
-          elif [ "${{ inputs.module }}" == "compose" ]; then
+          fi
+          
+          if [ "${{ inputs.publish_compose }}" == "true" ]; then
+            echo "Publishing Compose Module..."
             ./gradlew :library:compose:publishToMavenCentral --no-configuration-cache
+          fi
+          
+          if [ "${{ inputs.publish_mlkit_barcode }}" == "true" ]; then
+            echo "Publishing MLKit Barcode Plugin..."
+            ./gradlew :plugin:mlkit-barcode:publishToMavenCentral --no-configuration-cache
+          fi
+          
+          if [ "${{ inputs.publish_mlkit_text }}" == "true" ]; then
+            echo "Publishing MLKit Text Plugin..."
+            ./gradlew :plugin:mlkit-text:publishToMavenCentral --no-configuration-cache
           fi
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
