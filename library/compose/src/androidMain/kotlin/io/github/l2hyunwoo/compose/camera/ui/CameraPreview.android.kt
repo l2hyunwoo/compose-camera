@@ -16,6 +16,7 @@
 package io.github.l2hyunwoo.compose.camera.ui
 
 import androidx.camera.compose.CameraXViewfinder
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -23,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
 import io.github.l2hyunwoo.compose.camera.core.CameraController
 import io.github.l2hyunwoo.compose.camera.core.initialize
@@ -55,12 +57,25 @@ actual fun CameraPreview(
     }
   }
 
-  // Render the camera preview
+  // Render the camera preview with pinch zoom gesture
   Box(modifier = modifier) {
     surfaceRequest?.let { request ->
       CameraXViewfinder(
         surfaceRequest = request,
-        modifier = Modifier.matchParentSize(),
+        modifier = Modifier
+          .matchParentSize()
+          .pointerInput(controller) {
+            detectTransformGestures { _, _, zoom, _ ->
+              // Access zoomRatioFlow.value directly to get current ratio
+              // This ensures we always use the latest value during gesture
+              val currentRatio = controller.zoomRatioFlow.value
+              val newZoomRatio = (currentRatio * zoom).coerceIn(
+                controller.minZoomRatio,
+                controller.maxZoomRatio,
+              )
+              controller.setZoom(newZoomRatio)
+            }
+          },
       )
     }
   }

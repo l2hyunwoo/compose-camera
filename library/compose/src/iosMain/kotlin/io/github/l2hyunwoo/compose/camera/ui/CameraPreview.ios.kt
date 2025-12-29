@@ -29,10 +29,14 @@ import io.github.l2hyunwoo.compose.camera.core.initialize
 import io.github.l2hyunwoo.compose.camera.core.rememberCameraController
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.cValue
+import platform.AVFoundation.AVCaptureSession
 import platform.AVFoundation.AVCaptureVideoPreviewLayer
 import platform.AVFoundation.AVLayerVideoGravityResizeAspectFill
 import platform.CoreGraphics.CGRectZero
 import platform.QuartzCore.CATransaction
+import platform.UIKit.UIGestureRecognizerStateBegan
+import platform.UIKit.UIGestureRecognizerStateChanged
+import platform.UIKit.UIPinchGestureRecognizer
 import platform.UIKit.UIView
 
 /**
@@ -64,7 +68,21 @@ actual fun CameraPreview(
   UIKitView(
     modifier = modifier,
     factory = {
-      val cameraView = CameraView(controller.captureSession)
+      val cameraView = CameraView(
+        captureSession = controller.captureSession,
+        onZoomChange = { scale, isStarting ->
+          if (isStarting) {
+            // Store current zoom as base when gesture starts
+            controller.setZoom(controller.zoomRatioFlow.value)
+          } else {
+            val newZoom = (controller.zoomRatioFlow.value * scale).coerceIn(
+              controller.minZoomRatio,
+              controller.maxZoomRatio,
+            )
+            controller.setZoom(newZoom)
+          }
+        },
+      )
       cameraView
     },
   )
@@ -75,15 +93,41 @@ actual fun CameraPreview(
  */
 @OptIn(ExperimentalForeignApi::class)
 private class CameraView(
-  private val captureSession: platform.AVFoundation.AVCaptureSession,
+  captureSession: AVCaptureSession,
+  private val onZoomChange: (Float, Boolean) -> Unit,
 ) : UIView(frame = cValue { CGRectZero }) {
 
   private val previewLayer = AVCaptureVideoPreviewLayer(session = captureSession).apply {
     videoGravity = AVLayerVideoGravityResizeAspectFill
   }
 
+  private var baseZoomScale: Float = 1.0f
+
   init {
     layer.addSublayer(previewLayer)
+
+    // Add pinch gesture recognizer for zoom
+    val pinchGesture = UIPinchGestureRecognizer(
+      target = this,
+      action = platform.objc.sel_registerName("handlePinch:"),
+    )
+    addGestureRecognizer(pinchGesture)
+  }
+
+  @Suppress("unused", "UNUSED_PARAMETER")
+  @kotlinx.cinterop.ObjCAction
+  fun handlePinch(gesture: UIPinchGestureRecognizer) {
+    when (gesture.state) {
+      UIGestureRecognizerStateBegan -> {
+        baseZoomScale = 1.0f
+        onZoomChange(gesture.scale().toFloat(), true)
+      }
+      UIGestureRecognizerStateChanged -> {
+        val scaleDelta = gesture.scale().toFloat() / baseZoomScale
+        baseZoomScale = gesture.scale().toFloat()
+        onZoomChange(scaleDelta, false)
+      }
+    }
   }
 
   override fun layoutSubviews() {
