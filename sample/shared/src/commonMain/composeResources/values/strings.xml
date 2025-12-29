@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <!-- SampleApp -->
+    <string name="checking_permissions">Checking permissions...</string>
+    <string name="open_camera_permission_settings">Open Camera Permission Settings</string>
+
+    <!-- BarcodeScannerScreen -->
+    <string name="barcode_scanner">Barcode Scanner</string>
+    <string name="point_camera_at_barcode">Point camera at a barcode</string>
+    <string name="detected_barcodes">Detected barcodes: %1$d</string>
+    <string name="format">Format: %1$s</string>
+
+    <!-- GalleryScreen -->
+    <string name="no_photos_or_videos">No photos or videos yet</string>
+</resources>

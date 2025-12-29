@@ -30,7 +30,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import compose_camera.sample.shared.generated.resources.Res
+import compose_camera.sample.shared.generated.resources.no_photos_or_videos
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Gallery screen showing captured photos and videos.
@@ -118,7 +121,7 @@ fun GalleryScreen(
           )
           Spacer(modifier = Modifier.height(16.dp))
           Text(
-            text = "No photos or videos yet",
+            text = stringResource(Res.string.no_photos_or_videos),
             color = Color.Gray,
             textAlign = TextAlign.Center,
           )

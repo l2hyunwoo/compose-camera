@@ -24,7 +24,11 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import compose_camera.sample.shared.generated.resources.Res
+import compose_camera.sample.shared.generated.resources.checking_permissions
+import compose_camera.sample.shared.generated.resources.open_camera_permission_settings
 import io.github.l2hyunwoo.compose.camera.core.rememberCameraPermissionManager
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Sample app entry point composable.
@@ -53,7 +57,7 @@ fun SampleApp() {
           modifier = Modifier.fillMaxSize(),
           contentAlignment = Alignment.Center,
         ) {
-          Text("권한 확인 중...", color = MaterialTheme.colorScheme.onBackground)
+          Text(stringResource(Res.string.checking_permissions), color = MaterialTheme.colorScheme.onBackground)
         }
       }
 
@@ -94,7 +98,7 @@ fun SampleApp() {
           contentAlignment = Alignment.Center,
         ) {
           Button(onClick = { permissionManager.openAppSettings() }) {
-            Text("카메라 권한 설정 열기")
+            Text(stringResource(Res.string.open_camera_permission_settings))
           }
         }
       }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <!-- SampleApp -->
+    <string name="checking_permissions">권한 확인 중...</string>
+    <string name="open_camera_permission_settings">카메라 권한 설정 열기</string>
+
+    <!-- BarcodeScannerScreen -->
+    <string name="barcode_scanner">바코드 스캐너</string>
+    <string name="point_camera_at_barcode">바코드를 카메라에 비춰주세요</string>
+    <string name="detected_barcodes">감지된 바코드: %1$d개</string>
+    <string name="format">형식: %1$s</string>
+
+    <!-- GalleryScreen -->
+    <string name="no_photos_or_videos">사진이나 비디오가 없습니다</string>
+</resources>

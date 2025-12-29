@@ -49,11 +49,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import compose_camera.sample.shared.generated.resources.Res
+import compose_camera.sample.shared.generated.resources.barcode_scanner
+import compose_camera.sample.shared.generated.resources.detected_barcodes
+import compose_camera.sample.shared.generated.resources.format
+import compose_camera.sample.shared.generated.resources.point_camera_at_barcode
 import io.github.l2hyunwoo.camera.plugin.mlkit.barcode.Barcode
 import io.github.l2hyunwoo.camera.plugin.mlkit.barcode.BarcodeScanner
 import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
 import io.github.l2hyunwoo.compose.camera.core.CameraController
 import io.github.l2hyunwoo.compose.camera.ui.CameraPreview
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Sample screen demonstrating the BarcodeScanner plugin.
@@ -112,7 +118,7 @@ fun BarcodeScannerScreen(
           )
         }
         Text(
-          text = "바코드 스캐너",
+          text = stringResource(Res.string.barcode_scanner),
           style = MaterialTheme.typography.titleLarge,
           color = Color.White,
         )
@@ -133,13 +139,13 @@ fun BarcodeScannerScreen(
       ) {
         if (barcodes.isEmpty()) {
           Text(
-            text = "바코드를 카메라에 비춰주세요",
+            text = stringResource(Res.string.point_camera_at_barcode),
             style = MaterialTheme.typography.bodyLarge,
             color = Color.White.copy(alpha = 0.7f),
           )
         } else {
           Text(
-            text = "감지된 바코드: ${barcodes.size}개",
+            text = stringResource(Res.string.detected_barcodes, barcodes.size),
             style = MaterialTheme.typography.titleMedium,
             color = Color.White,
           )
@@ -175,7 +181,7 @@ private fun BarcodeCard(barcode: Barcode) {
         color = Color.White,
       )
       Text(
-        text = "형식: ${barcode.format.name}",
+        text = stringResource(Res.string.format, barcode.format.name),
         style = MaterialTheme.typography.bodySmall,
         color = Color.White.copy(alpha = 0.7f),
       )
