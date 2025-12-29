@@ -71,10 +71,7 @@ actual fun CameraPreview(
       val cameraView = CameraView(
         captureSession = controller.captureSession,
         onZoomChange = { scale, isStarting ->
-          if (isStarting) {
-            // Store current zoom as base when gesture starts
-            controller.setZoom(controller.zoomRatioFlow.value)
-          } else {
+          if (!isStarting) {
             val newZoom = (controller.zoomRatioFlow.value * scale).coerceIn(
               controller.minZoomRatio,
               controller.maxZoomRatio,
@@ -114,7 +111,7 @@ private class CameraView(
     addGestureRecognizer(pinchGesture)
   }
 
-  @Suppress("unused", "UNUSED_PARAMETER")
+  @Suppress("unused")
   @kotlinx.cinterop.ObjCAction
   fun handlePinch(gesture: UIPinchGestureRecognizer) {
     when (gesture.state) {
