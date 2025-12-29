@@ -36,6 +36,7 @@ data class CameraConfiguration(
   val targetFps: Int = 30,
   val enableHdr: Boolean = false,
   val directory: Directory = Directory.PICTURES,
+  val captureMode: CaptureMode = CaptureMode.BALANCED,
   val plugins: List<CameraPlugin> = emptyList(),
 ) {
   /**
