@@ -34,9 +34,9 @@ kotlin {
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
-        withHostTestBuilder {}.configure {}
         withDeviceTestBuilder {
             sourceSetTreeName = "test"
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
 
         compilations.configureEach {
@@ -73,6 +73,8 @@ kotlin {
             implementation(project.dependencies.platform(libs.compose.bom))
             implementation("androidx.compose.ui:ui-test-junit4")
             implementation("androidx.compose.ui:ui-test-manifest")
+            implementation(libs.androidx.test.runner)
+            implementation(libs.androidx.test.rules)
         }
     }
 }

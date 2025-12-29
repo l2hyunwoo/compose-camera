@@ -44,6 +44,10 @@ compose-bom = "2025.12.01"
 # Kotest
 kotest = "6.0.7"
 
+# AndroidX Test
+androidx-test = "1.6.2"
+androidx-test-rules = "1.6.1"
+
 [libraries]
 # Compose BOM (version management)
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
@@ -75,6 +79,10 @@ androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-kt
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" } 
+
+# AndroidX Test
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test" }
+androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidx-test-rules" } 
 
 # Coil
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3" }
