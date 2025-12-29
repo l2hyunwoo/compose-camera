@@ -48,4 +48,31 @@ class CameraStateTest {
 
     assertTrue(state.exception is CameraException.PermissionDenied)
   }
+
+  @Test
+  fun testReadyStateWithCustomZoom() {
+    val state = CameraState.Ready(
+      currentLens = CameraLens.BACK,
+      flashMode = FlashMode.OFF,
+      zoomRatio = 2.5f,
+    )
+
+    assertEquals(2.5f, state.zoomRatio)
+  }
+
+  @Test
+  fun testCopyStateWithNewZoom() {
+    val original = CameraState.Ready(
+      currentLens = CameraLens.FRONT,
+      flashMode = FlashMode.ON,
+      zoomRatio = 1.0f,
+    )
+
+    val zoomed = original.copy(zoomRatio = 3.0f)
+
+    assertEquals(3.0f, zoomed.zoomRatio)
+    assertEquals(original.currentLens, zoomed.currentLens)
+    assertEquals(original.flashMode, zoomed.flashMode)
+    assertEquals(original.isRecording, zoomed.isRecording)
+  }
 }
