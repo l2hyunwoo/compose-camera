@@ -15,18 +15,18 @@
  */
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 
-package io.github.l2hyunwoo.camera.compose
+package io.github.l2hyunwoo.compose.camera.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitView
-import io.github.l2hyunwoo.camera.core.CameraConfiguration
-import io.github.l2hyunwoo.camera.core.CameraController
-import io.github.l2hyunwoo.camera.core.captureSession
-import io.github.l2hyunwoo.camera.core.initialize
-import io.github.l2hyunwoo.camera.core.rememberCameraController
+import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
+import io.github.l2hyunwoo.compose.camera.core.CameraController
+import io.github.l2hyunwoo.compose.camera.core.captureSession
+import io.github.l2hyunwoo.compose.camera.core.initialize
+import io.github.l2hyunwoo.compose.camera.core.rememberCameraController
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.cValue
 import platform.AVFoundation.AVCaptureVideoPreviewLayer

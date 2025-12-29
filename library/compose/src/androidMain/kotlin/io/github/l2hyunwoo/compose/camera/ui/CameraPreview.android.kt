@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.l2hyunwoo.camera.compose
+package io.github.l2hyunwoo.compose.camera.ui
 
 import androidx.camera.compose.CameraXViewfinder
 import androidx.compose.foundation.layout.Box
@@ -23,11 +23,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import io.github.l2hyunwoo.camera.core.CameraConfiguration
-import io.github.l2hyunwoo.camera.core.CameraController
-import io.github.l2hyunwoo.camera.core.initialize
-import io.github.l2hyunwoo.camera.core.rememberCameraController
-import io.github.l2hyunwoo.camera.core.surfaceRequestFlow
+import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
+import io.github.l2hyunwoo.compose.camera.core.CameraController
+import io.github.l2hyunwoo.compose.camera.core.initialize
+import io.github.l2hyunwoo.compose.camera.core.rememberCameraController
+import io.github.l2hyunwoo.compose.camera.core.surfaceRequestFlow
 
 /**
  * Android implementation of CameraPreview using CameraX Compose Viewfinder.

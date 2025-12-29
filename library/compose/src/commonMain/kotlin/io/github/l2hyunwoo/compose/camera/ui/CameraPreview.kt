@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.l2hyunwoo.camera.compose
+package io.github.l2hyunwoo.compose.camera.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import io.github.l2hyunwoo.camera.core.CameraConfiguration
-import io.github.l2hyunwoo.camera.core.CameraController
+import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
+import io.github.l2hyunwoo.compose.camera.core.CameraController
 
 /**
  * Camera preview composable.
