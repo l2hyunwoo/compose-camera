@@ -34,11 +34,11 @@ public final class io/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat
 	public static fun values ()[Lio/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeFormat;
 }
 
-public final class io/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeScanner : io/github/l2hyunwoo/camera/core/plugin/CameraPlugin {
+public final class io/github/l2hyunwoo/camera/plugin/mlkit/barcode/BarcodeScanner : io/github/l2hyunwoo/compose/camera/core/plugin/CameraPlugin {
 	public fun <init> ()V
 	public final fun getBarcodes ()Lkotlinx/coroutines/flow/StateFlow;
 	public fun getId ()Ljava/lang/String;
-	public fun onAttach (Lio/github/l2hyunwoo/camera/core/CameraController;)V
+	public fun onAttach (Lio/github/l2hyunwoo/compose/camera/core/CameraController;)V
 	public fun onDetach ()V
 }
 

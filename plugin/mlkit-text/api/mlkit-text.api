@@ -35,11 +35,11 @@ public final class io/github/l2hyunwoo/camera/plugin/mlkit/text/TextLine {
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/l2hyunwoo/camera/plugin/mlkit/text/TextRecognizer : io/github/l2hyunwoo/camera/core/plugin/CameraPlugin {
+public final class io/github/l2hyunwoo/camera/plugin/mlkit/text/TextRecognizer : io/github/l2hyunwoo/compose/camera/core/plugin/CameraPlugin {
 	public fun <init> ()V
 	public fun getId ()Ljava/lang/String;
 	public final fun getText ()Lkotlinx/coroutines/flow/StateFlow;
-	public fun onAttach (Lio/github/l2hyunwoo/camera/core/CameraController;)V
+	public fun onAttach (Lio/github/l2hyunwoo/compose/camera/core/CameraController;)V
 	public fun onDetach ()V
 }
 
