@@ -44,5 +44,5 @@ enum class CaptureMode {
    * - Android: Maps to [ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY]
    * - iOS: Maps to [AVCapturePhotoQualityPrioritizationBalanced]
    */
-  BALANCED
+  BALANCED,
 }
