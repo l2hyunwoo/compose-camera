@@ -132,7 +132,7 @@ class AndroidCameraController(
 
       // Build image capture use case
       imageCapture = ImageCapture.Builder()
-        .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+        .setCaptureMode(configuration.captureMode.toCameraXCaptureMode())
         .setFlashMode(configuration.flashMode.toCameraXFlashMode())
         .build()
 
@@ -303,7 +303,8 @@ class AndroidCameraController(
   }
 
   override fun updateConfiguration(config: CameraConfiguration) {
-    val needsRebind = config.lens != _configuration.lens
+    val needsRebind = config.lens != _configuration.lens ||
+      config.captureMode != _configuration.captureMode
     _configuration = config
 
     // Update flash mode without rebinding
@@ -455,4 +456,9 @@ private fun VideoQuality.toCameraXQuality(): Quality = when (this) {
   VideoQuality.HD -> Quality.HD
   VideoQuality.FHD -> Quality.FHD
   VideoQuality.UHD -> Quality.UHD
+}
+
+private fun CaptureMode.toCameraXCaptureMode(): Int = when (this) {
+  CaptureMode.QUALITY -> ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY
+  CaptureMode.SPEED, CaptureMode.BALANCED -> ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY
 }

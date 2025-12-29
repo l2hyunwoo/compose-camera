@@ -45,6 +45,9 @@ import platform.AVFoundation.AVCaptureOutput
 import platform.AVFoundation.AVCapturePhoto
 import platform.AVFoundation.AVCapturePhotoCaptureDelegateProtocol
 import platform.AVFoundation.AVCapturePhotoOutput
+import platform.AVFoundation.AVCapturePhotoQualityPrioritizationBalanced
+import platform.AVFoundation.AVCapturePhotoQualityPrioritizationQuality
+import platform.AVFoundation.AVCapturePhotoQualityPrioritizationSpeed
 import platform.AVFoundation.AVCapturePhotoSettings
 import platform.AVFoundation.AVCaptureSession
 import platform.AVFoundation.AVCaptureSessionPreset1280x720
@@ -276,6 +279,13 @@ class IOSCameraController(
         FlashMode.AUTO -> AVCaptureFlashModeAuto
         FlashMode.TORCH -> AVCaptureFlashModeOff
       }
+    }
+
+    // Set capture mode
+    settings.photoQualityPrioritization = when (configuration.captureMode) {
+      CaptureMode.QUALITY -> AVCapturePhotoQualityPrioritizationQuality
+      CaptureMode.SPEED -> AVCapturePhotoQualityPrioritizationSpeed
+      CaptureMode.BALANCED -> AVCapturePhotoQualityPrioritizationBalanced
     }
 
     // Create delegate
