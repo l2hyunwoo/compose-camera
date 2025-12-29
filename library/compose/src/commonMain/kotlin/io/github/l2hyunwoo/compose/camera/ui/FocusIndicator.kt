@@ -49,7 +49,8 @@ import kotlinx.coroutines.launch
 fun BoxScope.DefaultFocusIndicator(
   tapPosition: Offset,
   size: Dp = 64.dp,
-  color: Color = Color(0xFFFFB800), // Default yellow/gold focus color
+  // Default yellow/gold focus color
+  color: Color = Color(0xFFFFB800),
   strokeWidth: Dp = 2.dp,
 ) {
   val scaleAnim = remember { Animatable(1.5f) }
@@ -64,7 +65,7 @@ fun BoxScope.DefaultFocusIndicator(
     launch {
       scaleAnim.animateTo(
         targetValue = 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
       )
     }
 
@@ -72,7 +73,7 @@ fun BoxScope.DefaultFocusIndicator(
     delay(1000)
     alphaAnim.animateTo(
       targetValue = 0f,
-      animationSpec = tween(durationMillis = 500)
+      animationSpec = tween(durationMillis = 500),
     )
   }
 
@@ -80,19 +81,19 @@ fun BoxScope.DefaultFocusIndicator(
   // We offset the box by -size/2 to center it at the tap point
   Box(
     modifier = Modifier
-      .matchParentSize()
+      .matchParentSize(),
   ) {
     Canvas(modifier = Modifier.matchParentSize()) {
       if (alphaAnim.value > 0f) {
         val side = size.toPx()
         val topLeft = Offset(
           x = tapPosition.x - side / 2f,
-          y = tapPosition.y - side / 2f
+          y = tapPosition.y - side / 2f,
         )
         val currentSize = side * scaleAnim.value
         val currentTopLeft = Offset(
           x = tapPosition.x - currentSize / 2f,
-          y = tapPosition.y - currentSize / 2f
+          y = tapPosition.y - currentSize / 2f,
         )
 
         drawRoundRect(
@@ -101,7 +102,7 @@ fun BoxScope.DefaultFocusIndicator(
           size = androidx.compose.ui.geometry.Size(currentSize, currentSize),
           style = Stroke(width = strokeWidth.toPx()),
           cornerRadius = CornerRadius(4.dp.toPx()),
-          alpha = alphaAnim.value
+          alpha = alphaAnim.value,
         )
       }
     }

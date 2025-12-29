@@ -89,21 +89,21 @@ actual fun CameraPreview(
               // Assuming CENTER_CROP scaling (FILL_CENTER) which is typical for Viewfinder
               val viewWidth = size.width.toFloat()
               val viewHeight = size.height.toFloat()
-              
+
               // Normalize coordinates assuming the surface fills the view
               // This acts as a simplified transformation which is sufficient for simple center-crop
-              // For perfect accuracy given different aspect ratios, full Matrix transformation 
+              // For perfect accuracy given different aspect ratios, full Matrix transformation
               // like CoordinateTransformer would be needed, but simple normalization usually works
               // well enough for tap-to-focus on full-screen type previews.
               val normalizedPoint = Offset(
                 x = offset.x / viewWidth,
-                y = offset.y / viewHeight
+                y = offset.y / viewHeight,
               )
               controller.focus(normalizedPoint)
             }
           },
       )
-      
+
       if (tapPosition != Offset.Unspecified) {
         focusIndicator(tapPosition)
       }

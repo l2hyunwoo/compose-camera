@@ -383,12 +383,12 @@ class IOSCameraController(
     currentDevice?.let { device ->
       try {
         device.lockForConfiguration(null)
-        
+
         // Optimize focus
         if (device.isFocusPointOfInterestSupported()) {
           device.focusPointOfInterest = cValue {
-             x = point.x.toDouble()
-             y = point.y.toDouble()
+            x = point.x.toDouble()
+            y = point.y.toDouble()
           }
           device.focusMode = AVCaptureFocusModeAutoFocus
         }
@@ -396,8 +396,8 @@ class IOSCameraController(
         // Optimize exposure
         if (device.isExposurePointOfInterestSupported()) {
           device.exposurePointOfInterest = cValue {
-             x = point.x.toDouble()
-             y = point.y.toDouble()
+            x = point.x.toDouble()
+            y = point.y.toDouble()
           }
           device.exposureMode = AVCaptureExposureModeAutoExpose
         }

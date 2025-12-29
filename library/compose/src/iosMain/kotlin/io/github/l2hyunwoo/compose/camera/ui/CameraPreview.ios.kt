@@ -36,6 +36,7 @@ import io.github.l2hyunwoo.compose.camera.core.initialize
 import io.github.l2hyunwoo.compose.camera.core.rememberCameraController
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.cValue
+import kotlinx.cinterop.useContents
 import platform.AVFoundation.AVCaptureSession
 import platform.AVFoundation.AVCaptureVideoPreviewLayer
 import platform.AVFoundation.AVLayerVideoGravityResizeAspectFill
@@ -92,7 +93,7 @@ actual fun CameraPreview(
           onTap = { offset, normalizedPoint ->
             tapPosition = offset
             controller.focus(normalizedPoint)
-          }
+          },
         )
         cameraView
       },
@@ -160,18 +161,18 @@ private class CameraView(
     val location = gesture.locationInView(this)
     val point = previewLayer.captureDevicePointOfInterestForPoint(location)
     val normalizedPoint = Offset(point.useContents { x }.toFloat(), point.useContents { y }.toFloat())
-    
+
     // Note: location is CGPoint, we need to convert to Compose Offset (pixels)
     // On iOS, points are logical pixels, Compose Offset usually expects pixels too but density matters.
-    // However, the visual indicator is drawn in Compose, which uses Dp or Px. 
-    // Location from gesture is in points. 
+    // However, the visual indicator is drawn in Compose, which uses Dp or Px.
+    // Location from gesture is in points.
     // We should pass back the View coordinates.
     // Wait, UIKitView coordinates (points) might need distinct handling if density implies scaling?
     // Usually Compose generic "Offset" in `pointerInput` `onTap` is in pixels.
     // Here we get points.
     // Let's assume for now we pass the raw points and the composable handles density if needed,
     // but `UIKitView` usually maps 1:1 if density is handled correctly by the interop.
-    
+
     val tapPoint = Offset(location.useContents { x }.toFloat(), location.useContents { y }.toFloat())
     onTap(tapPoint, normalizedPoint)
   }

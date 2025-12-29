@@ -1,10 +1,20 @@
 public final class io/github/l2hyunwoo/compose/camera/ui/CameraPreview_androidKt {
-	public static final fun CameraPreview (Landroidx/compose/ui/Modifier;Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;II)V
+	public static final fun CameraPreview (Landroidx/compose/ui/Modifier;Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
+}
+
+public final class io/github/l2hyunwoo/compose/camera/ui/ComposableSingletons$CameraPreview_androidKt {
+	public static final field INSTANCE Lio/github/l2hyunwoo/compose/camera/ui/ComposableSingletons$CameraPreview_androidKt;
+	public fun <init> ()V
+	public final fun getLambda$-1023186067$compose ()Lkotlin/jvm/functions/Function4;
 }
 
 public final class io/github/l2hyunwoo/compose/camera/ui/ComposeCamera {
 	public static final field $stable I
 	public static final field INSTANCE Lio/github/l2hyunwoo/compose/camera/ui/ComposeCamera;
 	public static final field VERSION Ljava/lang/String;
+}
+
+public final class io/github/l2hyunwoo/compose/camera/ui/FocusIndicatorKt {
+	public static final fun DefaultFocusIndicator-uuAPwAo (Landroidx/compose/foundation/layout/BoxScope;JFJFLandroidx/compose/runtime/Composer;II)V
 }
 
