@@ -15,12 +15,17 @@
  */
 package io.github.l2hyunwoo.compose.camera.sample
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -30,8 +35,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.github.l2hyunwoo.compose.camera.core.*
 import io.github.l2hyunwoo.compose.camera.ui.*
 import kotlinx.coroutines.delay
@@ -54,6 +63,12 @@ fun CameraScreen(
   val scope = rememberCoroutineScope()
   var lastCaptureResult by remember { mutableStateOf<String?>(null) }
   var currentRecording by remember { mutableStateOf<VideoRecording?>(null) }
+
+  // Exposure compensation state
+  var showExposureSlider by remember { mutableStateOf(false) }
+  val currentExposure by cameraController?.exposureCompensationFlow?.collectAsState()
+    ?: remember { mutableStateOf(0f) }
+  val exposureRange = cameraController?.exposureCompensationRange ?: (-2f to 2f)
 
   Scaffold(
     modifier = modifier.fillMaxSize(),
@@ -309,7 +324,148 @@ fun CameraScreen(
             }
           }
         }
+
+        // Right-edge swipe gesture for EV slider
+        Box(
+          modifier = Modifier
+            .width(40.dp)
+            .fillMaxHeight()
+            .align(Alignment.CenterEnd)
+            .pointerInput(Unit) {
+              detectHorizontalDragGestures { _, dragAmount ->
+                if (dragAmount < -10) {
+                  showExposureSlider = true
+                }
+              }
+            },
+        )
+
+        // EV Slider Panel
+        AnimatedVisibility(
+          visible = showExposureSlider,
+          enter = slideInHorizontally(initialOffsetX = { it }),
+          exit = slideOutHorizontally(targetOffsetX = { it }),
+          modifier = Modifier.align(Alignment.CenterEnd),
+        ) {
+          ExposureSliderPanel(
+            currentExposure = currentExposure,
+            exposureRange = exposureRange,
+            onExposureChange = { ev ->
+              cameraController?.setExposureCompensation(ev)
+            },
+            onDismiss = { showExposureSlider = false },
+          )
+        }
+
+        // EV toggle button (visible when slider is hidden)
+        if (!showExposureSlider) {
+          IconButton(
+            onClick = { showExposureSlider = true },
+            modifier = Modifier
+              .align(Alignment.CenterEnd)
+              .padding(end = 8.dp)
+              .background(Color.Black.copy(alpha = 0.5f), CircleShape),
+          ) {
+            Icon(
+              imageVector = Icons.Filled.Exposure,
+              contentDescription = "Exposure",
+              tint = Color.White,
+            )
+          }
+        }
       }
     },
   )
+}
+
+@Composable
+private fun ExposureSliderPanel(
+  currentExposure: Float,
+  exposureRange: Pair<Float, Float>,
+  onExposureChange: (Float) -> Unit,
+  onDismiss: () -> Unit,
+) {
+  var sliderValue by remember(currentExposure) { mutableStateOf(currentExposure) }
+
+  Row(
+    modifier = Modifier
+      .padding(end = 16.dp)
+      .background(
+        Color.Black.copy(alpha = 0.7f),
+        RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp),
+      )
+      .padding(horizontal = 12.dp, vertical = 24.dp)
+      .pointerInput(Unit) {
+        detectHorizontalDragGestures { _, dragAmount ->
+          if (dragAmount > 10) {
+            onDismiss()
+          }
+        }
+      },
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+      // EV Label
+      Text(
+        text = "EV",
+        color = Color.White,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Bold,
+      )
+
+      // Current EV value
+      val formattedEV = kotlin.math.round(sliderValue * 10) / 10
+      Text(
+        text = if (sliderValue >= 0) "+$formattedEV" else "$formattedEV",
+        color = Color.Yellow,
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Bold,
+      )
+
+      // Vertical Slider (rotated)
+      Box(
+        modifier = Modifier
+          .height(200.dp)
+          .width(48.dp),
+      ) {
+        Slider(
+          value = sliderValue,
+          onValueChange = {
+            sliderValue = it
+            onExposureChange(it)
+          },
+          valueRange = exposureRange.first..exposureRange.second,
+          steps = ((exposureRange.second - exposureRange.first) / 0.5f).toInt() - 1,
+          modifier = Modifier
+            .graphicsLayer {
+              rotationZ = -90f
+            }
+            .width(200.dp)
+            .height(48.dp)
+            .offset(x = (-76).dp),
+          colors = SliderDefaults.colors(
+            thumbColor = Color.Yellow,
+            activeTrackColor = Color.Yellow,
+            inactiveTrackColor = Color.White.copy(alpha = 0.3f),
+          ),
+        )
+      }
+
+      // Close button
+      IconButton(
+        onClick = onDismiss,
+        modifier = Modifier.size(32.dp),
+      ) {
+        Icon(
+          imageVector = Icons.Filled.Close,
+          contentDescription = "Close",
+          tint = Color.White,
+          modifier = Modifier.size(20.dp),
+        )
+      }
+    }
+  }
 }
