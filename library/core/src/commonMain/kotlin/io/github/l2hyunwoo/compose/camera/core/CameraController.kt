@@ -54,6 +54,19 @@ interface CameraController {
   val maxZoomRatio: Float
 
   /**
+   * Current exposure compensation value as StateFlow (in EV units).
+   * Annotated with [NativeCoroutinesState] for Swift compatibility.
+   */
+  @NativeCoroutinesState
+  val exposureCompensationFlow: StateFlow<Float>
+
+  /**
+   * Supported exposure compensation range.
+   * @return Pair(min, max) in EV units (typically -2.0 to +2.0)
+   */
+  val exposureCompensationRange: Pair<Float, Float>
+
+  /**
    * Current camera configuration
    */
   val configuration: CameraConfiguration
@@ -100,6 +113,12 @@ interface CameraController {
    * @param point The normalized point (0-1 range) to focus on
    */
   fun focus(point: Offset)
+
+  /**
+   * Set exposure compensation value.
+   * @param exposureValue Exposure Value to set (will be clamped to supported range)
+   */
+  fun setExposureCompensation(exposureValue: Float)
 
   /**
    * Release camera resources

@@ -32,6 +32,7 @@ sealed class CameraState {
     val flashMode: FlashMode,
     val isRecording: Boolean = false,
     val zoomRatio: Float = 1.0f,
+    val exposureCompensation: Float = 0.0f,
   ) : CameraState()
 
   /**
