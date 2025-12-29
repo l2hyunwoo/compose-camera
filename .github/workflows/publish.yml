@@ -36,6 +36,14 @@ jobs:
           java-version: 17
       - name: Publish to MavenCentral
         run: |
+          if [ "${{ inputs.publish_core }}" != "true" ] && \
+             [ "${{ inputs.publish_compose }}" != "true" ] && \
+             [ "${{ inputs.publish_mlkit_barcode }}" != "true" ] && \
+             [ "${{ inputs.publish_mlkit_text }}" != "true" ]; then
+            echo "Error: No modules selected for publication."
+            exit 1
+          fi
+
           if [ "${{ inputs.publish_core }}" == "true" ]; then
             echo "Publishing Core Module..."
             ./gradlew :library:core:publishToMavenCentral --no-configuration-cache
@@ -47,13 +55,13 @@ jobs:
           fi
           
           if [ "${{ inputs.publish_mlkit_barcode }}" == "true" ]; then
-             echo "Publishing MLKit Barcode Plugin..."
-             ./gradlew :plugin:mlkit-barcode:publishToMavenCentral --no-configuration-cache
+            echo "Publishing MLKit Barcode Plugin..."
+            ./gradlew :plugin:mlkit-barcode:publishToMavenCentral --no-configuration-cache
           fi
           
           if [ "${{ inputs.publish_mlkit_text }}" == "true" ]; then
-             echo "Publishing MLKit Text Plugin..."
-             ./gradlew :plugin:mlkit-text:publishToMavenCentral --no-configuration-cache
+            echo "Publishing MLKit Text Plugin..."
+            ./gradlew :plugin:mlkit-text:publishToMavenCentral --no-configuration-cache
           fi
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
