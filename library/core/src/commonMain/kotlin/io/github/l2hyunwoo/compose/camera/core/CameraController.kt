@@ -33,6 +33,27 @@ interface CameraController {
   val cameraState: StateFlow<CameraState>
 
   /**
+   * Current zoom ratio as a StateFlow.
+   * This provides real-time updates of the zoom level (1.0 = no zoom).
+   * Annotated with [NativeCoroutinesState] for Swift compatibility.
+   */
+  @NativeCoroutinesState
+  val zoomRatioFlow: StateFlow<Float>
+
+  /**
+   * Minimum zoom ratio supported by the camera.
+   * This is hardware-dependent and typically 1.0f for most devices.
+   * Some devices with wide-angle lenses may support values less than 1.0f.
+   */
+  val minZoomRatio: Float
+
+  /**
+   * Maximum zoom ratio supported by the camera.
+   * This is hardware-dependent and varies between devices.
+   */
+  val maxZoomRatio: Float
+
+  /**
    * Current camera configuration
    */
   val configuration: CameraConfiguration
