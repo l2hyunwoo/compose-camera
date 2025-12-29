@@ -35,7 +35,7 @@ import com.google.mlkit.vision.barcode.common.Barcode as MlKitBarcode
  * Detects barcodes and QR codes from camera frames.
  */
 actual class BarcodeScanner actual constructor() : CameraPlugin {
-  override val id: String = "BarcodeScanner"
+  actual override val id: String = "BarcodeScanner"
 
   private val _barcodes = MutableStateFlow<List<Barcode>>(emptyList())
   actual val barcodes: StateFlow<List<Barcode>> = _barcodes.asStateFlow()
@@ -54,14 +54,14 @@ actual class BarcodeScanner actual constructor() : CameraPlugin {
     processImage(imageProxy)
   }
 
-  override fun onAttach(controller: CameraController) {
+  actual override fun onAttach(controller: CameraController) {
     if (controller is AndroidCameraController) {
       androidController = controller
       controller.addAnalyzer(analyzer)
     }
   }
 
-  override fun onDetach() {
+  actual override fun onDetach() {
     androidController?.removeAnalyzer(analyzer)
     androidController = null
     scanner.close()

@@ -15,6 +15,7 @@
  */
 package io.github.l2hyunwoo.camera.plugin.mlkit.text
 
+import io.github.l2hyunwoo.compose.camera.core.CameraController
 import io.github.l2hyunwoo.compose.camera.core.plugin.CameraPlugin
 import kotlinx.coroutines.flow.StateFlow
 
@@ -64,6 +65,21 @@ data class TextElement(
  * Plugin for Recognizing Text (OCR).
  */
 expect class TextRecognizer() : CameraPlugin {
+  /**
+   * Unique identifier for this plugin
+   */
+  override val id: String
+
+  /**
+   * Called when the plugin is attached to a camera controller
+   */
+  override fun onAttach(controller: CameraController)
+
+  /**
+   * Called when the plugin is detached from the camera controller
+   */
+  override fun onDetach()
+
   /**
    * Stream of recognized text.
    */

@@ -36,7 +36,7 @@ import platform.Vision.VNRequestTextRecognitionLevelAccurate
  * Recognizes text from camera frames in real-time.
  */
 actual class TextRecognizer actual constructor() : CameraPlugin {
-  override val id: String = "TextRecognizer"
+  actual override val id: String = "TextRecognizer"
 
   private val _text = MutableStateFlow<TextResult?>(null)
   actual val text: StateFlow<TextResult?> = _text.asStateFlow()
@@ -82,14 +82,14 @@ actual class TextRecognizer actual constructor() : CameraPlugin {
     request.recognitionLevel = VNRequestTextRecognitionLevelAccurate
   }
 
-  override fun onAttach(controller: CameraController) {
+  actual override fun onAttach(controller: CameraController) {
     if (controller is IOSCameraController) {
       iosController = controller
       controller.addFrameListener(frameListener)
     }
   }
 
-  override fun onDetach() {
+  actual override fun onDetach() {
     iosController?.removeFrameListener(frameListener)
     iosController = null
   }
