@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.l2hyunwoo.camera.core
+package io.github.l2hyunwoo.compose.camera.core
 
 import android.Manifest
 import android.content.Context

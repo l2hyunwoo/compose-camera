@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.l2hyunwoo.camera.core.plugin
+package io.github.l2hyunwoo.compose.camera.core.plugin
 
 import com.rickclephas.kmp.nativecoroutines.NativeCoroutines
-import io.github.l2hyunwoo.camera.core.CameraController
+import io.github.l2hyunwoo.compose.camera.core.CameraController
 import kotlinx.coroutines.flow.Flow
 
 /**

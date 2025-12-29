@@ -15,7 +15,7 @@
  */
 @file:OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 
-package io.github.l2hyunwoo.camera.core
+package io.github.l2hyunwoo.compose.camera.core
 
 import androidx.compose.ui.geometry.Offset
 import kotlinx.cinterop.*

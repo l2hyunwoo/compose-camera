@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.l2hyunwoo.camera.core
+package io.github.l2hyunwoo.compose.camera.core
 
-import io.github.l2hyunwoo.camera.core.plugin.CameraPlugin
+import io.github.l2hyunwoo.compose.camera.core.plugin.CameraPlugin
 
 /**
  * Immutable camera configuration.
