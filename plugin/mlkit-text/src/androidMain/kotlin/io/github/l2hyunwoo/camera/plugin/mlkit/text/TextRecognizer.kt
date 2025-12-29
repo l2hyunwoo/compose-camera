@@ -83,22 +83,20 @@ actual class TextRecognizer actual constructor() : CameraPlugin {
     }
   }
 
-  private fun Text.toCommon(): TextResult {
-    return TextResult(
-      text = this.text,
-      blocks = this.textBlocks.map { block ->
-        TextBlock(
-          text = block.text,
-          lines = block.lines.map { line ->
-            TextLine(
-              text = line.text,
-              elements = line.elements.map { element ->
-                TextElement(text = element.text)
-              },
-            )
-          },
-        )
-      },
-    )
-  }
+  private fun Text.toCommon(): TextResult = TextResult(
+    text = this.text,
+    blocks = this.textBlocks.map { block ->
+      TextBlock(
+        text = block.text,
+        lines = block.lines.map { line ->
+          TextLine(
+            text = line.text,
+            elements = line.elements.map { element ->
+              TextElement(text = element.text)
+            },
+          )
+        },
+      )
+    },
+  )
 }

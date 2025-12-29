@@ -29,10 +29,8 @@ import platform.AVFoundation.AVCaptureSession
 @Composable
 actual fun rememberCameraController(
   configuration: CameraConfiguration,
-): CameraController {
-  return remember {
-    IOSCameraController(initialConfiguration = configuration)
-  }
+): CameraController = remember {
+  IOSCameraController(initialConfiguration = configuration)
 }
 
 /**

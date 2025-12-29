@@ -122,16 +122,16 @@ actual class CameraPermissionManager internal constructor(
     context.startActivity(intent)
   }
 
-  private fun CameraPermission.toAndroidPermission(): String? {
-    return when (this) {
-      CameraPermission.CAMERA -> Manifest.permission.CAMERA
-      CameraPermission.MICROPHONE -> Manifest.permission.RECORD_AUDIO
-      CameraPermission.STORAGE -> {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-          Manifest.permission.WRITE_EXTERNAL_STORAGE
-        } else {
-          null
-        }
+  private fun CameraPermission.toAndroidPermission(): String? = when (this) {
+    CameraPermission.CAMERA -> Manifest.permission.CAMERA
+
+    CameraPermission.MICROPHONE -> Manifest.permission.RECORD_AUDIO
+
+    CameraPermission.STORAGE -> {
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+      } else {
+        null
       }
     }
   }

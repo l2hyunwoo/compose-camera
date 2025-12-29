@@ -94,20 +94,18 @@ actual class BarcodeScanner actual constructor() : CameraPlugin {
     }
   }
 
-  private fun mapSymbology(symbology: String): BarcodeFormat {
-    return when (symbology) {
-      VNBarcodeSymbologyQR -> BarcodeFormat.QR_CODE
-      VNBarcodeSymbologyAztec -> BarcodeFormat.AZTEC
-      VNBarcodeSymbologyDataMatrix -> BarcodeFormat.DATA_MATRIX
-      VNBarcodeSymbologyPDF417 -> BarcodeFormat.PDF417
-      VNBarcodeSymbologyEAN13 -> BarcodeFormat.EAN_13
-      VNBarcodeSymbologyEAN8 -> BarcodeFormat.EAN_8
-      VNBarcodeSymbologyUPCE -> BarcodeFormat.UPC_E
-      VNBarcodeSymbologyCode39 -> BarcodeFormat.CODE_39
-      VNBarcodeSymbologyCode93 -> BarcodeFormat.CODE_93
-      VNBarcodeSymbologyCode128 -> BarcodeFormat.CODE_128
-      VNBarcodeSymbologyITF14 -> BarcodeFormat.ITF
-      else -> BarcodeFormat.UNKNOWN
-    }
+  private fun mapSymbology(symbology: String): BarcodeFormat = when (symbology) {
+    VNBarcodeSymbologyQR -> BarcodeFormat.QR_CODE
+    VNBarcodeSymbologyAztec -> BarcodeFormat.AZTEC
+    VNBarcodeSymbologyDataMatrix -> BarcodeFormat.DATA_MATRIX
+    VNBarcodeSymbologyPDF417 -> BarcodeFormat.PDF417
+    VNBarcodeSymbologyEAN13 -> BarcodeFormat.EAN_13
+    VNBarcodeSymbologyEAN8 -> BarcodeFormat.EAN_8
+    VNBarcodeSymbologyUPCE -> BarcodeFormat.UPC_E
+    VNBarcodeSymbologyCode39 -> BarcodeFormat.CODE_39
+    VNBarcodeSymbologyCode93 -> BarcodeFormat.CODE_93
+    VNBarcodeSymbologyCode128 -> BarcodeFormat.CODE_128
+    VNBarcodeSymbologyITF14 -> BarcodeFormat.ITF
+    else -> BarcodeFormat.UNKNOWN
   }
 }

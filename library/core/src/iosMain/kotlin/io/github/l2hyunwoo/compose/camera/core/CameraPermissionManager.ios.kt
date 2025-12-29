@@ -31,20 +31,16 @@ import kotlin.coroutines.resume
 @OptIn(ExperimentalForeignApi::class)
 actual class CameraPermissionManager {
 
-  actual suspend fun checkPermission(permission: CameraPermission): PermissionStatus {
-    return when (permission) {
-      CameraPermission.CAMERA -> checkCameraPermission()
-      CameraPermission.MICROPHONE -> checkMicrophonePermission()
-      CameraPermission.STORAGE -> PermissionStatus.GRANTED // Not needed on iOS
-    }
+  actual suspend fun checkPermission(permission: CameraPermission): PermissionStatus = when (permission) {
+    CameraPermission.CAMERA -> checkCameraPermission()
+    CameraPermission.MICROPHONE -> checkMicrophonePermission()
+    CameraPermission.STORAGE -> PermissionStatus.GRANTED // Not needed on iOS
   }
 
-  actual suspend fun requestPermission(permission: CameraPermission): PermissionStatus {
-    return when (permission) {
-      CameraPermission.CAMERA -> requestCameraPermission()
-      CameraPermission.MICROPHONE -> requestMicrophonePermission()
-      CameraPermission.STORAGE -> PermissionStatus.GRANTED // Not needed on iOS
-    }
+  actual suspend fun requestPermission(permission: CameraPermission): PermissionStatus = when (permission) {
+    CameraPermission.CAMERA -> requestCameraPermission()
+    CameraPermission.MICROPHONE -> requestMicrophonePermission()
+    CameraPermission.STORAGE -> PermissionStatus.GRANTED // Not needed on iOS
   }
 
   actual suspend fun requestCameraPermissions(): PermissionResult {
@@ -66,20 +62,16 @@ actual class CameraPermissionManager {
     }
   }
 
-  private fun checkCameraPermission(): PermissionStatus {
-    return when (AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)) {
-      AVAuthorizationStatusAuthorized -> PermissionStatus.GRANTED
-      AVAuthorizationStatusNotDetermined -> PermissionStatus.NOT_DETERMINED
-      else -> PermissionStatus.DENIED
-    }
+  private fun checkCameraPermission(): PermissionStatus = when (AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)) {
+    AVAuthorizationStatusAuthorized -> PermissionStatus.GRANTED
+    AVAuthorizationStatusNotDetermined -> PermissionStatus.NOT_DETERMINED
+    else -> PermissionStatus.DENIED
   }
 
-  private fun checkMicrophonePermission(): PermissionStatus {
-    return when (AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeAudio)) {
-      AVAuthorizationStatusAuthorized -> PermissionStatus.GRANTED
-      AVAuthorizationStatusNotDetermined -> PermissionStatus.NOT_DETERMINED
-      else -> PermissionStatus.DENIED
-    }
+  private fun checkMicrophonePermission(): PermissionStatus = when (AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeAudio)) {
+    AVAuthorizationStatusAuthorized -> PermissionStatus.GRANTED
+    AVAuthorizationStatusNotDetermined -> PermissionStatus.NOT_DETERMINED
+    else -> PermissionStatus.DENIED
   }
 
   private suspend fun requestCameraPermission(): PermissionStatus {
@@ -117,6 +109,4 @@ actual class CameraPermissionManager {
  * Create iOS [CameraPermissionManager].
  */
 @Composable
-actual fun rememberCameraPermissionManager(): CameraPermissionManager {
-  return remember { CameraPermissionManager() }
-}
+actual fun rememberCameraPermissionManager(): CameraPermissionManager = remember { CameraPermissionManager() }

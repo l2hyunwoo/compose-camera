@@ -273,6 +273,7 @@ class AndroidCameraController(
             _cameraState.value = currentState.copy(isRecording = true)
           }
         }
+
         is VideoRecordEvent.Finalize -> {
           val currentState = _cameraState.value
           if (currentState is CameraState.Ready) {
@@ -386,19 +387,17 @@ internal class AndroidVideoRecording(
 
   private var startTimeMs = System.currentTimeMillis()
 
-  override suspend fun stop(): VideoRecordingResult {
-    return suspendCancellableCoroutine { continuation ->
-      recording.stop()
-      _isRecording = false
+  override suspend fun stop(): VideoRecordingResult = suspendCancellableCoroutine { continuation ->
+    recording.stop()
+    _isRecording = false
 
-      val durationMs = System.currentTimeMillis() - startTimeMs
-      continuation.resume(
-        VideoRecordingResult.Success(
-          uri = outputUri,
-          durationMs = durationMs,
-        ),
-      )
-    }
+    val durationMs = System.currentTimeMillis() - startTimeMs
+    continuation.resume(
+      VideoRecordingResult.Success(
+        uri = outputUri,
+        durationMs = durationMs,
+      ),
+    )
   }
 
   override fun pause() {

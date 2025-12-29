@@ -60,24 +60,20 @@ sealed class CameraException(
   /**
    * Camera initialization failed
    */
-  class InitializationFailed(cause: Throwable? = null) :
-    CameraException("Camera initialization failed", cause)
+  class InitializationFailed(cause: Throwable? = null) : CameraException("Camera initialization failed", cause)
 
   /**
    * Image capture failed
    */
-  class CaptureFailed(cause: Throwable? = null) :
-    CameraException("Image capture failed", cause)
+  class CaptureFailed(cause: Throwable? = null) : CameraException("Image capture failed", cause)
 
   /**
    * Video recording failed
    */
-  class RecordingFailed(cause: Throwable? = null) :
-    CameraException("Video recording failed", cause)
+  class RecordingFailed(cause: Throwable? = null) : CameraException("Video recording failed", cause)
 
   /**
    * Unknown camera error
    */
-  class Unknown(message: String, cause: Throwable? = null) :
-    CameraException(message, cause)
+  class Unknown(message: String, cause: Throwable? = null) : CameraException(message, cause)
 }

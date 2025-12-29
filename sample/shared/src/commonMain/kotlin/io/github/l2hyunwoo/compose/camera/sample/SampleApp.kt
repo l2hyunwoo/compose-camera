@@ -56,6 +56,7 @@ fun SampleApp() {
           Text("권한 확인 중...", color = MaterialTheme.colorScheme.onBackground)
         }
       }
+
       hasPermission -> {
         when (currentScreen) {
           Screen.Camera -> {
@@ -64,6 +65,7 @@ fun SampleApp() {
               onBarcodeScannerClick = { currentScreen = Screen.BarcodeScanner },
             )
           }
+
           Screen.Gallery -> {
             BackHandler(enabled = true) {
               currentScreen = Screen.Camera
@@ -73,6 +75,7 @@ fun SampleApp() {
               onItemClick = { /* TODO: Show media detail */ },
             )
           }
+
           Screen.BarcodeScanner -> {
             BackHandler(enabled = true) {
               currentScreen = Screen.Camera
@@ -83,6 +86,7 @@ fun SampleApp() {
           }
         }
       }
+
       else -> {
         // Permission denied - show settings button
         Box(

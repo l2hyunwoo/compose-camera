@@ -83,6 +83,7 @@ fun CameraScreen(
               CircularProgressIndicator(color = Color.White)
             }
           }
+
           is CameraState.Error -> {
             Box(
               modifier = Modifier.fillMaxSize(),
@@ -109,6 +110,7 @@ fun CameraScreen(
               }
             }
           }
+
           is CameraState.Ready -> {
             // Ready - show controls
           }
@@ -247,6 +249,7 @@ fun CameraScreen(
                           is ImageCaptureResult.Success -> {
                             lastCaptureResult = "Captured ${result.width}x${result.height}"
                           }
+
                           is ImageCaptureResult.Error -> {
                             lastCaptureResult = "Error: ${result.exception.message}"
                           }
@@ -276,9 +279,11 @@ fun CameraScreen(
                       is VideoRecordingResult.Success -> {
                         lastCaptureResult = "Recorded ${result.durationMs / 1000}s"
                       }
+
                       is VideoRecordingResult.Error -> {
                         lastCaptureResult = "Error: ${result.exception.message}"
                       }
+
                       null -> {}
                     }
                     currentRecording = null

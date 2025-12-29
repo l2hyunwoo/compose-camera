@@ -87,26 +87,24 @@ actual class BarcodeScanner actual constructor() : CameraPlugin {
     }
   }
 
-  private fun MlKitBarcode.toCommon(): Barcode {
-    return Barcode(
-      rawValue = this.rawValue ?: "",
-      displayValue = this.displayValue,
-      format = when (this.format) {
-        MlKitBarcode.FORMAT_QR_CODE -> BarcodeFormat.QR_CODE
-        MlKitBarcode.FORMAT_AZTEC -> BarcodeFormat.AZTEC
-        MlKitBarcode.FORMAT_DATA_MATRIX -> BarcodeFormat.DATA_MATRIX
-        MlKitBarcode.FORMAT_PDF417 -> BarcodeFormat.PDF417
-        MlKitBarcode.FORMAT_EAN_13 -> BarcodeFormat.EAN_13
-        MlKitBarcode.FORMAT_EAN_8 -> BarcodeFormat.EAN_8
-        MlKitBarcode.FORMAT_UPC_A -> BarcodeFormat.UPC_A
-        MlKitBarcode.FORMAT_UPC_E -> BarcodeFormat.UPC_E
-        MlKitBarcode.FORMAT_CODE_39 -> BarcodeFormat.CODE_39
-        MlKitBarcode.FORMAT_CODE_93 -> BarcodeFormat.CODE_93
-        MlKitBarcode.FORMAT_CODE_128 -> BarcodeFormat.CODE_128
-        MlKitBarcode.FORMAT_CODABAR -> BarcodeFormat.CODABAR
-        MlKitBarcode.FORMAT_ITF -> BarcodeFormat.ITF
-        else -> BarcodeFormat.UNKNOWN
-      },
-    )
-  }
+  private fun MlKitBarcode.toCommon(): Barcode = Barcode(
+    rawValue = this.rawValue ?: "",
+    displayValue = this.displayValue,
+    format = when (this.format) {
+      MlKitBarcode.FORMAT_QR_CODE -> BarcodeFormat.QR_CODE
+      MlKitBarcode.FORMAT_AZTEC -> BarcodeFormat.AZTEC
+      MlKitBarcode.FORMAT_DATA_MATRIX -> BarcodeFormat.DATA_MATRIX
+      MlKitBarcode.FORMAT_PDF417 -> BarcodeFormat.PDF417
+      MlKitBarcode.FORMAT_EAN_13 -> BarcodeFormat.EAN_13
+      MlKitBarcode.FORMAT_EAN_8 -> BarcodeFormat.EAN_8
+      MlKitBarcode.FORMAT_UPC_A -> BarcodeFormat.UPC_A
+      MlKitBarcode.FORMAT_UPC_E -> BarcodeFormat.UPC_E
+      MlKitBarcode.FORMAT_CODE_39 -> BarcodeFormat.CODE_39
+      MlKitBarcode.FORMAT_CODE_93 -> BarcodeFormat.CODE_93
+      MlKitBarcode.FORMAT_CODE_128 -> BarcodeFormat.CODE_128
+      MlKitBarcode.FORMAT_CODABAR -> BarcodeFormat.CODABAR
+      MlKitBarcode.FORMAT_ITF -> BarcodeFormat.ITF
+      else -> BarcodeFormat.UNKNOWN
+    },
+  )
 }

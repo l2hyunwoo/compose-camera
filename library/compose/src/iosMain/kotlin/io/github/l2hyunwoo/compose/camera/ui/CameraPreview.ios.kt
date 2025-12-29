@@ -156,6 +156,7 @@ private class CameraView(
         baseZoomScale = 1.0f
         onZoomChange(gesture.scale().toFloat(), true)
       }
+
       UIGestureRecognizerStateChanged -> {
         val scaleDelta = gesture.scale().toFloat() / baseZoomScale
         baseZoomScale = gesture.scale().toFloat()

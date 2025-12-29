@@ -65,6 +65,4 @@ actual class MediaLoader {
 }
 
 @Composable
-actual fun rememberMediaLoader(): MediaLoader {
-  return remember { MediaLoader() }
-}
+actual fun rememberMediaLoader(): MediaLoader = remember { MediaLoader() }

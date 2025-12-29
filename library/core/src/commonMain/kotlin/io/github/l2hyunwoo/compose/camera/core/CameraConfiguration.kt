@@ -41,18 +41,15 @@ data class CameraConfiguration(
   /**
    * Add a plugin to the configuration
    */
-  fun withPlugin(plugin: CameraPlugin): CameraConfiguration =
-    copy(plugins = plugins + plugin)
+  fun withPlugin(plugin: CameraPlugin): CameraConfiguration = copy(plugins = plugins + plugin)
 
   /**
    * Add multiple plugins to the configuration
    */
-  fun withPlugins(vararg pluginsToAdd: CameraPlugin): CameraConfiguration =
-    copy(plugins = plugins + pluginsToAdd.toList())
+  fun withPlugins(vararg pluginsToAdd: CameraPlugin): CameraConfiguration = copy(plugins = plugins + pluginsToAdd.toList())
 
   /**
    * Remove a plugin from the configuration
    */
-  fun withoutPlugin(pluginId: String): CameraConfiguration =
-    copy(plugins = plugins.filter { it.id != pluginId })
+  fun withoutPlugin(pluginId: String): CameraConfiguration = copy(plugins = plugins.filter { it.id != pluginId })
 }

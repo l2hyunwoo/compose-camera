@@ -426,7 +426,8 @@ class IOSCameraController(
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 private class PhotoCaptureDelegate(
   private val onResult: (ImageCaptureResult) -> Unit,
-) : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
+) : NSObject(),
+  AVCapturePhotoCaptureDelegateProtocol {
 
   override fun captureOutput(
     output: AVCapturePhotoOutput,
@@ -589,7 +590,8 @@ internal class IOSVideoRecording(
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 private class VideoDataDelegate(
   private val onFrame: (CMSampleBufferRef?) -> Unit,
-) : NSObject(), AVCaptureVideoDataOutputSampleBufferDelegateProtocol {
+) : NSObject(),
+  AVCaptureVideoDataOutputSampleBufferDelegateProtocol {
 
   override fun captureOutput(
     output: AVCaptureOutput,
@@ -606,7 +608,8 @@ private class VideoDataDelegate(
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 private class VideoRecordingDelegate(
   private val onFinished: (String?) -> Unit,
-) : NSObject(), AVCaptureFileOutputRecordingDelegateProtocol {
+) : NSObject(),
+  AVCaptureFileOutputRecordingDelegateProtocol {
 
   override fun captureOutput(
     output: AVCaptureFileOutput,
