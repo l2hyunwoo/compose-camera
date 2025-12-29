@@ -16,20 +16,27 @@
 package io.github.l2hyunwoo.compose.camera.ui
 
 import androidx.camera.compose.CameraXViewfinder
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
 import io.github.l2hyunwoo.compose.camera.core.CameraController
 import io.github.l2hyunwoo.compose.camera.core.initialize
 import io.github.l2hyunwoo.compose.camera.core.rememberCameraController
 import io.github.l2hyunwoo.compose.camera.core.surfaceRequestFlow
+import kotlinx.coroutines.delay
 
 /**
  * Android implementation of CameraPreview using CameraX Compose Viewfinder.
@@ -39,13 +46,23 @@ actual fun CameraPreview(
   modifier: Modifier,
   configuration: CameraConfiguration,
   onCameraControllerReady: (CameraController) -> Unit,
+  focusIndicator: @Composable BoxScope.(tapPosition: Offset) -> Unit,
 ) {
   val controller = rememberCameraController(configuration)
+  var tapPosition by remember { mutableStateOf(Offset.Unspecified) }
 
   // Initialize camera
   LaunchedEffect(controller) {
     controller.initialize()
     onCameraControllerReady(controller)
+  }
+
+  // Auto-dismiss focus indicator
+  LaunchedEffect(tapPosition) {
+    if (tapPosition != Offset.Unspecified) {
+      delay(2500)
+      tapPosition = Offset.Unspecified
+    }
   }
 
   val surfaceRequest by controller.surfaceRequestFlow.collectAsState()
@@ -66,8 +83,6 @@ actual fun CameraPreview(
           .matchParentSize()
           .pointerInput(controller) {
             detectTransformGestures { _, _, zoom, _ ->
-              // Access zoomRatioFlow.value directly to get current ratio
-              // This ensures we always use the latest value during gesture
               val currentRatio = controller.zoomRatioFlow.value
               val newZoomRatio = (currentRatio * zoom).coerceIn(
                 controller.minZoomRatio,
@@ -75,8 +90,34 @@ actual fun CameraPreview(
               )
               controller.setZoom(newZoomRatio)
             }
+          }
+          .pointerInput(controller) {
+            detectTapGestures { offset ->
+              tapPosition = offset
+              // Calculate normalized point (0..1)
+              // NOTE: This assumes a CENTER_CROP / FILL_CENTER style preview where the camera
+              // output fully fills the composable bounds without letterboxing or padding.
+              // If the preview uses a different scale type or aspect ratio (e.g. is not full-screen
+              // or has black bars), this simple normalization will NOT accurately map to the
+              // camera sensor coordinates and tap-to-focus may target the wrong region.
+              //
+              // For configurations where accurate mapping is required regardless of aspect ratio
+              // or scaling behavior, a full Matrix-based coordinate transformation such as
+              // CameraX's CoordinateTransformer (preview <-> sensor coordinates) should be used.
+              val viewWidth = size.width.toFloat()
+              val viewHeight = size.height.toFloat()
+              val normalizedPoint = Offset(
+                x = offset.x / viewWidth,
+                y = offset.y / viewHeight,
+              )
+              controller.focus(normalizedPoint)
+            }
           },
       )
+
+      if (tapPosition != Offset.Unspecified) {
+        focusIndicator(tapPosition)
+      }
     }
   }
 }

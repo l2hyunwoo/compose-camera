@@ -18,18 +18,75 @@
 package io.github.l2hyunwoo.compose.camera.core
 
 import androidx.compose.ui.geometry.Offset
-import kotlinx.cinterop.*
+import kotlinx.cinterop.BetaInteropApi
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.cValue
+import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import platform.AVFoundation.*
-import platform.CoreMedia.*
-import platform.CoreVideo.*
-import platform.Foundation.*
-import platform.Photos.*
-import platform.UIKit.UIImage
-import platform.darwin.*
+import platform.AVFoundation.AVCaptureConnection
+import platform.AVFoundation.AVCaptureDevice
+import platform.AVFoundation.AVCaptureDeviceInput
+import platform.AVFoundation.AVCaptureDevicePositionBack
+import platform.AVFoundation.AVCaptureDevicePositionFront
+import platform.AVFoundation.AVCaptureDeviceTypeBuiltInWideAngleCamera
+import platform.AVFoundation.AVCaptureExposureModeAutoExpose
+import platform.AVFoundation.AVCaptureFileOutput
+import platform.AVFoundation.AVCaptureFileOutputRecordingDelegateProtocol
+import platform.AVFoundation.AVCaptureFlashModeAuto
+import platform.AVFoundation.AVCaptureFlashModeOff
+import platform.AVFoundation.AVCaptureFlashModeOn
+import platform.AVFoundation.AVCaptureFocusModeAutoFocus
+import platform.AVFoundation.AVCaptureMovieFileOutput
+import platform.AVFoundation.AVCaptureOutput
+import platform.AVFoundation.AVCapturePhoto
+import platform.AVFoundation.AVCapturePhotoCaptureDelegateProtocol
+import platform.AVFoundation.AVCapturePhotoOutput
+import platform.AVFoundation.AVCapturePhotoSettings
+import platform.AVFoundation.AVCaptureSession
+import platform.AVFoundation.AVCaptureSessionPreset1280x720
+import platform.AVFoundation.AVCaptureSessionPreset1920x1080
+import platform.AVFoundation.AVCaptureSessionPreset3840x2160
+import platform.AVFoundation.AVCaptureSessionPreset640x480
+import platform.AVFoundation.AVCaptureTorchModeOff
+import platform.AVFoundation.AVCaptureTorchModeOn
+import platform.AVFoundation.AVCaptureVideoDataOutput
+import platform.AVFoundation.AVCaptureVideoDataOutputSampleBufferDelegateProtocol
+import platform.AVFoundation.AVMediaTypeVideo
+import platform.AVFoundation.CGImageRepresentation
+import platform.AVFoundation.defaultDeviceWithDeviceType
+import platform.AVFoundation.exposureMode
+import platform.AVFoundation.exposurePointOfInterest
+import platform.AVFoundation.fileDataRepresentation
+import platform.AVFoundation.focusMode
+import platform.AVFoundation.focusPointOfInterest
+import platform.AVFoundation.hasFlash
+import platform.AVFoundation.hasTorch
+import platform.AVFoundation.isExposurePointOfInterestSupported
+import platform.AVFoundation.isFocusPointOfInterestSupported
+import platform.AVFoundation.isTorchAvailable
+import platform.AVFoundation.maxAvailableVideoZoomFactor
+import platform.AVFoundation.minAvailableVideoZoomFactor
+import platform.AVFoundation.torchMode
+import platform.AVFoundation.videoZoomFactor
+import platform.CoreMedia.CMSampleBufferRef
+import platform.CoreVideo.kCVPixelBufferPixelFormatTypeKey
+import platform.CoreVideo.kCVPixelFormatType_32BGRA
+import platform.Foundation.NSDate
+import platform.Foundation.NSError
+import platform.Foundation.NSTemporaryDirectory
+import platform.Foundation.NSURL
+import platform.Foundation.timeIntervalSince1970
+import platform.Photos.PHAssetChangeRequest
+import platform.Photos.PHPhotoLibrary
+import platform.darwin.DISPATCH_QUEUE_PRIORITY_DEFAULT
+import platform.darwin.NSObject
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_global_queue
+import platform.darwin.dispatch_queue_create
 import platform.posix.memcpy
 
 /**
@@ -120,7 +177,6 @@ class IOSCameraController(
     currentDevice?.let { device ->
       try {
         val input = AVCaptureDeviceInput.deviceInputWithDevice(device, null)
-          as? AVCaptureDeviceInput
 
         if (input != null && captureSession.canAddInput(input)) {
           captureSession.addInput(input)
@@ -325,14 +381,30 @@ class IOSCameraController(
 
   override fun focus(point: Offset) {
     currentDevice?.let { device ->
-      if (device.isFocusPointOfInterestSupported()) {
-        try {
-          device.lockForConfiguration(null)
+      try {
+        device.lockForConfiguration(null)
+
+        // Set focus point
+        if (device.isFocusPointOfInterestSupported()) {
+          device.focusPointOfInterest = cValue {
+            x = point.x.toDouble()
+            y = point.y.toDouble()
+          }
           device.focusMode = AVCaptureFocusModeAutoFocus
-          device.unlockForConfiguration()
-        } catch (_: Exception) {
-          // Ignore focus errors
         }
+
+        // Set exposure point
+        if (device.isExposurePointOfInterestSupported()) {
+          device.exposurePointOfInterest = cValue {
+            x = point.x.toDouble()
+            y = point.y.toDouble()
+          }
+          device.exposureMode = AVCaptureExposureModeAutoExpose
+        }
+
+        device.unlockForConfiguration()
+      } catch (_: Exception) {
+        // Ignore focus errors
       }
     }
   }
@@ -397,7 +469,7 @@ private class PhotoCaptureDelegate(
     // Save to Photo Library
     PHPhotoLibrary.sharedPhotoLibrary().performChanges({
       PHAssetChangeRequest.creationRequestForAssetFromImage(
-        platform.UIKit.UIImage(data = data!!),
+        platform.UIKit.UIImage(data = data),
       )
     }, completionHandler = { success, error ->
       if (success) {

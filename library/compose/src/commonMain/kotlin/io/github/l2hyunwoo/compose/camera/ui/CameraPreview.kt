@@ -15,8 +15,10 @@
  */
 package io.github.l2hyunwoo.compose.camera.ui
 
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
 import io.github.l2hyunwoo.compose.camera.core.CameraController
 
@@ -50,4 +52,5 @@ expect fun CameraPreview(
   modifier: Modifier = Modifier,
   configuration: CameraConfiguration = CameraConfiguration(),
   onCameraControllerReady: (CameraController) -> Unit = {},
+  focusIndicator: @Composable BoxScope.(tapPosition: Offset) -> Unit = { DefaultFocusIndicator(it) },
 )

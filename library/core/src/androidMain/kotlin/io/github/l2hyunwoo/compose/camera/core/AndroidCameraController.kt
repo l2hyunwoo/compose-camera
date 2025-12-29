@@ -22,10 +22,12 @@ import android.content.pm.PackageManager
 import android.provider.MediaStore
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.FocusMeteringAction
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
+import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.core.SurfaceRequest
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
@@ -321,8 +323,15 @@ class AndroidCameraController(
   }
 
   override fun focus(point: Offset) {
-    // Focus implementation with coordinate transformation
-    // Would require MutableCoordinateTransformer from CameraXViewfinder
+    val cameraControl = camera?.cameraControl ?: return
+    val meteringPoint = SurfaceOrientedMeteringPointFactory(1f, 1f)
+      .createPoint(point.x, point.y)
+
+    val action = FocusMeteringAction.Builder(meteringPoint)
+      .setAutoCancelDuration(5, java.util.concurrent.TimeUnit.SECONDS)
+      .build()
+
+    cameraControl.startFocusAndMetering(action)
   }
 
   private val analyzers = mutableListOf<ImageAnalysis.Analyzer>()

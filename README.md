@@ -15,6 +15,7 @@ A robust, feature-rich camera library for Compose Multiplatform supporting Andro
 - 🔦 **Flash Control**: Torch, On, Off, Auto modes
 - 🔍 **Pinch Zoom**: Native pinch-to-zoom gesture and zoom ratio control
 - ✋ **Permission Handling**: Built-in, platform-independent permission manager
+- 🎯 **Tap-to-Focus**: Auto focus on tapped area with customizable visual indicator
 - 🧩 **Plugin Architecture**: Extensible design for frame processing and custom features
 
 | Platform | Status | Implementation |
@@ -140,6 +141,14 @@ fun MyCameraScreen() {
       onCameraControllerReady = { controller ->
         cameraController = controller
       },
+      // Customize the focus indicator (Optional)
+      focusIndicator = { tapPosition ->
+        DefaultFocusIndicator(
+          tapPosition = tapPosition,
+          color = Color.Yellow,
+          size = 64.dp,
+        )
+      }
     )
 
     // Example Controls
