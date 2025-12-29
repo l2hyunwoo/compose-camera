@@ -31,7 +31,7 @@ version = "1.0.0"
 
 kotlin {
     androidLibrary {
-        namespace = "io.github.l2hyunwoo.camera.core"
+        namespace = "io.github.l2hyunwoo.compose.camera.core"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
@@ -81,7 +81,7 @@ kotlin {
 mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
-    coordinates(group.toString(), "camera-core", version.toString())
+    coordinates(group.toString(), "compose-camera-core", version.toString())
 
     pom {
         name = "Compose Camera Core"

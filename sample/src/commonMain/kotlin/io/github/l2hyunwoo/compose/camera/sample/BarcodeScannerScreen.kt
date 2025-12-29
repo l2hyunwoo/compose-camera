@@ -49,11 +49,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import io.github.l2hyunwoo.camera.compose.CameraPreview
-import io.github.l2hyunwoo.camera.core.CameraConfiguration
-import io.github.l2hyunwoo.camera.core.CameraController
 import io.github.l2hyunwoo.camera.plugin.mlkit.barcode.Barcode
 import io.github.l2hyunwoo.camera.plugin.mlkit.barcode.BarcodeScanner
+import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
+import io.github.l2hyunwoo.compose.camera.core.CameraController
+import io.github.l2hyunwoo.compose.camera.ui.CameraPreview
 
 /**
  * Sample screen demonstrating the BarcodeScanner plugin.

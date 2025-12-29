@@ -30,7 +30,7 @@ version = "1.0.0"
 
 kotlin {
     androidLibrary {
-        namespace = "io.github.l2hyunwoo.camera.compose"
+        namespace = "io.github.l2hyunwoo.compose.camera.ui"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
@@ -72,7 +72,7 @@ kotlin {
 mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
-    coordinates(group.toString(), "camera-compose", version.toString())
+    coordinates(group.toString(), "compose-camera-ui", version.toString())
 
     pom {
         name = "Compose Camera UI"

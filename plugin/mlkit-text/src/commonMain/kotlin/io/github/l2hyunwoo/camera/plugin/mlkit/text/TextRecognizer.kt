@@ -15,7 +15,7 @@
  */
 package io.github.l2hyunwoo.camera.plugin.mlkit.text
 
-import io.github.l2hyunwoo.camera.core.plugin.CameraPlugin
+import io.github.l2hyunwoo.compose.camera.core.plugin.CameraPlugin
 import kotlinx.coroutines.flow.StateFlow
 
 /**

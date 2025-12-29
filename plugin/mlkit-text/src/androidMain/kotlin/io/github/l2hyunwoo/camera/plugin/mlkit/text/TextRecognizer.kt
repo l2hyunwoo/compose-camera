@@ -15,15 +15,17 @@
  */
 package io.github.l2hyunwoo.camera.plugin.mlkit.text
 
+import androidx.annotation.OptIn
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import io.github.l2hyunwoo.camera.core.AndroidCameraController
-import io.github.l2hyunwoo.camera.core.CameraController
-import io.github.l2hyunwoo.camera.core.plugin.CameraPlugin
+import io.github.l2hyunwoo.compose.camera.core.AndroidCameraController
+import io.github.l2hyunwoo.compose.camera.core.CameraController
+import io.github.l2hyunwoo.compose.camera.core.plugin.CameraPlugin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -61,7 +63,7 @@ actual class TextRecognizer actual constructor() : CameraPlugin {
     recognizer.close()
   }
 
-  @androidx.annotation.OptIn(androidx.camera.core.ExperimentalGetImage::class)
+  @OptIn(ExperimentalGetImage::class)
   private fun processImage(imageProxy: ImageProxy) {
     val mediaImage = imageProxy.image
     if (mediaImage != null) {

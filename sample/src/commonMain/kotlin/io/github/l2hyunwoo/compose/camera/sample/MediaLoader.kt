@@ -15,6 +15,9 @@
  */
 package io.github.l2hyunwoo.compose.camera.sample
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+
 /**
  * Media item representing a captured photo or video.
  */
@@ -35,14 +38,14 @@ expect class MediaLoader {
 /**
  * Create a platform-specific media loader.
  */
-@androidx.compose.runtime.Composable
+@Composable
 expect fun rememberMediaLoader(): MediaLoader
 
 /**
  * Platform-specific media thumbnail composable.
  */
-@androidx.compose.runtime.Composable
+@Composable
 expect fun MediaThumbnailImage(
   item: MediaItem,
-  modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modifier,
+  modifier: Modifier = Modifier,
 )

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+@file:OptIn(ExperimentalForeignApi::class)
 
 package io.github.l2hyunwoo.camera.plugin.mlkit.barcode
 
-import io.github.l2hyunwoo.camera.core.CameraController
-import io.github.l2hyunwoo.camera.core.IOSCameraController
-import io.github.l2hyunwoo.camera.core.plugin.CameraPlugin
+import io.github.l2hyunwoo.compose.camera.core.CameraController
+import io.github.l2hyunwoo.compose.camera.core.IOSCameraController
+import io.github.l2hyunwoo.compose.camera.core.plugin.CameraPlugin
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
