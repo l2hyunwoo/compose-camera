@@ -45,7 +45,7 @@ import platform.Vision.VNImageRequestHandler
  * Detects barcodes and QR codes from camera frames.
  */
 actual class BarcodeScanner actual constructor() : CameraPlugin {
-  override val id: String = "BarcodeScanner"
+  actual override val id: String = "BarcodeScanner"
 
   private val _barcodes = MutableStateFlow<List<Barcode>>(emptyList())
   actual val barcodes: StateFlow<List<Barcode>> = _barcodes.asStateFlow()
@@ -72,14 +72,14 @@ actual class BarcodeScanner actual constructor() : CameraPlugin {
     }
   }
 
-  override fun onAttach(controller: CameraController) {
+  actual override fun onAttach(controller: CameraController) {
     if (controller is IOSCameraController) {
       iosController = controller
       controller.addFrameListener(frameListener)
     }
   }
 
-  override fun onDetach() {
+  actual override fun onDetach() {
     iosController?.removeFrameListener(frameListener)
     iosController = null
   }

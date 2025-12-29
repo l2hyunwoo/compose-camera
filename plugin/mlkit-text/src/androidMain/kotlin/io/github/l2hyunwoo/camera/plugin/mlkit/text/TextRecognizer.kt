@@ -35,7 +35,7 @@ import kotlinx.coroutines.flow.asStateFlow
  * Recognizes text from camera frames in real-time.
  */
 actual class TextRecognizer actual constructor() : CameraPlugin {
-  override val id: String = "TextRecognizer"
+  actual override val id: String = "TextRecognizer"
 
   private val _text = MutableStateFlow<TextResult?>(null)
   actual val text: StateFlow<TextResult?> = _text.asStateFlow()
@@ -50,14 +50,14 @@ actual class TextRecognizer actual constructor() : CameraPlugin {
     processImage(imageProxy)
   }
 
-  override fun onAttach(controller: CameraController) {
+  actual override fun onAttach(controller: CameraController) {
     if (controller is AndroidCameraController) {
       androidController = controller
       controller.addAnalyzer(analyzer)
     }
   }
 
-  override fun onDetach() {
+  actual override fun onDetach() {
     androidController?.removeAnalyzer(analyzer)
     androidController = null
     recognizer.close()

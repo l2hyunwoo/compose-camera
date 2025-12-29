@@ -15,6 +15,7 @@
  */
 package io.github.l2hyunwoo.camera.plugin.mlkit.barcode
 
+import io.github.l2hyunwoo.compose.camera.core.CameraController
 import io.github.l2hyunwoo.compose.camera.core.plugin.CameraPlugin
 import kotlinx.coroutines.flow.StateFlow
 
@@ -51,6 +52,21 @@ enum class BarcodeFormat {
  * Plugin for scanning barcodes and QR codes.
  */
 expect class BarcodeScanner() : CameraPlugin {
+  /**
+   * Unique identifier for this plugin
+   */
+  override val id: String
+
+  /**
+   * Called when the plugin is attached to a camera controller
+   */
+  override fun onAttach(controller: CameraController)
+
+  /**
+   * Called when the plugin is detached from the camera controller
+   */
+  override fun onDetach()
+
   /**
    * Stream of detected barcodes.
    * Emits a list of barcodes detected in the current frame.
