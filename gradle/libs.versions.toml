@@ -45,7 +45,7 @@ compose-bom = "2025.12.01"
 kotest = "6.0.7"
 
 # AndroidX Test
-androidx-test = "1.6.2"
+androidx-test = "1.7.0"
 androidx-test-rules = "1.6.1"
 
 [libraries]
