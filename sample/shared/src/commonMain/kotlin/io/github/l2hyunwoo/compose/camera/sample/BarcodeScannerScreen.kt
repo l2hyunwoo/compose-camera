@@ -49,11 +49,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import compose_camera.sample.generated.resources.Res
-import compose_camera.sample.generated.resources.barcode_scanner
-import compose_camera.sample.generated.resources.detected_barcodes
-import compose_camera.sample.generated.resources.format
-import compose_camera.sample.generated.resources.point_camera_at_barcode
+import compose_camera.sample.shared.generated.resources.Res
+import compose_camera.sample.shared.generated.resources.barcode_scanner
+import compose_camera.sample.shared.generated.resources.detected_barcodes
+import compose_camera.sample.shared.generated.resources.format
+import compose_camera.sample.shared.generated.resources.point_camera_at_barcode
 import io.github.l2hyunwoo.camera.plugin.mlkit.barcode.Barcode
 import io.github.l2hyunwoo.camera.plugin.mlkit.barcode.BarcodeScanner
 import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration

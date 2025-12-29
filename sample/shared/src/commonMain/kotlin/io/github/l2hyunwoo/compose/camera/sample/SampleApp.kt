@@ -24,9 +24,9 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import compose_camera.sample.generated.resources.Res
-import compose_camera.sample.generated.resources.checking_permissions
-import compose_camera.sample.generated.resources.open_camera_permission_settings
+import compose_camera.sample.shared.generated.resources.Res
+import compose_camera.sample.shared.generated.resources.checking_permissions
+import compose_camera.sample.shared.generated.resources.open_camera_permission_settings
 import io.github.l2hyunwoo.compose.camera.core.rememberCameraPermissionManager
 import org.jetbrains.compose.resources.stringResource
 

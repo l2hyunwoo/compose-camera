@@ -30,8 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import compose_camera.sample.generated.resources.Res
-import compose_camera.sample.generated.resources.no_photos_or_videos
+import compose_camera.sample.shared.generated.resources.Res
+import compose_camera.sample.shared.generated.resources.no_photos_or_videos
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
