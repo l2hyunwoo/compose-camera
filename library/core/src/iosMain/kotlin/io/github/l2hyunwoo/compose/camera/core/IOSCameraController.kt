@@ -69,7 +69,10 @@ import platform.AVFoundation.isExposurePointOfInterestSupported
 import platform.AVFoundation.isFocusPointOfInterestSupported
 import platform.AVFoundation.isTorchAvailable
 import platform.AVFoundation.maxAvailableVideoZoomFactor
+import platform.AVFoundation.maxExposureTargetBias
 import platform.AVFoundation.minAvailableVideoZoomFactor
+import platform.AVFoundation.minExposureTargetBias
+import platform.AVFoundation.setExposureTargetBias
 import platform.AVFoundation.torchMode
 import platform.AVFoundation.videoZoomFactor
 import platform.CoreMedia.CMSampleBufferRef
