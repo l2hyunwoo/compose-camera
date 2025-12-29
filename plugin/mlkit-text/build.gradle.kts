@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
+    alias(libs.plugins.kmpNativeCoroutines)
     alias(libs.plugins.vanniktech.mavenPublish)
     alias(libs.plugins.binaryCompatibilityValidator)
 }
@@ -46,6 +47,7 @@ kotlin {
         commonMain.dependencies {
             api(project(":library:core"))
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kmp.nativecoroutines.annotations)
         }
 
         androidMain.dependencies {
