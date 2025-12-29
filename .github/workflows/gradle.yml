@@ -18,7 +18,28 @@ permissions:
   contents: read
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Validate Gradle Wrapper
+      uses: gradle/actions/wrapper-validation@v5
+    - name: Set up JDK 17
+      uses: actions/setup-java@v5
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    - name: Spotless Check
+      uses: gradle/gradle-build-action@093dfe9d598ec5a42246855d09b49dc76803c005
+      with:
+        arguments: spotlessCheck
+    - name: API Check
+      uses: gradle/gradle-build-action@093dfe9d598ec5a42246855d09b49dc76803c005
+      with:
+        arguments: apiCheck
+
   build:
+    needs: check
     strategy:
       matrix:
         include:
