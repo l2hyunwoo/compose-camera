@@ -15,6 +15,8 @@
  */
 package io.github.l2hyunwoo.camera.plugin.mlkit.text
 
+import androidx.annotation.OptIn
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.common.InputImage
@@ -61,7 +63,7 @@ actual class TextRecognizer actual constructor() : CameraPlugin {
     recognizer.close()
   }
 
-  @androidx.annotation.OptIn(androidx.camera.core.ExperimentalGetImage::class)
+  @OptIn(ExperimentalGetImage::class)
   private fun processImage(imageProxy: ImageProxy) {
     val mediaImage = imageProxy.image
     if (mediaImage != null) {

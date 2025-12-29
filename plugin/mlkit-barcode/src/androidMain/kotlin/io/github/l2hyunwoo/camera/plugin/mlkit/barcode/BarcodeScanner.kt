@@ -15,6 +15,8 @@
  */
 package io.github.l2hyunwoo.camera.plugin.mlkit.barcode
 
+import androidx.annotation.OptIn
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
@@ -65,7 +67,7 @@ actual class BarcodeScanner actual constructor() : CameraPlugin {
     scanner.close()
   }
 
-  @androidx.annotation.OptIn(androidx.camera.core.ExperimentalGetImage::class)
+  @OptIn(ExperimentalGetImage::class)
   private fun processImage(imageProxy: ImageProxy) {
     val mediaImage = imageProxy.image
     if (mediaImage != null) {

@@ -28,11 +28,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.l2hyunwoo.compose.camera.core.*
 import io.github.l2hyunwoo.compose.camera.ui.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -117,7 +119,7 @@ fun CameraScreen(
           modifier = Modifier
             .fillMaxWidth()
             .background(
-              brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+              brush = Brush.verticalGradient(
                 colors = listOf(Color.Black.copy(alpha = 0.5f), Color.Transparent),
               ),
             )
@@ -183,7 +185,7 @@ fun CameraScreen(
         // Capture result toast
         lastCaptureResult?.let { result ->
           LaunchedEffect(result) {
-            kotlinx.coroutines.delay(3000)
+            delay(3000)
             lastCaptureResult = null
           }
 
@@ -204,7 +206,7 @@ fun CameraScreen(
             .fillMaxWidth()
             .align(Alignment.BottomCenter)
             .background(
-              brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+              brush = Brush.verticalGradient(
                 colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.8f)),
               ),
             )

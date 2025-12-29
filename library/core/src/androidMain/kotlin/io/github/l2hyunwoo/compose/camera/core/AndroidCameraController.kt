@@ -22,6 +22,7 @@ import android.content.pm.PackageManager
 import android.provider.MediaStore
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
@@ -134,8 +135,8 @@ class AndroidCameraController(
       }
 
       // ImageAnalysis
-      val analysis = androidx.camera.core.ImageAnalysis.Builder()
-        .setBackpressureStrategy(androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+      val analysis = ImageAnalysis.Builder()
+        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
         .build()
       imageAnalysis = analysis
       updateImageAnalysis()
@@ -311,15 +312,15 @@ class AndroidCameraController(
     // Would require MutableCoordinateTransformer from CameraXViewfinder
   }
 
-  private val analyzers = mutableListOf<androidx.camera.core.ImageAnalysis.Analyzer>()
-  private var imageAnalysis: androidx.camera.core.ImageAnalysis? = null
+  private val analyzers = mutableListOf<ImageAnalysis.Analyzer>()
+  private var imageAnalysis: ImageAnalysis? = null
 
-  fun addAnalyzer(analyzer: androidx.camera.core.ImageAnalysis.Analyzer) {
+  fun addAnalyzer(analyzer: ImageAnalysis.Analyzer) {
     analyzers.add(analyzer)
     updateImageAnalysis()
   }
 
-  fun removeAnalyzer(analyzer: androidx.camera.core.ImageAnalysis.Analyzer) {
+  fun removeAnalyzer(analyzer: ImageAnalysis.Analyzer) {
     analyzers.remove(analyzer)
     updateImageAnalysis()
   }

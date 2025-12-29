@@ -15,6 +15,8 @@
  */
 package io.github.l2hyunwoo.compose.camera.core
 
+import androidx.compose.runtime.Composable
+
 /**
  * Platform-specific permission manager for camera-related permissions.
  *
@@ -50,5 +52,5 @@ expect class CameraPermissionManager {
  * This is a Composable function that provides proper context handling
  * on each platform automatically.
  */
-@androidx.compose.runtime.Composable
+@Composable
 expect fun rememberCameraPermissionManager(): CameraPermissionManager
