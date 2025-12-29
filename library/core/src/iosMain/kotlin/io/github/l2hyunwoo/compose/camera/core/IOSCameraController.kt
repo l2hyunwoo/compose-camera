@@ -43,6 +43,15 @@ class IOSCameraController(
   private val _cameraState = MutableStateFlow<CameraState>(CameraState.Initializing)
   override val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
 
+  private val _zoomRatioFlow = MutableStateFlow(1.0f)
+  override val zoomRatioFlow: StateFlow<Float> = _zoomRatioFlow.asStateFlow()
+
+  override val minZoomRatio: Float
+    get() = currentDevice?.minAvailableVideoZoomFactor?.toFloat() ?: 1.0f
+
+  override val maxZoomRatio: Float
+    get() = currentDevice?.maxAvailableVideoZoomFactor?.toFloat() ?: 1.0f
+
   private var _configuration = initialConfiguration
   override val configuration: CameraConfiguration get() = _configuration
 
@@ -296,15 +305,17 @@ class IOSCameraController(
     currentDevice?.let { device ->
       try {
         device.lockForConfiguration(null)
-        device.videoZoomFactor = ratio.toDouble().coerceIn(
+        val clampedRatio = ratio.toDouble().coerceIn(
           device.minAvailableVideoZoomFactor,
           device.maxAvailableVideoZoomFactor,
         )
+        device.videoZoomFactor = clampedRatio
         device.unlockForConfiguration()
 
+        _zoomRatioFlow.value = clampedRatio.toFloat()
         val currentState = _cameraState.value
         if (currentState is CameraState.Ready) {
-          _cameraState.value = currentState.copy(zoomRatio = ratio)
+          _cameraState.value = currentState.copy(zoomRatio = clampedRatio.toFloat())
         }
       } catch (_: Exception) {
         // Ignore zoom errors

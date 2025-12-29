@@ -65,6 +65,15 @@ class AndroidCameraController(
   private val _cameraState = MutableStateFlow<CameraState>(CameraState.Initializing)
   override val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
 
+  private val _zoomRatioFlow = MutableStateFlow(1.0f)
+  override val zoomRatioFlow: StateFlow<Float> = _zoomRatioFlow.asStateFlow()
+
+  override val minZoomRatio: Float
+    get() = camera?.cameraInfo?.zoomState?.value?.minZoomRatio ?: 1.0f
+
+  override val maxZoomRatio: Float
+    get() = camera?.cameraInfo?.zoomState?.value?.maxZoomRatio ?: 1.0f
+
   private var _configuration = initialConfiguration
   override val configuration: CameraConfiguration get() = _configuration
 
@@ -155,6 +164,15 @@ class AndroidCameraController(
         videoCapture,
         analysis,
       )
+
+      // Observe zoom state changes
+      camera?.cameraInfo?.zoomState?.observe(lifecycleOwner) { zoomState ->
+        _zoomRatioFlow.value = zoomState.zoomRatio
+        val currentState = _cameraState.value
+        if (currentState is CameraState.Ready) {
+          _cameraState.value = currentState.copy(zoomRatio = zoomState.zoomRatio)
+        }
+      }
 
       // Update state to ready
       _cameraState.value = CameraState.Ready(
@@ -300,11 +318,6 @@ class AndroidCameraController(
 
   override fun setZoom(ratio: Float) {
     camera?.cameraControl?.setZoomRatio(ratio)
-
-    val currentState = _cameraState.value
-    if (currentState is CameraState.Ready) {
-      _cameraState.value = currentState.copy(zoomRatio = ratio)
-    }
   }
 
   override fun focus(point: Offset) {
