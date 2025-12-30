@@ -61,7 +61,7 @@ fun CameraScreen(
 ) {
   var cameraController by remember { mutableStateOf<CameraController?>(null) }
   var cameraConfig by remember { mutableStateOf(CameraConfiguration()) }
-  val cameraState by cameraController?.cameraState?.collectAsState()
+  val cameraState by cameraController?.cameraInfo?.cameraState?.collectAsState()
     ?: remember { mutableStateOf<CameraState>(CameraState.Initializing) }
 
   val scope = rememberCoroutineScope()
@@ -70,9 +70,10 @@ fun CameraScreen(
 
   // Exposure compensation state
   var showExposureSlider by remember { mutableStateOf(false) }
-  val currentExposure by cameraController?.exposureCompensationFlow?.collectAsState()
-    ?: remember { mutableStateOf(0f) }
-  val exposureRange = cameraController?.exposureCompensationRange ?: (-2f to 2f)
+  val exposureState by cameraController?.cameraInfo?.exposureState?.collectAsState()
+    ?: remember { mutableStateOf(ExposureState()) }
+  val currentExposure = exposureState.exposureCompensation
+  val exposureRange = exposureState.exposureCompensationRange
 
   Scaffold(
     modifier = modifier.fillMaxSize(),
@@ -159,7 +160,7 @@ fun CameraScreen(
                 FlashMode.TORCH -> FlashMode.OFF
               }
               cameraConfig = cameraConfig.copy(flashMode = newFlashMode)
-              cameraController?.setFlashMode(newFlashMode)
+              cameraController?.cameraControl?.setFlashMode(newFlashMode)
             },
           ) {
             val iconAndTint = when (cameraConfig.flashMode) {
@@ -383,7 +384,7 @@ fun CameraScreen(
             currentExposure = currentExposure,
             exposureRange = exposureRange,
             onExposureChange = { ev ->
-              cameraController?.setExposureCompensation(ev)
+              cameraController?.cameraControl?.setExposureCompensation(ev)
             },
             onDismiss = { showExposureSlider = false },
           )
