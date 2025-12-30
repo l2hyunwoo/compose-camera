@@ -104,25 +104,119 @@ class IOSCameraController(
 ) : CameraController {
 
   private val _cameraState = MutableStateFlow<CameraState>(CameraState.Initializing)
-  override val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
+  private val _zoomState = MutableStateFlow(ZoomState())
+  private val _exposureState = MutableStateFlow(ExposureState())
 
-  private val _zoomRatioFlow = MutableStateFlow(1.0f)
-  override val zoomRatioFlow: StateFlow<Float> = _zoomRatioFlow.asStateFlow()
+  private val iosCameraInfo = object : CameraInfo {
+    override val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
+    override val zoomState: StateFlow<ZoomState> = _zoomState.asStateFlow()
+    override val exposureState: StateFlow<ExposureState> = _exposureState.asStateFlow()
+  }
 
-  override val minZoomRatio: Float
-    get() = currentDevice?.minAvailableVideoZoomFactor?.toFloat() ?: 1.0f
+  override val cameraInfo: CameraInfo = iosCameraInfo
 
-  override val maxZoomRatio: Float
-    get() = currentDevice?.maxAvailableVideoZoomFactor?.toFloat() ?: 1.0f
+  private val iosCameraControl = object : CameraControl {
+    override fun setZoom(ratio: Float) {
+      currentDevice?.let { device ->
+        try {
+          device.lockForConfiguration(null)
+          val clampedRatio = ratio.toDouble().coerceIn(
+            device.minAvailableVideoZoomFactor,
+            device.maxAvailableVideoZoomFactor,
+          )
+          device.videoZoomFactor = clampedRatio
+          device.unlockForConfiguration()
 
-  private val _exposureCompensationFlow = MutableStateFlow(0.0f)
-  override val exposureCompensationFlow: StateFlow<Float> = _exposureCompensationFlow.asStateFlow()
+          _zoomState.value = _zoomState.value.copy(zoomRatio = clampedRatio.toFloat())
 
-  override val exposureCompensationRange: Pair<Float, Float>
-    get() {
-      val device = currentDevice ?: return Pair(-2.0f, 2.0f)
-      return Pair(device.minExposureTargetBias, device.maxExposureTargetBias)
+          val currentState = _cameraState.value
+          if (currentState is CameraState.Ready) {
+            _cameraState.value = currentState.copy(zoomRatio = clampedRatio.toFloat())
+          }
+        } catch (_: Exception) {
+          // Ignore zoom errors
+        }
+      }
     }
+
+    override fun focus(point: Offset) {
+      currentDevice?.let { device ->
+        try {
+          device.lockForConfiguration(null)
+
+          // Set focus point
+          if (device.isFocusPointOfInterestSupported()) {
+            device.focusPointOfInterest = cValue {
+              x = point.x.toDouble()
+              y = point.y.toDouble()
+            }
+            device.focusMode = AVCaptureFocusModeAutoFocus
+          }
+
+          // Set exposure point
+          if (device.isExposurePointOfInterestSupported()) {
+            device.exposurePointOfInterest = cValue {
+              x = point.x.toDouble()
+              y = point.y.toDouble()
+            }
+            device.exposureMode = AVCaptureExposureModeAutoExpose
+          }
+
+          device.unlockForConfiguration()
+        } catch (_: Exception) {
+          // Ignore focus errors
+        }
+      }
+    }
+
+    override fun setExposureCompensation(exposureValue: Float) {
+      currentDevice?.let { device ->
+        try {
+          device.lockForConfiguration(null)
+          val clampedEV = exposureValue.coerceIn(
+            device.minExposureTargetBias,
+            device.maxExposureTargetBias,
+          )
+          device.setExposureTargetBias(clampedEV) { _ ->
+            // Update local state in completion handler
+            _exposureState.value = _exposureState.value.copy(exposureCompensation = clampedEV)
+
+            val currentState = _cameraState.value
+            if (currentState is CameraState.Ready) {
+              _cameraState.value = currentState.copy(exposureCompensation = clampedEV)
+            }
+          }
+          device.unlockForConfiguration()
+        } catch (_: Exception) {
+          // Ignore exposure errors
+        }
+      }
+    }
+
+    override fun setFlashMode(mode: FlashMode) {
+      _configuration = configuration.copy(flashMode = mode)
+      updateFlashMode(mode)
+
+      val currentState = _cameraState.value
+      if (currentState is CameraState.Ready) {
+        _cameraState.value = currentState.copy(flashMode = mode)
+      }
+    }
+
+    override fun enableTorch(enabled: Boolean) {
+      currentDevice?.let { device ->
+        if (device.hasTorch && device.isTorchAvailable()) {
+          try {
+            device.lockForConfiguration(null)
+            device.torchMode = if (enabled) AVCaptureTorchModeOn else AVCaptureTorchModeOff
+            device.unlockForConfiguration()
+          } catch (_: Exception) {}
+        }
+      }
+    }
+  }
+
+  override val cameraControl: CameraControl = iosCameraControl
 
   private var _configuration = initialConfiguration
   override val configuration: CameraConfiguration get() = _configuration
@@ -240,6 +334,19 @@ class IOSCameraController(
           captureSession.addOutput(video)
           videoOutput = video
         }
+
+        // Initial State Update from Device
+        _zoomState.value = ZoomState(
+          zoomRatio = device.videoZoomFactor.toFloat(),
+          minZoomRatio = device.minAvailableVideoZoomFactor.toFloat(),
+          maxZoomRatio = device.maxAvailableVideoZoomFactor.toFloat(),
+        )
+
+        _exposureState.value = ExposureState(
+          exposureCompensation = 0f, // Assume 0 initially or read from device if property available
+          exposureCompensationRange = Pair(device.minExposureTargetBias, device.maxExposureTargetBias),
+          exposureStep = 0f, // iOS doesn't explicitly expose step, continuous
+        )
       } catch (e: Exception) {
         _cameraState.value = CameraState.Error(
           CameraException.InitializationFailed(e),
@@ -372,16 +479,6 @@ class IOSCameraController(
     }
   }
 
-  override fun setFlashMode(mode: FlashMode) {
-    _configuration = configuration.copy(flashMode = mode)
-    updateFlashMode(mode)
-
-    val currentState = _cameraState.value
-    if (currentState is CameraState.Ready) {
-      _cameraState.value = currentState.copy(flashMode = mode)
-    }
-  }
-
   private fun updateFlashMode(mode: FlashMode) {
     currentDevice?.let { device ->
       if (device.hasTorch && device.isTorchAvailable()) {
@@ -395,81 +492,6 @@ class IOSCameraController(
         } catch (_: Exception) {
           // Ignore errors for torch mode
         }
-      }
-    }
-  }
-
-  override fun setZoom(ratio: Float) {
-    currentDevice?.let { device ->
-      try {
-        device.lockForConfiguration(null)
-        val clampedRatio = ratio.toDouble().coerceIn(
-          device.minAvailableVideoZoomFactor,
-          device.maxAvailableVideoZoomFactor,
-        )
-        device.videoZoomFactor = clampedRatio
-        device.unlockForConfiguration()
-
-        _zoomRatioFlow.value = clampedRatio.toFloat()
-        val currentState = _cameraState.value
-        if (currentState is CameraState.Ready) {
-          _cameraState.value = currentState.copy(zoomRatio = clampedRatio.toFloat())
-        }
-      } catch (_: Exception) {
-        // Ignore zoom errors
-      }
-    }
-  }
-
-  override fun focus(point: Offset) {
-    currentDevice?.let { device ->
-      try {
-        device.lockForConfiguration(null)
-
-        // Set focus point
-        if (device.isFocusPointOfInterestSupported()) {
-          device.focusPointOfInterest = cValue {
-            x = point.x.toDouble()
-            y = point.y.toDouble()
-          }
-          device.focusMode = AVCaptureFocusModeAutoFocus
-        }
-
-        // Set exposure point
-        if (device.isExposurePointOfInterestSupported()) {
-          device.exposurePointOfInterest = cValue {
-            x = point.x.toDouble()
-            y = point.y.toDouble()
-          }
-          device.exposureMode = AVCaptureExposureModeAutoExpose
-        }
-
-        device.unlockForConfiguration()
-      } catch (_: Exception) {
-        // Ignore focus errors
-      }
-    }
-  }
-
-  override fun setExposureCompensation(exposureValue: Float) {
-    currentDevice?.let { device ->
-      try {
-        device.lockForConfiguration(null)
-        val clampedEV = exposureValue.coerceIn(
-          device.minExposureTargetBias,
-          device.maxExposureTargetBias,
-        )
-        device.setExposureTargetBias(clampedEV) { _ ->
-          _exposureCompensationFlow.value = clampedEV
-
-          val currentState = _cameraState.value
-          if (currentState is CameraState.Ready) {
-            _cameraState.value = currentState.copy(exposureCompensation = clampedEV)
-          }
-        }
-        device.unlockForConfiguration()
-      } catch (_: Exception) {
-        // Ignore exposure errors
       }
     }
   }
