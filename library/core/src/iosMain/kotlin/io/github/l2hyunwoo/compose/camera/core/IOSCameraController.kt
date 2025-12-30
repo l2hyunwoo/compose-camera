@@ -22,6 +22,7 @@ import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.cValue
+import kotlinx.cinterop.interpretObjCPointer
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -82,9 +83,13 @@ import platform.CoreMedia.CMSampleBufferRef
 import platform.CoreVideo.kCVPixelBufferPixelFormatTypeKey
 import platform.CoreVideo.kCVPixelFormatType_32BGRA
 import platform.Foundation.NSDate
+import platform.Foundation.NSDictionary
 import platform.Foundation.NSError
+import platform.Foundation.NSMutableDictionary
+import platform.Foundation.NSNumber
 import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSURL
+import platform.Foundation.numberWithUnsignedInt
 import platform.Foundation.timeIntervalSince1970
 import platform.Photos.PHAssetChangeRequest
 import platform.Photos.PHPhotoLibrary
@@ -263,6 +268,12 @@ class IOSCameraController(
   private fun setupCamera() {
     captureSession.beginConfiguration()
 
+    // Cleanup old inputs/outputs to prevent accumulation during lens switch
+    currentInput?.let { captureSession.removeInput(it) }
+    photoOutput?.let { captureSession.removeOutput(it) }
+    videoDataOutput?.let { captureSession.removeOutput(it) }
+    videoOutput?.let { captureSession.removeOutput(it) }
+
     // Set session preset
     captureSession.sessionPreset = when (configuration.videoQuality) {
       VideoQuality.SD -> AVCaptureSessionPreset640x480
@@ -312,8 +323,14 @@ class IOSCameraController(
         // Video Data Output (Frame Analysis)
         val videoDataOutput = AVCaptureVideoDataOutput()
         // Using 32BGRA is generally good for ML Kit / generic processing
-        val settings = mapOf<Any?, Any>(kCVPixelBufferPixelFormatTypeKey to kCVPixelFormatType_32BGRA)
-        videoDataOutput.videoSettings = settings
+        // Use interpretObjCPointer to bridge CFStringRef to NSString as a dictionary key
+        val settings = NSMutableDictionary().apply {
+          setObject(
+            NSNumber.numberWithUnsignedInt(kCVPixelFormatType_32BGRA),
+            forKey = interpretObjCPointer<platform.Foundation.NSString>(kCVPixelBufferPixelFormatTypeKey!!.rawValue),
+          )
+        }
+        videoDataOutput.videoSettings = settings as Map<Any?, *>
         videoDataOutput.alwaysDiscardsLateVideoFrames = true
 
         val delegate = VideoDataDelegate { buffer ->
@@ -456,16 +473,12 @@ class IOSCameraController(
 
   override fun updateConfiguration(config: CameraConfiguration) {
     val needsRebind = config.lens != _configuration.lens
+    val oldPlugins = _configuration.plugins
     _configuration = config
 
     if (needsRebind) {
+      oldPlugins.forEach { it.onDetach() }
       captureSession.stopRunning()
-
-      // Remove existing inputs
-      currentInput?.let { input ->
-        captureSession.removeInput(input)
-      }
-
       setupCamera()
     }
 
