@@ -31,10 +31,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import kotlin.coroutines.resume
 
 /**
  * Android implementation of [CameraPermissionManager].
  */
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class CameraPermissionManager internal constructor(
   private val context: Context,
   private val onRequestPermissions: (Array<String>, (Map<String, Boolean>) -> Unit) -> Unit,
@@ -52,7 +54,11 @@ actual class CameraPermissionManager internal constructor(
     val androidPermission = permission.toAndroidPermission() ?: return PermissionStatus.GRANTED
 
     // First check if already granted
-    if (ContextCompat.checkSelfPermission(context, androidPermission) == PackageManager.PERMISSION_GRANTED) {
+    if (ContextCompat.checkSelfPermission(
+        context,
+        androidPermission,
+      ) == PackageManager.PERMISSION_GRANTED
+    ) {
       return PermissionStatus.GRANTED
     }
 
@@ -61,13 +67,14 @@ actual class CameraPermissionManager internal constructor(
         val granted = results[androidPermission] == true
         continuation.resume(
           if (granted) PermissionStatus.GRANTED else PermissionStatus.DENIED,
-        ) {}
+        )
       }
     }
   }
 
   actual suspend fun requestCameraPermissions(): PermissionResult {
-    val permissionsToRequest = mutableListOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+    val permissionsToRequest =
+      mutableListOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
 
     // Check which permissions are already granted
     val alreadyGranted = permissionsToRequest.filter {
@@ -106,7 +113,7 @@ actual class CameraPermissionManager internal constructor(
                 PermissionStatus.DENIED
               }
           }
-          continuation.resume(PermissionResult(resultMap)) {}
+          continuation.resume(PermissionResult(resultMap))
         }
       }
     }

@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 /**
  * Android implementation of MediaLoader using MediaStore.
  */
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class MediaLoader(private val context: Context) {
 
   actual suspend fun loadMedia(): List<MediaItem> {

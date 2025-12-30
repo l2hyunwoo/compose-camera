@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
  *
  * Use [rememberCameraPermissionManager] to create an instance.
  */
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 expect class CameraPermissionManager {
   /**
    * Check the current status of a permission without requesting it.
