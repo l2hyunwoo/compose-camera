@@ -26,7 +26,7 @@ plugins {
 }
 
 group = "io.github.l2hyunwoo"
-version = "1.1.0"
+version = "1.2.0"
 
 kotlin {
     androidLibrary {

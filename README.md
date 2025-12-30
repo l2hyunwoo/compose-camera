@@ -33,7 +33,7 @@ Add the following dependencies to your `build.gradle.kts`:
 ```toml
 # libs.versions.toml
 [versions]
-compose-camera = "1.1.0"
+compose-camera = "1.2.0"
 
 [libraries]
 compose-camera-core = { module = "io.github.l2hyunwoo:compose-camera-core", version.ref = "compose-camera" }
@@ -59,8 +59,8 @@ kotlin {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("io.github.l2hyunwoo:compose-camera-core:1.1.0")
-            implementation("io.github.l2hyunwoo:compose-camera-ui:1.1.0")
+            implementation("io.github.l2hyunwoo:compose-camera-core:1.2.0")
+            implementation("io.github.l2hyunwoo:compose-camera-ui:1.2.0")
         }
     }
 }
