@@ -45,6 +45,9 @@ import platform.AVFoundation.AVCaptureOutput
 import platform.AVFoundation.AVCapturePhoto
 import platform.AVFoundation.AVCapturePhotoCaptureDelegateProtocol
 import platform.AVFoundation.AVCapturePhotoOutput
+import platform.AVFoundation.AVCapturePhotoQualityPrioritizationBalanced
+import platform.AVFoundation.AVCapturePhotoQualityPrioritizationQuality
+import platform.AVFoundation.AVCapturePhotoQualityPrioritizationSpeed
 import platform.AVFoundation.AVCapturePhotoSettings
 import platform.AVFoundation.AVCaptureSession
 import platform.AVFoundation.AVCaptureSessionPreset1280x720
@@ -118,7 +121,7 @@ class IOSCameraController(
   override val exposureCompensationRange: Pair<Float, Float>
     get() {
       val device = currentDevice ?: return Pair(-2.0f, 2.0f)
-      return Pair(device.minExposureTargetBias.toFloat(), device.maxExposureTargetBias.toFloat())
+      return Pair(device.minExposureTargetBias, device.maxExposureTargetBias)
     }
 
   private var _configuration = initialConfiguration
@@ -197,6 +200,16 @@ class IOSCameraController(
 
         // Add photo output
         val photo = AVCapturePhotoOutput()
+
+        // Configure max prioritization
+        if (photo.maxPhotoQualityPrioritization < AVCapturePhotoQualityPrioritizationQuality) {
+          try {
+            photo.maxPhotoQualityPrioritization = AVCapturePhotoQualityPrioritizationQuality
+          } catch (_: Exception) {
+            // Ignore if unable to set
+          }
+        }
+
         if (captureSession.canAddOutput(photo)) {
           captureSession.addOutput(photo)
           photoOutput = photo
@@ -276,6 +289,23 @@ class IOSCameraController(
         FlashMode.AUTO -> AVCaptureFlashModeAuto
         FlashMode.TORCH -> AVCaptureFlashModeOff
       }
+    }
+
+    // Set capture mode
+    // Clamp to supported max prioritization
+    val targetPrioritization = when (configuration.captureMode) {
+      CaptureMode.QUALITY -> AVCapturePhotoQualityPrioritizationQuality
+      CaptureMode.SPEED -> AVCapturePhotoQualityPrioritizationSpeed
+      CaptureMode.BALANCED -> AVCapturePhotoQualityPrioritizationBalanced
+    }
+
+    val maxPrioritization = output.maxPhotoQualityPrioritization
+    // Assuming enums are ordered: Speed(1) < Balanced(2) < Quality(3)
+    // We can use direct comparison if they are numbers, or check specific values
+    settings.photoQualityPrioritization = if (targetPrioritization > maxPrioritization) {
+      maxPrioritization
+    } else {
+      targetPrioritization
     }
 
     // Create delegate
@@ -426,8 +456,8 @@ class IOSCameraController(
       try {
         device.lockForConfiguration(null)
         val clampedEV = exposureValue.coerceIn(
-          device.minExposureTargetBias.toFloat(),
-          device.maxExposureTargetBias.toFloat(),
+          device.minExposureTargetBias,
+          device.maxExposureTargetBias,
         )
         device.setExposureTargetBias(clampedEV) { _ ->
           _exposureCompensationFlow.value = clampedEV

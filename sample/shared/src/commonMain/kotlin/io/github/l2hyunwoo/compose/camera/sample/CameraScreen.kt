@@ -193,6 +193,31 @@ fun CameraScreen(
             )
           }
 
+          // Capture Mode button
+          IconButton(
+            onClick = {
+              val newMode = when (cameraConfig.captureMode) {
+                CaptureMode.BALANCED -> CaptureMode.QUALITY
+                CaptureMode.QUALITY -> CaptureMode.SPEED
+                CaptureMode.SPEED -> CaptureMode.BALANCED
+              }
+              cameraConfig = cameraConfig.copy(captureMode = newMode)
+              cameraController?.updateConfiguration(cameraConfig)
+              lastCaptureResult = "Mode: ${newMode.name}"
+            },
+          ) {
+            val icon = when (cameraConfig.captureMode) {
+              CaptureMode.BALANCED -> Icons.Filled.AutoAwesome
+              CaptureMode.QUALITY -> Icons.Filled.Star
+              CaptureMode.SPEED -> Icons.Filled.Timer
+            }
+            Icon(
+              imageVector = icon,
+              contentDescription = "Capture Mode: ${cameraConfig.captureMode.name}",
+              tint = Color.White,
+            )
+          }
+
           // Barcode scanner button
           IconButton(onClick = onBarcodeScannerClick) {
             Icon(

@@ -24,8 +24,8 @@ public final class io/github/l2hyunwoo/compose/camera/core/AndroidCameraControll
 public final class io/github/l2hyunwoo/compose/camera/core/CameraConfiguration {
 	public static final field $stable I
 	public fun <init> ()V
-	public fun <init> (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;Lio/github/l2hyunwoo/compose/camera/core/VideoQuality;IZLio/github/l2hyunwoo/compose/camera/core/Directory;Ljava/util/List;)V
-	public synthetic fun <init> (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;Lio/github/l2hyunwoo/compose/camera/core/VideoQuality;IZLio/github/l2hyunwoo/compose/camera/core/Directory;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;Lio/github/l2hyunwoo/compose/camera/core/VideoQuality;IZLio/github/l2hyunwoo/compose/camera/core/Directory;Lio/github/l2hyunwoo/compose/camera/core/CaptureMode;Ljava/util/List;)V
+	public synthetic fun <init> (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;Lio/github/l2hyunwoo/compose/camera/core/VideoQuality;IZLio/github/l2hyunwoo/compose/camera/core/Directory;Lio/github/l2hyunwoo/compose/camera/core/CaptureMode;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Lio/github/l2hyunwoo/compose/camera/core/CameraLens;
 	public final fun component2 ()Lio/github/l2hyunwoo/compose/camera/core/FlashMode;
 	public final fun component3 ()Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;
@@ -33,10 +33,12 @@ public final class io/github/l2hyunwoo/compose/camera/core/CameraConfiguration {
 	public final fun component5 ()I
 	public final fun component6 ()Z
 	public final fun component7 ()Lio/github/l2hyunwoo/compose/camera/core/Directory;
-	public final fun component8 ()Ljava/util/List;
-	public final fun copy (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;Lio/github/l2hyunwoo/compose/camera/core/VideoQuality;IZLio/github/l2hyunwoo/compose/camera/core/Directory;Ljava/util/List;)Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
-	public static synthetic fun copy$default (Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;Lio/github/l2hyunwoo/compose/camera/core/VideoQuality;IZLio/github/l2hyunwoo/compose/camera/core/Directory;Ljava/util/List;ILjava/lang/Object;)Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
+	public final fun component8 ()Lio/github/l2hyunwoo/compose/camera/core/CaptureMode;
+	public final fun component9 ()Ljava/util/List;
+	public final fun copy (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;Lio/github/l2hyunwoo/compose/camera/core/VideoQuality;IZLio/github/l2hyunwoo/compose/camera/core/Directory;Lio/github/l2hyunwoo/compose/camera/core/CaptureMode;Ljava/util/List;)Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
+	public static synthetic fun copy$default (Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;Lio/github/l2hyunwoo/compose/camera/core/VideoQuality;IZLio/github/l2hyunwoo/compose/camera/core/Directory;Lio/github/l2hyunwoo/compose/camera/core/CaptureMode;Ljava/util/List;ILjava/lang/Object;)Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCaptureMode ()Lio/github/l2hyunwoo/compose/camera/core/CaptureMode;
 	public final fun getDirectory ()Lio/github/l2hyunwoo/compose/camera/core/Directory;
 	public final fun getEnableHdr ()Z
 	public final fun getFlashMode ()Lio/github/l2hyunwoo/compose/camera/core/FlashMode;
@@ -193,6 +195,15 @@ public final class io/github/l2hyunwoo/compose/camera/core/CameraState$Ready : i
 	public fun hashCode ()I
 	public final fun isRecording ()Z
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/l2hyunwoo/compose/camera/core/CaptureMode : java/lang/Enum {
+	public static final field BALANCED Lio/github/l2hyunwoo/compose/camera/core/CaptureMode;
+	public static final field QUALITY Lio/github/l2hyunwoo/compose/camera/core/CaptureMode;
+	public static final field SPEED Lio/github/l2hyunwoo/compose/camera/core/CaptureMode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/l2hyunwoo/compose/camera/core/CaptureMode;
+	public static fun values ()[Lio/github/l2hyunwoo/compose/camera/core/CaptureMode;
 }
 
 public final class io/github/l2hyunwoo/compose/camera/core/Directory : java/lang/Enum {
