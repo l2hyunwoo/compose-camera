@@ -92,16 +92,16 @@ actual fun CameraPreview(
           captureSession = controller.captureSession,
           onZoomChange = { scale, isStarting ->
             if (!isStarting) {
-              val newZoom = (controller.zoomRatioFlow.value * scale).coerceIn(
-                controller.minZoomRatio,
-                controller.maxZoomRatio,
+              val newZoom = (controller.cameraInfo.zoomState.value.zoomRatio * scale).coerceIn(
+                controller.cameraInfo.zoomState.value.minZoomRatio,
+                controller.cameraInfo.zoomState.value.maxZoomRatio,
               )
-              controller.setZoom(newZoom)
+              controller.cameraControl.setZoom(newZoom)
             }
           },
           onTap = { offset, normalizedPoint ->
             tapPosition = offset
-            controller.focus(normalizedPoint)
+            controller.cameraControl.focus(normalizedPoint)
           },
         )
         cameraView
