@@ -2,20 +2,12 @@ public final class io/github/l2hyunwoo/compose/camera/core/AndroidCameraControll
 	public static final field $stable I
 	public fun <init> (Landroid/content/Context;Landroidx/lifecycle/LifecycleOwner;Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;)V
 	public final fun addAnalyzer (Landroidx/camera/core/ImageAnalysis$Analyzer;)V
-	public fun focus-k-4lQ0M (J)V
-	public fun getCameraState ()Lkotlinx/coroutines/flow/StateFlow;
+	public fun getCameraControl ()Lio/github/l2hyunwoo/compose/camera/core/CameraControl;
+	public fun getCameraInfo ()Lio/github/l2hyunwoo/compose/camera/core/CameraInfo;
 	public fun getConfiguration ()Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
-	public fun getExposureCompensationFlow ()Lkotlinx/coroutines/flow/StateFlow;
-	public fun getExposureCompensationRange ()Lkotlin/Pair;
-	public fun getMaxZoomRatio ()F
-	public fun getMinZoomRatio ()F
-	public fun getZoomRatioFlow ()Lkotlinx/coroutines/flow/StateFlow;
 	public fun release ()V
 	public final fun removeAnalyzer (Landroidx/camera/core/ImageAnalysis$Analyzer;)V
-	public fun setExposureCompensation (F)V
-	public fun setFlashMode (Lio/github/l2hyunwoo/compose/camera/core/FlashMode;)V
 	public fun setLens (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;)V
-	public fun setZoom (F)V
 	public fun startRecording (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun takePicture (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun updateConfiguration (Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;)V
@@ -54,20 +46,20 @@ public final class io/github/l2hyunwoo/compose/camera/core/CameraConfiguration {
 	public final fun withoutPlugin (Ljava/lang/String;)Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
 }
 
-public abstract interface class io/github/l2hyunwoo/compose/camera/core/CameraController {
+public abstract interface class io/github/l2hyunwoo/compose/camera/core/CameraControl {
+	public abstract fun enableTorch (Z)V
 	public abstract fun focus-k-4lQ0M (J)V
-	public abstract fun getCameraState ()Lkotlinx/coroutines/flow/StateFlow;
-	public abstract fun getConfiguration ()Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
-	public abstract fun getExposureCompensationFlow ()Lkotlinx/coroutines/flow/StateFlow;
-	public abstract fun getExposureCompensationRange ()Lkotlin/Pair;
-	public abstract fun getMaxZoomRatio ()F
-	public abstract fun getMinZoomRatio ()F
-	public abstract fun getZoomRatioFlow ()Lkotlinx/coroutines/flow/StateFlow;
-	public abstract fun release ()V
 	public abstract fun setExposureCompensation (F)V
 	public abstract fun setFlashMode (Lio/github/l2hyunwoo/compose/camera/core/FlashMode;)V
-	public abstract fun setLens (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;)V
 	public abstract fun setZoom (F)V
+}
+
+public abstract interface class io/github/l2hyunwoo/compose/camera/core/CameraController {
+	public abstract fun getCameraControl ()Lio/github/l2hyunwoo/compose/camera/core/CameraControl;
+	public abstract fun getCameraInfo ()Lio/github/l2hyunwoo/compose/camera/core/CameraInfo;
+	public abstract fun getConfiguration ()Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
+	public abstract fun release ()V
+	public abstract fun setLens (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;)V
 	public abstract fun startRecording (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun takePicture (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun updateConfiguration (Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;)V
@@ -121,6 +113,17 @@ public final class io/github/l2hyunwoo/compose/camera/core/CameraException$Unkno
 	public static final field $stable I
 	public fun <init> (Ljava/lang/String;Ljava/lang/Throwable;)V
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public abstract interface class io/github/l2hyunwoo/compose/camera/core/CameraInfo {
+	public abstract fun getCameraState ()Lkotlinx/coroutines/flow/StateFlow;
+	public abstract fun getExposureState ()Lkotlinx/coroutines/flow/StateFlow;
+	public fun getFlashMode ()Lio/github/l2hyunwoo/compose/camera/core/FlashMode;
+	public abstract fun getZoomState ()Lkotlinx/coroutines/flow/StateFlow;
+}
+
+public final class io/github/l2hyunwoo/compose/camera/core/CameraInfo$DefaultImpls {
+	public static fun getFlashMode (Lio/github/l2hyunwoo/compose/camera/core/CameraInfo;)Lio/github/l2hyunwoo/compose/camera/core/FlashMode;
 }
 
 public final class io/github/l2hyunwoo/compose/camera/core/CameraLens : java/lang/Enum {
@@ -214,6 +217,24 @@ public final class io/github/l2hyunwoo/compose/camera/core/Directory : java/lang
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/github/l2hyunwoo/compose/camera/core/Directory;
 	public static fun values ()[Lio/github/l2hyunwoo/compose/camera/core/Directory;
+}
+
+public final class io/github/l2hyunwoo/compose/camera/core/ExposureState {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (FLkotlin/Pair;F)V
+	public synthetic fun <init> (FLkotlin/Pair;FILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()F
+	public final fun component2 ()Lkotlin/Pair;
+	public final fun component3 ()F
+	public final fun copy (FLkotlin/Pair;F)Lio/github/l2hyunwoo/compose/camera/core/ExposureState;
+	public static synthetic fun copy$default (Lio/github/l2hyunwoo/compose/camera/core/ExposureState;FLkotlin/Pair;FILjava/lang/Object;)Lio/github/l2hyunwoo/compose/camera/core/ExposureState;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getExposureCompensation ()F
+	public final fun getExposureCompensationRange ()Lkotlin/Pair;
+	public final fun getExposureStep ()F
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/l2hyunwoo/compose/camera/core/FlashMode : java/lang/Enum {
@@ -338,6 +359,24 @@ public final class io/github/l2hyunwoo/compose/camera/core/VideoRecordingResult$
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDurationMs ()J
 	public final fun getUri ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/l2hyunwoo/compose/camera/core/ZoomState {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (FFF)V
+	public synthetic fun <init> (FFFILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()F
+	public final fun component2 ()F
+	public final fun component3 ()F
+	public final fun copy (FFF)Lio/github/l2hyunwoo/compose/camera/core/ZoomState;
+	public static synthetic fun copy$default (Lio/github/l2hyunwoo/compose/camera/core/ZoomState;FFFILjava/lang/Object;)Lio/github/l2hyunwoo/compose/camera/core/ZoomState;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMaxZoomRatio ()F
+	public final fun getMinZoomRatio ()F
+	public final fun getZoomRatio ()F
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
