@@ -15,56 +15,23 @@
  */
 package io.github.l2hyunwoo.compose.camera.core
 
-import androidx.compose.ui.geometry.Offset
 import com.rickclephas.kmp.nativecoroutines.NativeCoroutines
-import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
-import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Controller for camera operations.
- * Provides methods for capturing photos, recording videos, and controlling camera settings.
+ * Provides access to camera information and controls, as well as methods for capturing media.
  */
 interface CameraController {
-  /**
-   * Current camera state as a StateFlow.
-   * Annotated with [NativeCoroutinesState] for Swift compatibility.
-   */
-  @NativeCoroutinesState
-  val cameraState: StateFlow<CameraState>
 
   /**
-   * Current zoom ratio as a StateFlow.
-   * This provides real-time updates of the zoom level (1.0 = no zoom).
-   * Annotated with [NativeCoroutinesState] for Swift compatibility.
+   * Access to camera configuration and capabilities.
    */
-  @NativeCoroutinesState
-  val zoomRatioFlow: StateFlow<Float>
+  val cameraInfo: CameraInfo
 
   /**
-   * Minimum zoom ratio supported by the camera.
-   * This is hardware-dependent and typically 1.0f for most devices.
-   * Some devices with wide-angle lenses may support values less than 1.0f.
+   * Access to camera controls (zoom, focus, exposure, etc.).
    */
-  val minZoomRatio: Float
-
-  /**
-   * Maximum zoom ratio supported by the camera.
-   * This is hardware-dependent and varies between devices.
-   */
-  val maxZoomRatio: Float
-
-  /**
-   * Current exposure compensation value as StateFlow (in EV units).
-   * Annotated with [NativeCoroutinesState] for Swift compatibility.
-   */
-  @NativeCoroutinesState
-  val exposureCompensationFlow: StateFlow<Float>
-
-  /**
-   * Supported exposure compensation range.
-   * @return Pair(min, max) in EV units (typically -2.0 to +2.0)
-   */
-  val exposureCompensationRange: Pair<Float, Float>
+  val cameraControl: CameraControl
 
   /**
    * Current camera configuration
@@ -95,30 +62,9 @@ interface CameraController {
 
   /**
    * Set the camera lens (front/back)
+   * This delegates to updateConfiguration internally.
    */
   fun setLens(lens: CameraLens)
-
-  /**
-   * Set the flash mode
-   */
-  fun setFlashMode(mode: FlashMode)
-
-  /**
-   * Set the zoom ratio (1.0 = no zoom)
-   */
-  fun setZoom(ratio: Float)
-
-  /**
-   * Focus on a specific point in the preview
-   * @param point The normalized point (0-1 range) to focus on
-   */
-  fun focus(point: Offset)
-
-  /**
-   * Set exposure compensation value.
-   * @param exposureValue Exposure Value to set (will be clamped to supported range)
-   */
-  fun setExposureCompensation(exposureValue: Float)
 
   /**
    * Release camera resources
