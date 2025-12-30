@@ -52,6 +52,7 @@ enum class BarcodeFormat {
 /**
  * Plugin for scanning barcodes and QR codes.
  */
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 expect class BarcodeScanner() : CameraPlugin {
   /**
    * Unique identifier for this plugin

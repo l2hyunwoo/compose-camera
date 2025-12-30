@@ -22,6 +22,7 @@ import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
+import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
 import io.github.l2hyunwoo.compose.camera.core.AndroidCameraController
 import io.github.l2hyunwoo.compose.camera.core.CameraController
 import io.github.l2hyunwoo.compose.camera.core.plugin.CameraPlugin
@@ -34,10 +35,13 @@ import com.google.mlkit.vision.barcode.common.Barcode as MlKitBarcode
  * Android implementation of barcode scanner using Google ML Kit.
  * Detects barcodes and QR codes from camera frames.
  */
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class BarcodeScanner actual constructor() : CameraPlugin {
   actual override val id: String = "BarcodeScanner"
 
   private val _barcodes = MutableStateFlow<List<Barcode>>(emptyList())
+
+  @NativeCoroutinesState
   actual val barcodes: StateFlow<List<Barcode>> = _barcodes.asStateFlow()
 
   private val scanner by lazy {

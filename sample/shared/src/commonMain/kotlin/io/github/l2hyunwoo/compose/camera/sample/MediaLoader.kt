@@ -31,6 +31,7 @@ data class MediaItem(
 /**
  * Platform-specific media loader for loading captured photos and videos.
  */
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 expect class MediaLoader {
   suspend fun loadMedia(): List<MediaItem>
 }
