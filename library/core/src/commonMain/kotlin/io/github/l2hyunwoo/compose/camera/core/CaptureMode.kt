@@ -41,7 +41,7 @@ enum class CaptureMode {
    * Balance between quality and speed.
    * This is the default mode.
    *
-   * - Android: Maps to [ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY]
+   * - Android: Maps to [ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY] (same as SPEED, as Android does not have a balanced mode)
    * - iOS: Maps to [AVCapturePhotoQualityPrioritizationBalanced]
    */
   BALANCED,
