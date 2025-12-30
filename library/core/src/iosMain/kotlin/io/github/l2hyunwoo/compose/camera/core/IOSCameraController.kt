@@ -200,6 +200,16 @@ class IOSCameraController(
 
         // Add photo output
         val photo = AVCapturePhotoOutput()
+
+        // Configure max prioritization
+        if (photo.maxPhotoQualityPrioritization < AVCapturePhotoQualityPrioritizationQuality) {
+          try {
+            photo.maxPhotoQualityPrioritization = AVCapturePhotoQualityPrioritizationQuality
+          } catch (e: Exception) {
+            // Ignore if unable to set
+          }
+        }
+
         if (captureSession.canAddOutput(photo)) {
           captureSession.addOutput(photo)
           photoOutput = photo
@@ -282,10 +292,20 @@ class IOSCameraController(
     }
 
     // Set capture mode
-    settings.photoQualityPrioritization = when (configuration.captureMode) {
+    // Clamp to supported max prioritization
+    val targetPrioritization = when (configuration.captureMode) {
       CaptureMode.QUALITY -> AVCapturePhotoQualityPrioritizationQuality
       CaptureMode.SPEED -> AVCapturePhotoQualityPrioritizationSpeed
       CaptureMode.BALANCED -> AVCapturePhotoQualityPrioritizationBalanced
+    }
+
+    val maxPrioritization = output.maxPhotoQualityPrioritization
+    // Assuming enums are ordered: Speed(1) < Balanced(2) < Quality(3)
+    // We can use direct comparison if they are numbers, or check specific values
+    settings.photoQualityPrioritization = if (targetPrioritization > maxPrioritization) {
+      maxPrioritization
+    } else {
+      targetPrioritization
     }
 
     // Create delegate
