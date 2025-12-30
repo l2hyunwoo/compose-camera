@@ -56,7 +56,7 @@ actual class CameraPermissionManager internal constructor(
     // First check if already granted
     if (ContextCompat.checkSelfPermission(
         context,
-        androidPermission
+        androidPermission,
       ) == PackageManager.PERMISSION_GRANTED
     ) {
       return PermissionStatus.GRANTED
