@@ -5,11 +5,14 @@ public final class io/github/l2hyunwoo/compose/camera/core/AndroidCameraControll
 	public fun focus-k-4lQ0M (J)V
 	public fun getCameraState ()Lkotlinx/coroutines/flow/StateFlow;
 	public fun getConfiguration ()Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
+	public fun getExposureCompensationFlow ()Lkotlinx/coroutines/flow/StateFlow;
+	public fun getExposureCompensationRange ()Lkotlin/Pair;
 	public fun getMaxZoomRatio ()F
 	public fun getMinZoomRatio ()F
 	public fun getZoomRatioFlow ()Lkotlinx/coroutines/flow/StateFlow;
 	public fun release ()V
 	public final fun removeAnalyzer (Landroidx/camera/core/ImageAnalysis$Analyzer;)V
+	public fun setExposureCompensation (F)V
 	public fun setFlashMode (Lio/github/l2hyunwoo/compose/camera/core/FlashMode;)V
 	public fun setLens (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;)V
 	public fun setZoom (F)V
@@ -53,10 +56,13 @@ public abstract interface class io/github/l2hyunwoo/compose/camera/core/CameraCo
 	public abstract fun focus-k-4lQ0M (J)V
 	public abstract fun getCameraState ()Lkotlinx/coroutines/flow/StateFlow;
 	public abstract fun getConfiguration ()Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
+	public abstract fun getExposureCompensationFlow ()Lkotlinx/coroutines/flow/StateFlow;
+	public abstract fun getExposureCompensationRange ()Lkotlin/Pair;
 	public abstract fun getMaxZoomRatio ()F
 	public abstract fun getMinZoomRatio ()F
 	public abstract fun getZoomRatioFlow ()Lkotlinx/coroutines/flow/StateFlow;
 	public abstract fun release ()V
+	public abstract fun setExposureCompensation (F)V
 	public abstract fun setFlashMode (Lio/github/l2hyunwoo/compose/camera/core/FlashMode;)V
 	public abstract fun setLens (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;)V
 	public abstract fun setZoom (F)V
@@ -170,16 +176,18 @@ public final class io/github/l2hyunwoo/compose/camera/core/CameraState$Initializ
 
 public final class io/github/l2hyunwoo/compose/camera/core/CameraState$Ready : io/github/l2hyunwoo/compose/camera/core/CameraState {
 	public static final field $stable I
-	public fun <init> (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;ZF)V
-	public synthetic fun <init> (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;ZFILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;ZFF)V
+	public synthetic fun <init> (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;ZFFILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Lio/github/l2hyunwoo/compose/camera/core/CameraLens;
 	public final fun component2 ()Lio/github/l2hyunwoo/compose/camera/core/FlashMode;
 	public final fun component3 ()Z
 	public final fun component4 ()F
-	public final fun copy (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;ZF)Lio/github/l2hyunwoo/compose/camera/core/CameraState$Ready;
-	public static synthetic fun copy$default (Lio/github/l2hyunwoo/compose/camera/core/CameraState$Ready;Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;ZFILjava/lang/Object;)Lio/github/l2hyunwoo/compose/camera/core/CameraState$Ready;
+	public final fun component5 ()F
+	public final fun copy (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;ZFF)Lio/github/l2hyunwoo/compose/camera/core/CameraState$Ready;
+	public static synthetic fun copy$default (Lio/github/l2hyunwoo/compose/camera/core/CameraState$Ready;Lio/github/l2hyunwoo/compose/camera/core/CameraLens;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;ZFFILjava/lang/Object;)Lio/github/l2hyunwoo/compose/camera/core/CameraState$Ready;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getCurrentLens ()Lio/github/l2hyunwoo/compose/camera/core/CameraLens;
+	public final fun getExposureCompensation ()F
 	public final fun getFlashMode ()Lio/github/l2hyunwoo/compose/camera/core/FlashMode;
 	public final fun getZoomRatio ()F
 	public fun hashCode ()I

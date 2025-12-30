@@ -76,6 +76,17 @@ class AndroidCameraController(
   override val maxZoomRatio: Float
     get() = camera?.cameraInfo?.zoomState?.value?.maxZoomRatio ?: 1.0f
 
+  private val _exposureCompensationFlow = MutableStateFlow(0.0f)
+  override val exposureCompensationFlow: StateFlow<Float> = _exposureCompensationFlow.asStateFlow()
+
+  override val exposureCompensationRange: Pair<Float, Float>
+    get() {
+      val exposureState = camera?.cameraInfo?.exposureState ?: return Pair(-2.0f, 2.0f)
+      val step = exposureState.exposureCompensationStep.toFloat()
+      val range = exposureState.exposureCompensationRange
+      return Pair(range.lower * step, range.upper * step)
+    }
+
   private var _configuration = initialConfiguration
   override val configuration: CameraConfiguration get() = _configuration
 
@@ -333,6 +344,28 @@ class AndroidCameraController(
       .build()
 
     cameraControl.startFocusAndMetering(action)
+  }
+
+  override fun setExposureCompensation(exposureValue: Float) {
+    val cameraInfo = camera?.cameraInfo ?: return
+    val cameraControl = camera?.cameraControl ?: return
+    val exposureState = cameraInfo.exposureState
+
+    if (!exposureState.isExposureCompensationSupported) return
+
+    val step = exposureState.exposureCompensationStep.toFloat()
+    val range = exposureState.exposureCompensationRange
+    val clampedEV = exposureValue.coerceIn(range.lower * step, range.upper * step)
+    val index = (clampedEV / step).toInt()
+
+    val appliedEV = index * step
+    cameraControl.setExposureCompensationIndex(index)
+    _exposureCompensationFlow.value = appliedEV
+
+    val currentState = _cameraState.value
+    if (currentState is CameraState.Ready) {
+      _cameraState.value = currentState.copy(exposureCompensation = appliedEV)
+    }
   }
 
   private val analyzers = mutableListOf<ImageAnalysis.Analyzer>()

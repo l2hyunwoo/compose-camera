@@ -14,6 +14,7 @@ A robust, feature-rich camera library for Compose Multiplatform supporting Andro
 - 🔄 **Lens Control**: Switch between Front and Back cameras
 - 🔦 **Flash Control**: Torch, On, Off, Auto modes
 - 🔍 **Pinch Zoom**: Native pinch-to-zoom gesture and zoom ratio control
+- ☀️ **Exposure Compensation**: Manual exposure adjustment (EV control)
 - ✋ **Permission Handling**: Built-in, platform-independent permission manager
 - 🎯 **Tap-to-Focus**: Auto focus on tapped area with customizable visual indicator
 - 🧩 **Plugin Architecture**: Extensible design for frame processing and custom features
@@ -202,6 +203,20 @@ scope.launch {
 }
 ```
 
+
+### 4. Exposure Compensation
+
+```kotlin
+// Get exposure compensation range
+val (minEV, maxEV) = cameraController?.exposureCompensationRange ?: Pair(-2f, 2f)
+
+// Observe current exposure value
+val currentEV by cameraController?.exposureCompensationFlow?.collectAsState() ?: remember { mutableStateOf(0f) }
+
+// Set exposure compensation (in EV units)
+cameraController?.setExposureCompensation(1.5f) // Brighten
+cameraController?.setExposureCompensation(-1.0f) // Darken
+```
 
 ## License
 
