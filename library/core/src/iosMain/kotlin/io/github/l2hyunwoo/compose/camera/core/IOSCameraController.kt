@@ -121,7 +121,7 @@ class IOSCameraController(
   override val exposureCompensationRange: Pair<Float, Float>
     get() {
       val device = currentDevice ?: return Pair(-2.0f, 2.0f)
-      return Pair(device.minExposureTargetBias.toFloat(), device.maxExposureTargetBias.toFloat())
+      return Pair(device.minExposureTargetBias, device.maxExposureTargetBias)
     }
 
   private var _configuration = initialConfiguration
@@ -205,7 +205,7 @@ class IOSCameraController(
         if (photo.maxPhotoQualityPrioritization < AVCapturePhotoQualityPrioritizationQuality) {
           try {
             photo.maxPhotoQualityPrioritization = AVCapturePhotoQualityPrioritizationQuality
-          } catch (e: Exception) {
+          } catch (_: Exception) {
             // Ignore if unable to set
           }
         }
@@ -456,8 +456,8 @@ class IOSCameraController(
       try {
         device.lockForConfiguration(null)
         val clampedEV = exposureValue.coerceIn(
-          device.minExposureTargetBias.toFloat(),
-          device.maxExposureTargetBias.toFloat(),
+          device.minExposureTargetBias,
+          device.maxExposureTargetBias,
         )
         device.setExposureTargetBias(clampedEV) { _ ->
           _exposureCompensationFlow.value = clampedEV
