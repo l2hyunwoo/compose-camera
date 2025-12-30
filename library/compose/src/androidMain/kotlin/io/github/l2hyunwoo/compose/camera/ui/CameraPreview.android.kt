@@ -83,12 +83,12 @@ actual fun CameraPreview(
           .matchParentSize()
           .pointerInput(controller) {
             detectTransformGestures { _, _, zoom, _ ->
-              val currentRatio = controller.zoomRatioFlow.value
+              val currentRatio = controller.cameraInfo.zoomState.value.zoomRatio
               val newZoomRatio = (currentRatio * zoom).coerceIn(
-                controller.minZoomRatio,
-                controller.maxZoomRatio,
+                controller.cameraInfo.zoomState.value.minZoomRatio,
+                controller.cameraInfo.zoomState.value.maxZoomRatio,
               )
-              controller.setZoom(newZoomRatio)
+              controller.cameraControl.setZoom(newZoomRatio)
             }
           }
           .pointerInput(controller) {
@@ -110,7 +110,7 @@ actual fun CameraPreview(
                 x = offset.x / viewWidth,
                 y = offset.y / viewHeight,
               )
-              controller.focus(normalizedPoint)
+              controller.cameraControl.focus(normalizedPoint)
             }
           },
       )

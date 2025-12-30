@@ -65,27 +65,75 @@ class AndroidCameraController(
   private val executor = Executors.newSingleThreadExecutor()
 
   private val _cameraState = MutableStateFlow<CameraState>(CameraState.Initializing)
-  override val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
+  private val _zoomState = MutableStateFlow(ZoomState())
+  private val _exposureState = MutableStateFlow(ExposureState())
 
-  private val _zoomRatioFlow = MutableStateFlow(1.0f)
-  override val zoomRatioFlow: StateFlow<Float> = _zoomRatioFlow.asStateFlow()
+  private val androidCameraInfo = object : CameraInfo {
+    override val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
+    override val zoomState: StateFlow<ZoomState> = _zoomState.asStateFlow()
+    override val exposureState: StateFlow<ExposureState> = _exposureState.asStateFlow()
+  }
 
-  override val minZoomRatio: Float
-    get() = camera?.cameraInfo?.zoomState?.value?.minZoomRatio ?: 1.0f
+  override val cameraInfo: CameraInfo = androidCameraInfo
 
-  override val maxZoomRatio: Float
-    get() = camera?.cameraInfo?.zoomState?.value?.maxZoomRatio ?: 1.0f
+  private val androidCameraControl = object : CameraControl {
+    override fun setZoom(ratio: Float) {
+      camera?.cameraControl?.setZoomRatio(ratio)
+    }
 
-  private val _exposureCompensationFlow = MutableStateFlow(0.0f)
-  override val exposureCompensationFlow: StateFlow<Float> = _exposureCompensationFlow.asStateFlow()
+    override fun focus(point: Offset) {
+      val cameraControl = camera?.cameraControl ?: return
+      val meteringPoint = SurfaceOrientedMeteringPointFactory(1f, 1f)
+        .createPoint(point.x, point.y)
 
-  override val exposureCompensationRange: Pair<Float, Float>
-    get() {
-      val exposureState = camera?.cameraInfo?.exposureState ?: return Pair(-2.0f, 2.0f)
+      val action = FocusMeteringAction.Builder(meteringPoint)
+        .setAutoCancelDuration(5, java.util.concurrent.TimeUnit.SECONDS)
+        .build()
+
+      cameraControl.startFocusAndMetering(action)
+    }
+
+    override fun setExposureCompensation(exposureValue: Float) {
+      val cameraInfo = camera?.cameraInfo ?: return
+      val cameraControl = camera?.cameraControl ?: return
+      val exposureState = cameraInfo.exposureState
+
+      if (!exposureState.isExposureCompensationSupported) return
+
       val step = exposureState.exposureCompensationStep.toFloat()
       val range = exposureState.exposureCompensationRange
-      return Pair(range.lower * step, range.upper * step)
+      val clampedEV = exposureValue.coerceIn(range.lower * step, range.upper * step)
+      val index = (clampedEV / step).toInt()
+
+      val appliedEV = index * step
+      cameraControl.setExposureCompensationIndex(index)
+
+      // Update local state immediately
+      val currentExposure = _exposureState.value
+      _exposureState.value = currentExposure.copy(exposureCompensation = appliedEV)
+
+      val currentState = _cameraState.value
+      if (currentState is CameraState.Ready) {
+        _cameraState.value = currentState.copy(exposureCompensation = appliedEV)
+      }
     }
+
+    override fun setFlashMode(mode: FlashMode) {
+      _configuration = configuration.copy(flashMode = mode)
+      imageCapture?.flashMode = mode.toCameraXFlashMode()
+
+      val currentState = _cameraState.value
+      if (currentState is CameraState.Ready) {
+        _cameraState.value = currentState.copy(flashMode = mode)
+      }
+    }
+
+    override fun enableTorch(enabled: Boolean) {
+      camera?.cameraControl?.enableTorch(enabled)
+    }
+  }
+
+  override val cameraControl: CameraControl = androidCameraControl
 
   private var _configuration = initialConfiguration
   override val configuration: CameraConfiguration get() = _configuration
@@ -97,6 +145,8 @@ class AndroidCameraController(
   private var imageCapture: ImageCapture? = null
   private var videoCapture: VideoCapture<Recorder>? = null
   private var activeRecording: Recording? = null
+  private var imageAnalysis: ImageAnalysis? = null
+  private val analyzers = mutableListOf<ImageAnalysis.Analyzer>()
 
   // Surface request for Compose viewfinder
   private val _surfaceRequest = MutableStateFlow<SurfaceRequest?>(null)
@@ -180,11 +230,27 @@ class AndroidCameraController(
 
       // Observe zoom state changes
       camera?.cameraInfo?.zoomState?.observe(lifecycleOwner) { zoomState ->
-        _zoomRatioFlow.value = zoomState.zoomRatio
+        _zoomState.value = ZoomState(
+          zoomRatio = zoomState.zoomRatio,
+          minZoomRatio = zoomState.minZoomRatio,
+          maxZoomRatio = zoomState.maxZoomRatio,
+        )
         val currentState = _cameraState.value
         if (currentState is CameraState.Ready) {
           _cameraState.value = currentState.copy(zoomRatio = zoomState.zoomRatio)
         }
+      }
+
+      // Update Exposure State capability
+      val exposureState = camera?.cameraInfo?.exposureState
+      if (exposureState != null) {
+        val step = exposureState.exposureCompensationStep.toFloat()
+        val range = exposureState.exposureCompensationRange
+        _exposureState.value = ExposureState(
+          exposureCompensation = 0f, // Reset usually or read current? CameraX doesn't easily expose current index instantly without tracking
+          exposureCompensationRange = Pair(range.lower * step, range.upper * step),
+          exposureStep = step,
+        )
       }
 
       // Update state to ready
@@ -320,57 +386,6 @@ class AndroidCameraController(
       updateConfiguration(configuration.copy(lens = lens))
     }
   }
-
-  override fun setFlashMode(mode: FlashMode) {
-    _configuration = configuration.copy(flashMode = mode)
-    imageCapture?.flashMode = mode.toCameraXFlashMode()
-
-    val currentState = _cameraState.value
-    if (currentState is CameraState.Ready) {
-      _cameraState.value = currentState.copy(flashMode = mode)
-    }
-  }
-
-  override fun setZoom(ratio: Float) {
-    camera?.cameraControl?.setZoomRatio(ratio)
-  }
-
-  override fun focus(point: Offset) {
-    val cameraControl = camera?.cameraControl ?: return
-    val meteringPoint = SurfaceOrientedMeteringPointFactory(1f, 1f)
-      .createPoint(point.x, point.y)
-
-    val action = FocusMeteringAction.Builder(meteringPoint)
-      .setAutoCancelDuration(5, java.util.concurrent.TimeUnit.SECONDS)
-      .build()
-
-    cameraControl.startFocusAndMetering(action)
-  }
-
-  override fun setExposureCompensation(exposureValue: Float) {
-    val cameraInfo = camera?.cameraInfo ?: return
-    val cameraControl = camera?.cameraControl ?: return
-    val exposureState = cameraInfo.exposureState
-
-    if (!exposureState.isExposureCompensationSupported) return
-
-    val step = exposureState.exposureCompensationStep.toFloat()
-    val range = exposureState.exposureCompensationRange
-    val clampedEV = exposureValue.coerceIn(range.lower * step, range.upper * step)
-    val index = (clampedEV / step).toInt()
-
-    val appliedEV = index * step
-    cameraControl.setExposureCompensationIndex(index)
-    _exposureCompensationFlow.value = appliedEV
-
-    val currentState = _cameraState.value
-    if (currentState is CameraState.Ready) {
-      _cameraState.value = currentState.copy(exposureCompensation = appliedEV)
-    }
-  }
-
-  private val analyzers = mutableListOf<ImageAnalysis.Analyzer>()
-  private var imageAnalysis: ImageAnalysis? = null
 
   fun addAnalyzer(analyzer: ImageAnalysis.Analyzer) {
     analyzers.add(analyzer)
