@@ -37,6 +37,7 @@ data class CameraConfiguration(
   val enableHdr: Boolean = false,
   val directory: Directory = Directory.PICTURES,
   val captureMode: CaptureMode = CaptureMode.BALANCED,
+  val photoResolution: Resolution? = null,
   val plugins: List<CameraPlugin> = emptyList(),
 ) {
   /**

@@ -23,82 +23,21 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.cValue
 import kotlinx.cinterop.interpretObjCPointer
+import kotlinx.cinterop.useContents
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import platform.AVFoundation.AVCaptureConnection
-import platform.AVFoundation.AVCaptureDevice
-import platform.AVFoundation.AVCaptureDeviceInput
-import platform.AVFoundation.AVCaptureDevicePositionBack
-import platform.AVFoundation.AVCaptureDevicePositionFront
-import platform.AVFoundation.AVCaptureDeviceTypeBuiltInWideAngleCamera
-import platform.AVFoundation.AVCaptureExposureModeAutoExpose
-import platform.AVFoundation.AVCaptureFileOutput
-import platform.AVFoundation.AVCaptureFileOutputRecordingDelegateProtocol
-import platform.AVFoundation.AVCaptureFlashModeAuto
-import platform.AVFoundation.AVCaptureFlashModeOff
-import platform.AVFoundation.AVCaptureFlashModeOn
-import platform.AVFoundation.AVCaptureFocusModeAutoFocus
-import platform.AVFoundation.AVCaptureMovieFileOutput
-import platform.AVFoundation.AVCaptureOutput
-import platform.AVFoundation.AVCapturePhoto
-import platform.AVFoundation.AVCapturePhotoCaptureDelegateProtocol
-import platform.AVFoundation.AVCapturePhotoOutput
-import platform.AVFoundation.AVCapturePhotoQualityPrioritizationBalanced
-import platform.AVFoundation.AVCapturePhotoQualityPrioritizationQuality
-import platform.AVFoundation.AVCapturePhotoQualityPrioritizationSpeed
-import platform.AVFoundation.AVCapturePhotoSettings
-import platform.AVFoundation.AVCaptureSession
-import platform.AVFoundation.AVCaptureSessionPreset1280x720
-import platform.AVFoundation.AVCaptureSessionPreset1920x1080
-import platform.AVFoundation.AVCaptureSessionPreset3840x2160
-import platform.AVFoundation.AVCaptureSessionPreset640x480
-import platform.AVFoundation.AVCaptureTorchModeOff
-import platform.AVFoundation.AVCaptureTorchModeOn
-import platform.AVFoundation.AVCaptureVideoDataOutput
-import platform.AVFoundation.AVCaptureVideoDataOutputSampleBufferDelegateProtocol
-import platform.AVFoundation.AVMediaTypeVideo
-import platform.AVFoundation.CGImageRepresentation
-import platform.AVFoundation.defaultDeviceWithDeviceType
-import platform.AVFoundation.exposureMode
-import platform.AVFoundation.exposurePointOfInterest
-import platform.AVFoundation.fileDataRepresentation
-import platform.AVFoundation.focusMode
-import platform.AVFoundation.focusPointOfInterest
-import platform.AVFoundation.hasFlash
-import platform.AVFoundation.hasTorch
-import platform.AVFoundation.isExposurePointOfInterestSupported
-import platform.AVFoundation.isFocusPointOfInterestSupported
-import platform.AVFoundation.isTorchAvailable
-import platform.AVFoundation.maxAvailableVideoZoomFactor
-import platform.AVFoundation.maxExposureTargetBias
-import platform.AVFoundation.minAvailableVideoZoomFactor
-import platform.AVFoundation.minExposureTargetBias
-import platform.AVFoundation.setExposureTargetBias
-import platform.AVFoundation.torchMode
-import platform.AVFoundation.videoZoomFactor
-import platform.CoreMedia.CMSampleBufferRef
-import platform.CoreVideo.kCVPixelBufferPixelFormatTypeKey
-import platform.CoreVideo.kCVPixelFormatType_32BGRA
-import platform.Foundation.NSDate
-import platform.Foundation.NSDictionary
-import platform.Foundation.NSError
-import platform.Foundation.NSMutableDictionary
-import platform.Foundation.NSNumber
-import platform.Foundation.NSTemporaryDirectory
-import platform.Foundation.NSURL
-import platform.Foundation.numberWithUnsignedInt
-import platform.Foundation.timeIntervalSince1970
-import platform.Photos.PHAssetChangeRequest
-import platform.Photos.PHPhotoLibrary
-import platform.darwin.DISPATCH_QUEUE_PRIORITY_DEFAULT
-import platform.darwin.NSObject
-import platform.darwin.dispatch_async
-import platform.darwin.dispatch_get_global_queue
-import platform.darwin.dispatch_queue_create
-import platform.posix.memcpy
+import platform.AVFoundation.*
+import platform.CoreGraphics.*
+import platform.CoreMedia.*
+import platform.CoreVideo.*
+import platform.Foundation.*
+import platform.Photos.*
+import platform.UIKit.*
+import platform.darwin.*
+import platform.posix.*
 
 /**
  * iOS implementation of [CameraController] using AVFoundation.
@@ -116,6 +55,26 @@ class IOSCameraController(
     override val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
     override val zoomState: StateFlow<ZoomState> = _zoomState.asStateFlow()
     override val exposureState: StateFlow<ExposureState> = _exposureState.asStateFlow()
+
+    @Suppress("UNCHECKED_CAST")
+    override val supportedPhotoResolutions: List<Resolution>
+      get() = currentDevice?.formats?.flatMap { format ->
+        val deviceFormat = format as AVCaptureDeviceFormat
+        deviceFormat.supportedMaxPhotoDimensions
+          .map { dim ->
+            (dim as NSValue).CMVideoDimensionsValue.useContents {
+              Resolution(width, height)
+            }
+          }
+      }?.distinct() ?: emptyList()
+
+    @OptIn(BetaInteropApi::class)
+    override val supportedVideoResolutions: List<Resolution>
+      get() = currentDevice?.formats?.mapNotNull { format ->
+        val deviceFormat = format as AVCaptureDeviceFormat
+        val dimensions = CMVideoFormatDescriptionGetDimensions(deviceFormat.formatDescription)
+        dimensions.useContents { Resolution(width, height) }
+      }?.distinct() ?: emptyList()
   }
 
   override val cameraInfo: CameraInfo = iosCameraInfo
@@ -327,7 +286,7 @@ class IOSCameraController(
         val settings = NSMutableDictionary().apply {
           setObject(
             NSNumber.numberWithUnsignedInt(kCVPixelFormatType_32BGRA),
-            forKey = interpretObjCPointer<platform.Foundation.NSString>(kCVPixelBufferPixelFormatTypeKey!!.rawValue),
+            forKey = interpretObjCPointer<NSString>(kCVPixelBufferPixelFormatTypeKey!!.rawValue),
           )
         }
         videoDataOutput.videoSettings = settings as Map<Any?, *>
@@ -432,6 +391,14 @@ class IOSCameraController(
       targetPrioritization
     }
 
+    // Set resolution
+    configuration.photoResolution?.let { res ->
+      val dimensions = cValue<CMVideoDimensions> {
+        width = res.width
+        height = res.height
+      }
+    }
+
     // Create delegate
     val delegate = PhotoCaptureDelegate { result ->
       completion.complete(result)
@@ -472,7 +439,8 @@ class IOSCameraController(
   }
 
   override fun updateConfiguration(config: CameraConfiguration) {
-    val needsRebind = config.lens != _configuration.lens
+    val needsRebind = config.lens != _configuration.lens ||
+      config.photoResolution != _configuration.photoResolution
     val oldPlugins = _configuration.plugins
     _configuration = config
 
@@ -563,14 +531,13 @@ private class PhotoCaptureDelegate(
 
     // Get dimensions from photo
     val cgImage = didFinishProcessingPhoto.CGImageRepresentation()
-    val width = cgImage?.let { platform.CoreGraphics.CGImageGetWidth(it).toInt() } ?: 0
-    val height = cgImage?.let { platform.CoreGraphics.CGImageGetHeight(it).toInt() } ?: 0
+    val width = cgImage?.let { CGImageGetWidth(it).toInt() } ?: 0
+    val height = cgImage?.let { CGImageGetHeight(it).toInt() } ?: 0
 
-    // Save to Photo Library
     // Save to Photo Library
     PHPhotoLibrary.sharedPhotoLibrary().performChanges({
       PHAssetChangeRequest.creationRequestForAssetFromImage(
-        platform.UIKit.UIImage(data = data),
+        UIImage(data = data),
       )
     }, completionHandler = { success, error ->
       if (success) {

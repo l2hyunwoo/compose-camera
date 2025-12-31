@@ -19,7 +19,13 @@ import android.Manifest
 import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.ImageFormat
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.params.StreamConfigurationMap
 import android.provider.MediaStore
+import android.util.Size
+import androidx.camera.camera2.interop.Camera2CameraInfo
+import androidx.camera.core.AspectRatio
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.FocusMeteringAction
@@ -29,6 +35,9 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.core.SurfaceRequest
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
 import androidx.camera.video.FallbackStrategy
@@ -39,6 +48,7 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
+import androidx.camera.video.VideoSpec
 import androidx.compose.ui.geometry.Offset
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -72,6 +82,24 @@ class AndroidCameraController(
     override val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
     override val zoomState: StateFlow<ZoomState> = _zoomState.asStateFlow()
     override val exposureState: StateFlow<ExposureState> = _exposureState.asStateFlow()
+
+    override val supportedPhotoResolutions: List<Resolution>
+      get() {
+        val info = camera?.cameraInfo ?: return emptyList()
+        val map = Camera2CameraInfo.from(info)
+          .getCameraCharacteristic(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+        return map?.getOutputSizes(PHOTO_FORMAT)
+          ?.map { Resolution(it.width, it.height) } ?: emptyList()
+      }
+
+    override val supportedVideoResolutions: List<Resolution>
+      get() {
+        val info = camera?.cameraInfo ?: return emptyList()
+        val map = Camera2CameraInfo.from(info)
+          .getCameraCharacteristic(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+        return map?.getOutputSizes(VIDEO_FORMAT)
+          ?.map { Resolution(it.width, it.height) } ?: emptyList()
+      }
   }
 
   override val cameraInfo: CameraInfo = androidCameraInfo
@@ -172,19 +200,31 @@ class AndroidCameraController(
     try {
       // Unbind all use cases before rebinding
       provider.unbindAll()
+      
+      // Clear previously registered analyzers before re-attaching plugins
+      analyzers.clear()
 
       // Build preview use case
-      preview = Preview.Builder().build().apply {
+      val previewBuilder = Preview.Builder()
+      configuration.photoResolution?.let { res ->
+        val selector = buildPreviewResolutionSelector(res)
+        previewBuilder.setResolutionSelector(selector)
+      }
+      preview = previewBuilder.build().apply {
         setSurfaceProvider { request ->
           _surfaceRequest.value = request
         }
       }
 
       // Build image capture use case
-      imageCapture = ImageCapture.Builder()
+      val imageCaptureBuilder = ImageCapture.Builder()
         .setCaptureMode(configuration.captureMode.toCameraXCaptureMode())
         .setFlashMode(configuration.flashMode.toCameraXFlashMode())
-        .build()
+
+      configuration.photoResolution?.let { res ->
+        imageCaptureBuilder.setResolutionSelector(buildResolutionSelector(res))
+      }
+      imageCapture = imageCaptureBuilder.build()
 
       // Build video capture use case with fallback strategy
       val qualitySelector = QualitySelector.fromOrderedList(
@@ -206,26 +246,36 @@ class AndroidCameraController(
         CameraLens.BACK -> CameraSelector.DEFAULT_BACK_CAMERA
       }
 
-      // ImageAnalysis
-      val analysis = ImageAnalysis.Builder()
-        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-        .build()
-      imageAnalysis = analysis
-      updateImageAnalysis()
-
-      // Attach plugins first to register any analyzers
+      // Attach plugins first to register any analyzers (e.g. for ImageAnalysis)
       configuration.plugins.forEach { plugin ->
         plugin.onAttach(this)
       }
 
+      // Build image analysis use case if analyzers were added by plugins
+      val analysis = if (analyzers.isNotEmpty()) {
+        val analysisBuilder = ImageAnalysis.Builder()
+          .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+        
+        configuration.photoResolution?.let { res ->
+          // Use the same strict selector to force aspect ratio agreement
+          analysisBuilder.setResolutionSelector(buildPreviewResolutionSelector(res))
+        }
+        analysisBuilder.build().also {
+          imageAnalysis = it
+          updateImageAnalysis()
+        }
+      } else {
+        imageAnalysis = null
+        null
+      }
+
       // Bind use cases to lifecycle
+      val useCases = listOfNotNull(preview, imageCapture, videoCapture, analysis)
+
       camera = provider.bindToLifecycle(
         lifecycleOwner,
         cameraSelector,
-        preview,
-        imageCapture,
-        videoCapture,
-        analysis,
+        *useCases.toTypedArray()
       )
 
       // Observe zoom state changes
@@ -291,12 +341,29 @@ class AndroidCameraController(
         object : ImageCapture.OnImageSavedCallback {
           override fun onImageSaved(output: ImageCapture.OutputFileResults) {
             val uri = output.savedUri
-            // Get image info from the saved file
+            
+            // Get actual dimensions from the saved file
+            var width = 0
+            var height = 0
+            if (uri != null) {
+              try {
+                context.contentResolver.openInputStream(uri)?.use { input ->
+                  val options = android.graphics.BitmapFactory.Options().apply {
+                    inJustDecodeBounds = true
+                  }
+                  android.graphics.BitmapFactory.decodeStream(input, null, options)
+                  width = options.outWidth
+                  height = options.outHeight
+                }
+              } catch (e: Exception) {
+                // Fallback to 0 if failed to read
+              }
+            }
+
             val result = ImageCaptureResult.Success(
-              // Image saved to file, not in memory
               byteArray = ByteArray(0),
-              width = 0,
-              height = 0,
+              width = width,
+              height = height,
               rotation = 0,
               filePath = uri?.toString(),
             )
@@ -368,9 +435,96 @@ class AndroidCameraController(
     )
   }
 
+  private fun buildResolutionSelector(resolution: Resolution): ResolutionSelector {
+    val strategy = ResolutionStrategy(
+      Size(resolution.width, resolution.height),
+      ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER
+    )
+
+    // Calculate aspect ratio strategy to ensure we stay within the same ratio if possible
+    val maxRes = maxOf(resolution.width, resolution.height)
+    val minRes = minOf(resolution.width, resolution.height)
+    val aspectRatio = maxRes.toDouble() / minRes.toDouble()
+    
+    val ratio = if (kotlin.math.abs(aspectRatio - 16.0 / 9.0) < 0.1) {
+      AspectRatio.RATIO_16_9
+    } else if (kotlin.math.abs(aspectRatio - 4.0 / 3.0) < 0.1) {
+      AspectRatio.RATIO_4_3
+    } else {
+      null
+    }
+
+    val builder = ResolutionSelector.Builder()
+      .setResolutionStrategy(strategy)
+
+    if (ratio != null) {
+      // Use FALLBACK_RULE_NONE to force the ratio when we know it's supported
+      builder.setAspectRatioStrategy(AspectRatioStrategy(ratio, AspectRatioStrategy.FALLBACK_RULE_NONE))
+      
+      // Add a resolution filter as a secondary safeguard to filter out any non-matching aspect ratios
+      builder.setResolutionFilter { supportedSizes, _ ->
+        supportedSizes.filter { size ->
+          val sr = maxOf(size.width, size.height).toDouble() / minOf(size.width, size.height).toDouble()
+          kotlin.math.abs(sr - aspectRatio) < 0.1
+        }
+      }
+    } else {
+      builder.setAspectRatioStrategy(
+        AspectRatioStrategy(
+          AspectRatio.RATIO_4_3,
+          AspectRatioStrategy.FALLBACK_RULE_AUTO
+        )
+      )
+    }
+
+    return builder.build()
+  }
+
+  private fun buildPreviewResolutionSelector(resolution: Resolution): ResolutionSelector {
+    val maxRes = maxOf(resolution.width, resolution.height)
+    val minRes = minOf(resolution.width, resolution.height)
+    val aspectRatio = maxRes.toDouble() / minRes.toDouble()
+    
+    val ratio = if (kotlin.math.abs(aspectRatio - 16.0 / 9.0) < 0.1) {
+      AspectRatio.RATIO_16_9
+    } else if (kotlin.math.abs(aspectRatio - 4.0 / 3.0) < 0.1) {
+      AspectRatio.RATIO_4_3
+    } else {
+      null
+    }
+
+    val builder = ResolutionSelector.Builder()
+
+    if (ratio != null) {
+      // Force the ratio for Preview too to avoid conflicts
+      builder.setAspectRatioStrategy(AspectRatioStrategy(ratio, AspectRatioStrategy.FALLBACK_RULE_NONE))
+      
+      // Apply the same filter to Preview to force agreement on the aspect ratio pipeline
+      builder.setResolutionFilter { supportedSizes, _ ->
+        supportedSizes.filter { size ->
+          val sr = maxOf(size.width, size.height).toDouble() / minOf(size.width, size.height).toDouble()
+          kotlin.math.abs(sr - aspectRatio) < 0.1
+        }
+      }
+    } else {
+      builder.setAspectRatioStrategy(
+        AspectRatioStrategy(
+          AspectRatio.RATIO_4_3,
+          AspectRatioStrategy.FALLBACK_RULE_AUTO
+        )
+      )
+    }
+
+    // For Preview, we only force the Aspect Ratio to match the photo, 
+    // but let CameraX choose the best size for display (usually matches screen or <= 1080p).
+    return builder.build()
+  }
+
   override fun updateConfiguration(config: CameraConfiguration) {
     val needsRebind = config.lens != _configuration.lens ||
-      config.captureMode != _configuration.captureMode
+      config.captureMode != _configuration.captureMode ||
+      config.photoResolution != _configuration.photoResolution ||
+      config.videoQuality != _configuration.videoQuality
     _configuration = config
 
     // Update flash mode without rebinding
@@ -420,6 +574,11 @@ class AndroidCameraController(
     activeRecording?.stop()
     cameraProvider?.unbindAll()
     executor.shutdown()
+  }
+
+  companion object {
+    private const val PHOTO_FORMAT = ImageFormat.JPEG
+    private const val VIDEO_FORMAT = 0x22 // ImageFormat.PRIVATE
   }
 }
 

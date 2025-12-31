@@ -48,6 +48,16 @@ interface CameraInfo {
       val state = cameraState.value
       return if (state is CameraState.Ready) state.flashMode else FlashMode.OFF
     }
+
+  /**
+   * List of supported photo resolutions for current camera.
+   */
+  val supportedPhotoResolutions: List<Resolution>
+
+  /**
+   * List of supported video resolutions for current camera.
+   */
+  val supportedVideoResolutions: List<Resolution>
 }
 
 /**
