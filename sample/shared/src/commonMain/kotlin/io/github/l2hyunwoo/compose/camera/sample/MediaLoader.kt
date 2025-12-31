@@ -17,15 +17,19 @@ package io.github.l2hyunwoo.compose.camera.sample
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import kotlinx.serialization.Serializable
 
 /**
  * Media item representing a captured photo or video.
  */
+@Serializable
 data class MediaItem(
   val uri: String,
   val isVideo: Boolean,
   val dateAdded: Long,
   val displayName: String,
+  val width: Int,
+  val height: Int,
 )
 
 /**

@@ -47,6 +47,8 @@ actual class MediaLoader(private val context: Context) {
       MediaStore.Images.Media.DISPLAY_NAME,
       MediaStore.Images.Media.DATE_ADDED,
       MediaStore.Images.Media.RELATIVE_PATH,
+      MediaStore.Images.Media.WIDTH,
+      MediaStore.Images.Media.HEIGHT,
     )
 
     val selection = "${MediaStore.Images.Media.RELATIVE_PATH} LIKE ?"
@@ -63,6 +65,8 @@ actual class MediaLoader(private val context: Context) {
       val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
       val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
       val dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
+      val widthColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.WIDTH)
+      val heightColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.HEIGHT)
 
       while (cursor.moveToNext()) {
         val id = cursor.getLong(idColumn)
@@ -76,6 +80,8 @@ actual class MediaLoader(private val context: Context) {
             isVideo = false,
             dateAdded = date,
             displayName = name,
+            width = cursor.getInt(widthColumn),
+            height = cursor.getInt(heightColumn),
           ),
         )
       }
@@ -88,6 +94,8 @@ actual class MediaLoader(private val context: Context) {
       MediaStore.Video.Media.DISPLAY_NAME,
       MediaStore.Video.Media.DATE_ADDED,
       MediaStore.Video.Media.RELATIVE_PATH,
+      MediaStore.Video.Media.WIDTH,
+      MediaStore.Video.Media.HEIGHT,
     )
 
     val selection = "${MediaStore.Video.Media.RELATIVE_PATH} LIKE ?"
@@ -104,6 +112,8 @@ actual class MediaLoader(private val context: Context) {
       val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
       val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)
       val dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
+      val widthColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.WIDTH)
+      val heightColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.HEIGHT)
 
       while (cursor.moveToNext()) {
         val id = cursor.getLong(idColumn)
@@ -117,6 +127,8 @@ actual class MediaLoader(private val context: Context) {
             isVideo = true,
             dateAdded = date,
             displayName = name,
+            width = cursor.getInt(widthColumn),
+            height = cursor.getInt(heightColumn),
           ),
         )
       }

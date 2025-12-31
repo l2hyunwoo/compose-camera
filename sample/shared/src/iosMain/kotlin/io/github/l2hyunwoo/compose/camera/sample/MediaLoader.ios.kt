@@ -56,6 +56,8 @@ actual class MediaLoader {
           isVideo = isVideo,
           dateAdded = dateAdded,
           displayName = "Media_$i",
+          width = asset.pixelWidth.toInt(),
+          height = asset.pixelHeight.toInt(),
         ),
       )
     }
