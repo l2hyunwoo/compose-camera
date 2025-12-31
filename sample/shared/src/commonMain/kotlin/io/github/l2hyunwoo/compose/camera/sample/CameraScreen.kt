@@ -24,8 +24,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -47,8 +49,6 @@ import io.github.l2hyunwoo.compose.camera.core.*
 import io.github.l2hyunwoo.compose.camera.ui.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import kotlin.math.max
 import kotlin.math.round
 
@@ -424,22 +424,33 @@ fun CameraScreen(
           title = { Text("Select Resolution") },
           text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-              supportedResolutions.forEach { resolution ->
-                Row(
+              if (supportedResolutions.isEmpty()) {
+                Text(
+                  text = "No resolutions available",
+                  style = MaterialTheme.typography.bodyMedium,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
                   modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {
-                      cameraConfig = cameraConfig.copy(photoResolution = resolution)
-                      showResolutionDialog = false
-                    }
                     .padding(16.dp),
-                  verticalAlignment = Alignment.CenterVertically
-                ) {
-                  Text(
-                    text = "${resolution.width} x ${resolution.height} (${resolution.megapixels}MP)",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = if (cameraConfig.photoResolution == resolution) MaterialTheme.colorScheme.primary else Color.Unspecified
-                  )
+                )
+              } else {
+                supportedResolutions.forEach { resolution ->
+                  Row(
+                    modifier = Modifier
+                      .fillMaxWidth()
+                      .clickable {
+                        cameraConfig = cameraConfig.copy(photoResolution = resolution)
+                        showResolutionDialog = false
+                      }
+                      .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                  ) {
+                    Text(
+                      text = "${resolution.width} x ${resolution.height} (${resolution.megapixels}MP)",
+                      style = MaterialTheme.typography.bodyLarge,
+                      color = if (cameraConfig.photoResolution == resolution) MaterialTheme.colorScheme.primary else Color.Unspecified,
+                    )
+                  }
                 }
               }
             }
@@ -448,7 +459,7 @@ fun CameraScreen(
             TextButton(onClick = { showResolutionDialog = false }) {
               Text("Close")
             }
-          }
+          },
         )
       }
     },

@@ -200,8 +200,9 @@ class AndroidCameraController(
     try {
       // Unbind all use cases before rebinding
       provider.unbindAll()
-      
+
       // Clear previously registered analyzers before re-attaching plugins
+      // Note: Plugins must re-register their analyzers in onAttach()
       analyzers.clear()
 
       // Build preview use case
@@ -255,7 +256,7 @@ class AndroidCameraController(
       val analysis = if (analyzers.isNotEmpty()) {
         val analysisBuilder = ImageAnalysis.Builder()
           .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-        
+
         configuration.photoResolution?.let { res ->
           // Use the same strict selector to force aspect ratio agreement
           analysisBuilder.setResolutionSelector(buildPreviewResolutionSelector(res))
@@ -275,7 +276,7 @@ class AndroidCameraController(
       camera = provider.bindToLifecycle(
         lifecycleOwner,
         cameraSelector,
-        *useCases.toTypedArray()
+        *useCases.toTypedArray(),
       )
 
       // Observe zoom state changes
@@ -341,7 +342,7 @@ class AndroidCameraController(
         object : ImageCapture.OnImageSavedCallback {
           override fun onImageSaved(output: ImageCapture.OutputFileResults) {
             val uri = output.savedUri
-            
+
             // Get actual dimensions from the saved file
             var width = 0
             var height = 0
@@ -438,86 +439,48 @@ class AndroidCameraController(
   private fun buildResolutionSelector(resolution: Resolution): ResolutionSelector {
     val strategy = ResolutionStrategy(
       Size(resolution.width, resolution.height),
-      ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER
+      ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER,
     )
 
-    // Calculate aspect ratio strategy to ensure we stay within the same ratio if possible
-    val maxRes = maxOf(resolution.width, resolution.height)
-    val minRes = minOf(resolution.width, resolution.height)
-    val aspectRatio = maxRes.toDouble() / minRes.toDouble()
-    
-    val ratio = if (kotlin.math.abs(aspectRatio - 16.0 / 9.0) < 0.1) {
-      AspectRatio.RATIO_16_9
-    } else if (kotlin.math.abs(aspectRatio - 4.0 / 3.0) < 0.1) {
-      AspectRatio.RATIO_4_3
-    } else {
-      null
-    }
-
-    val builder = ResolutionSelector.Builder()
+    return ResolutionSelector.Builder()
       .setResolutionStrategy(strategy)
+      .setAspectRatioStrategy(getAspectRatioStrategy(resolution.width, resolution.height, false))
+      .build()
+  }
+  private fun buildPreviewResolutionSelector(resolution: Resolution): ResolutionSelector {
+    val builder = ResolutionSelector.Builder()
+      .setAspectRatioStrategy(getAspectRatioStrategy(resolution.width, resolution.height, true))
 
-    if (ratio != null) {
-      // Use FALLBACK_RULE_NONE to force the ratio when we know it's supported
-      builder.setAspectRatioStrategy(AspectRatioStrategy(ratio, AspectRatioStrategy.FALLBACK_RULE_NONE))
-      
-      // Add a resolution filter as a secondary safeguard to filter out any non-matching aspect ratios
-      builder.setResolutionFilter { supportedSizes, _ ->
-        supportedSizes.filter { size ->
-          val sr = maxOf(size.width, size.height).toDouble() / minOf(size.width, size.height).toDouble()
-          kotlin.math.abs(sr - aspectRatio) < 0.1
-        }
-      }
-    } else {
-      builder.setAspectRatioStrategy(
-        AspectRatioStrategy(
-          AspectRatio.RATIO_4_3,
-          AspectRatioStrategy.FALLBACK_RULE_AUTO
-        )
-      )
-    }
-
+    // For Preview, we only force the Aspect Ratio to match the photo,
+    // but let CameraX choose the best size for display (usually matches screen or <= 1080p).
     return builder.build()
   }
 
-  private fun buildPreviewResolutionSelector(resolution: Resolution): ResolutionSelector {
-    val maxRes = maxOf(resolution.width, resolution.height)
-    val minRes = minOf(resolution.width, resolution.height)
+  private fun getAspectRatioStrategy(width: Int, height: Int, isPreview: Boolean): AspectRatioStrategy {
+    val maxRes = maxOf(width, height)
+    val minRes = minOf(width, height)
     val aspectRatio = maxRes.toDouble() / minRes.toDouble()
-    
-    val ratio = if (kotlin.math.abs(aspectRatio - 16.0 / 9.0) < 0.1) {
+
+    // Tolerance of 0.2 handles wider ratios like 18:9, 19.5:9
+    val tolerance = 0.2
+
+    val ratio = if (kotlin.math.abs(aspectRatio - 16.0 / 9.0) < tolerance) {
       AspectRatio.RATIO_16_9
-    } else if (kotlin.math.abs(aspectRatio - 4.0 / 3.0) < 0.1) {
+    } else if (kotlin.math.abs(aspectRatio - 4.0 / 3.0) < tolerance) {
       AspectRatio.RATIO_4_3
     } else {
       null
     }
 
-    val builder = ResolutionSelector.Builder()
-
-    if (ratio != null) {
-      // Force the ratio for Preview too to avoid conflicts
-      builder.setAspectRatioStrategy(AspectRatioStrategy(ratio, AspectRatioStrategy.FALLBACK_RULE_NONE))
-      
-      // Apply the same filter to Preview to force agreement on the aspect ratio pipeline
-      builder.setResolutionFilter { supportedSizes, _ ->
-        supportedSizes.filter { size ->
-          val sr = maxOf(size.width, size.height).toDouble() / minOf(size.width, size.height).toDouble()
-          kotlin.math.abs(sr - aspectRatio) < 0.1
-        }
-      }
+    return if (ratio != null) {
+      // Use FALLBACK_RULE_NONE to force the ratio when we know it's supported
+      AspectRatioStrategy(ratio, AspectRatioStrategy.FALLBACK_RULE_NONE)
     } else {
-      builder.setAspectRatioStrategy(
-        AspectRatioStrategy(
-          AspectRatio.RATIO_4_3,
-          AspectRatioStrategy.FALLBACK_RULE_AUTO
-        )
+      AspectRatioStrategy(
+        AspectRatio.RATIO_4_3,
+        AspectRatioStrategy.FALLBACK_RULE_AUTO,
       )
     }
-
-    // For Preview, we only force the Aspect Ratio to match the photo, 
-    // but let CameraX choose the best size for display (usually matches screen or <= 1080p).
-    return builder.build()
   }
 
   override fun updateConfiguration(config: CameraConfiguration) {
@@ -578,7 +541,7 @@ class AndroidCameraController(
 
   companion object {
     private const val PHOTO_FORMAT = ImageFormat.JPEG
-    private const val VIDEO_FORMAT = 0x22 // ImageFormat.PRIVATE
+    private const val VIDEO_FORMAT = ImageFormat.PRIVATE
   }
 }
 

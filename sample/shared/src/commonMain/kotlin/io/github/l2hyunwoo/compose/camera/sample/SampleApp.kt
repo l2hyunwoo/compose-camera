@@ -24,19 +24,19 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.toRoute
+import androidx.savedstate.SavedState
+import androidx.savedstate.read
+import androidx.savedstate.write
 import io.github.l2hyunwoo.compose.camera.core.rememberCameraPermissionManager
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlin.reflect.typeOf
-import androidx.navigation.NavType
-import androidx.savedstate.SavedState
-import androidx.savedstate.read
-import androidx.savedstate.write
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlin.reflect.typeOf
 
 /**
  * Sample app entry point composable.
@@ -86,7 +86,7 @@ fun SampleApp() {
         }
 
         composable<Destination.MediaDetail>(
-          typeMap = mapOf(typeOf<MediaItem>() to MediaItemNavType)
+          typeMap = mapOf(typeOf<MediaItem>() to MediaItemNavType),
         ) { backStackEntry ->
           val detail = backStackEntry.toRoute<Destination.MediaDetail>()
           MediaDetailScreen(
@@ -129,14 +129,12 @@ private sealed class Destination {
 }
 
 private val MediaItemNavType = object : NavType<MediaItem>(isNullableAllowed = false) {
-  override fun get(bundle: SavedState, key: String): MediaItem? =
-    bundle.read {
-      if (contains(key)) getString(key)?.let { Json.decodeFromString(it) } else null
-    }
+  override fun get(bundle: SavedState, key: String): MediaItem? = bundle.read {
+    if (contains(key)) getString(key)?.let { Json.decodeFromString(it) } else null
+  }
 
   @OptIn(ExperimentalEncodingApi::class)
-  override fun parseValue(value: String): MediaItem =
-    Json.decodeFromString(Base64.decode(value).decodeToString())
+  override fun parseValue(value: String): MediaItem = Json.decodeFromString(Base64.decode(value).decodeToString())
 
   override fun put(bundle: SavedState, key: String, value: MediaItem) {
     bundle.write {
@@ -145,6 +143,5 @@ private val MediaItemNavType = object : NavType<MediaItem>(isNullableAllowed = f
   }
 
   @OptIn(ExperimentalEncodingApi::class)
-  override fun serializeAsValue(value: MediaItem): String =
-    Base64.encode(Json.encodeToString(value).encodeToByteArray())
+  override fun serializeAsValue(value: MediaItem): String = Base64.encode(Json.encodeToString(value).encodeToByteArray())
 }

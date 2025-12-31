@@ -28,7 +28,9 @@ data class MediaItem(
   val isVideo: Boolean,
   val dateAdded: Long,
   val displayName: String,
+  /** Width of the media in pixels */
   val width: Int,
+  /** Height of the media in pixels */
   val height: Int,
 )
 

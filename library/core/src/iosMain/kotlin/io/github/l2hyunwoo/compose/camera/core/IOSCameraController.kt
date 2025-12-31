@@ -248,7 +248,7 @@ class IOSCameraController(
         VideoQuality.UHD -> AVCaptureSessionPreset3840x2160
       }
     }
-    
+
     if (captureSession.canSetSessionPreset(targetPreset)) {
       captureSession.sessionPreset = targetPreset
     }
@@ -274,7 +274,6 @@ class IOSCameraController(
           currentInput = input
         }
 
-
         // Add photo output
         val photo = AVCapturePhotoOutput()
 
@@ -289,19 +288,21 @@ class IOSCameraController(
         if (captureSession.canAddOutput(photo)) {
           captureSession.addOutput(photo)
           photoOutput = photo
-          
+
           // Enable high resolution capture to allow shooting larger than session preset
           photo.highResolutionCaptureEnabled = true
-          
+
           // Explicitly set maxPhotoDimensions on output to the active format's max
           // This is required on iOS 16+ to prevent "maxPhotoDimensions must not be larger than output's" error
-          currentDevice?.activeFormat?.supportedMaxPhotoDimensions?.lastOrNull()?.let { maxDim ->
-               val dim = (maxDim as NSValue).CMVideoDimensionsValue
-               try {
-                   photo.maxPhotoDimensions = dim
-               } catch (e: Exception) {
-                   // Ignore if setting fails (e.g. not supported on this OS version)
-               }
+          if (isIOS16OrNewer()) {
+            currentDevice?.activeFormat?.supportedMaxPhotoDimensions?.lastOrNull()?.let { maxDim ->
+              val dim = (maxDim as NSValue).CMVideoDimensionsValue
+              try {
+                photo.maxPhotoDimensions = dim
+              } catch (e: Exception) {
+                // Ignore if setting fails
+              }
+            }
           }
         }
 
@@ -340,27 +341,30 @@ class IOSCameraController(
         // Manual Format Selection (Moved to end to ensure persistence)
         // If a specific resolution is requested, we must find a device format that supports it
         // and manually set the activeFormat. This bypasses the session preset's limitations.
-        configuration.photoResolution?.let { targetRes ->
-          try {
-            device.lockForConfiguration(null)
-            
-            // Find best matching format
-            val bestFormat = device.formats.filterIsInstance<AVCaptureDeviceFormat>().firstOrNull { format ->
-              // Check if format supports high-res photo capture of the target size
-              val supportsPhoto = format.supportedMaxPhotoDimensions.any { 
-                val dim = (it as NSValue).CMVideoDimensionsValue
-                dim.useContents { width } == targetRes.width && dim.useContents { height } == targetRes.height
-              }
-              supportsPhoto
-            }
+        // supportedMaxPhotoDimensions is available on iOS 16+
+        if (isIOS16OrNewer()) {
+          configuration.photoResolution?.let { targetRes ->
+            try {
+              device.lockForConfiguration(null)
 
-            if (bestFormat != null) {
-              device.activeFormat = bestFormat
+              // Find best matching format
+              val bestFormat = device.formats.filterIsInstance<AVCaptureDeviceFormat>().firstOrNull { format ->
+                // Check if format supports high-res photo capture of the target size
+                val supportsPhoto = format.supportedMaxPhotoDimensions.any {
+                  val dim = (it as NSValue).CMVideoDimensionsValue
+                  dim.useContents { width } == targetRes.width && dim.useContents { height } == targetRes.height
+                }
+                supportsPhoto
+              }
+
+              if (bestFormat != null) {
+                device.activeFormat = bestFormat
+              }
+
+              device.unlockForConfiguration()
+            } catch (e: Exception) {
+              // Ignore format selection failure
             }
-            
-            device.unlockForConfiguration()
-          } catch (e: Exception) {
-            // Ignore format selection failure
           }
         }
 
@@ -450,28 +454,32 @@ class IOSCameraController(
         width = res.width
         height = res.height
       }
-      
-      val isSupported = currentDevice?.activeFormat?.supportedMaxPhotoDimensions?.any { 
-        val dim = (it as NSValue).CMVideoDimensionsValue
-        dim.useContents { width } == dimensions.useContents { width } && 
-        dim.useContents { height } == dimensions.useContents { height }
-      } == true
 
-      if (isSupported) {
-        // Clamp to output's maxPhotoDimensions to prevent crash
-        val outputMax = output.maxPhotoDimensions.useContents { this }
-        val reqWidth = dimensions.useContents { width }
-        val reqHeight = dimensions.useContents { height }
-        
-        if (reqWidth <= outputMax.width && reqHeight <= outputMax.height) {
+      // Verification against active format requires iOS 16+ APIs
+      if (isIOS16OrNewer()) {
+        val isSupported = currentDevice?.activeFormat?.supportedMaxPhotoDimensions?.any {
+          val dim = (it as NSValue).CMVideoDimensionsValue
+          dim.useContents { width } == dimensions.useContents { width } &&
+            dim.useContents { height } == dimensions.useContents { height }
+        } == true
+
+        if (isSupported) {
+          // Clamp to output's maxPhotoDimensions to prevent crash
+          val outputMax = output.maxPhotoDimensions.useContents { this }
+          val reqWidth = dimensions.useContents { width }
+          val reqHeight = dimensions.useContents { height }
+
+          if (reqWidth <= outputMax.width && reqHeight <= outputMax.height) {
             settings.maxPhotoDimensions = dimensions
-        } else {
+          } else {
             // If requested is larger than output max, use output max or skip
-             settings.maxPhotoDimensions = output.maxPhotoDimensions
+            settings.maxPhotoDimensions = output.maxPhotoDimensions
+          }
         }
       } else {
-        // If not supported, we don't set maxPhotoDimensions, effectively falling back 
-        // to the highest resolution supported by the active format (since highResolutionCaptureEnabled=true)
+        // Fallback or older iOS handling?
+        // On older iOS, highResolutionCaptureEnabled=true usually just works with max resolution implicitly
+        // or we rely on session preset. We can leave it unset here as safely doing nothing avoids crashes.
       }
     }
 
@@ -762,4 +770,8 @@ private class VideoRecordingDelegate(
   ) {
     onFinished(error?.localizedDescription)
   }
+}
+
+private fun isIOS16OrNewer(): Boolean = NSProcessInfo.processInfo.operatingSystemVersion.useContents {
+  majorVersion >= 16
 }

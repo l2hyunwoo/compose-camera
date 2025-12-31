@@ -89,7 +89,7 @@ fun MediaDetailScreen(
           DetailRow(label = "Name", value = item.displayName)
           DetailRow(label = "Resolution", value = "${item.width} x ${item.height}")
           val megapixels = (item.width * item.height) / 1_000_000f
-          val megapixelsText = (megapixels * 100).toInt().let { it / 100f }.toString()
+          val megapixelsText = (kotlin.math.round(megapixels * 100) / 100.0).toString()
           DetailRow(label = "Megapixels", value = "$megapixelsText MP")
           DetailRow(label = "Type", value = if (item.isVideo) "Video" else "Image")
         }
