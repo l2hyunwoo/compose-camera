@@ -618,7 +618,6 @@ private class PhotoCaptureDelegate(
     val width = cgImage?.let { CGImageGetWidth(it).toInt() } ?: 0
     val height = cgImage?.let { CGImageGetHeight(it).toInt() } ?: 0
 
-    // Save to Photo Library
     PHPhotoLibrary.sharedPhotoLibrary().performChanges({
       PHAssetChangeRequest.creationRequestForAssetFromImage(
         UIImage(data = data),
