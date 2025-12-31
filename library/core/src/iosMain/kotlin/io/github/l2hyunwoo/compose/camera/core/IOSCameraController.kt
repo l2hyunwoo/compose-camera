@@ -234,11 +234,23 @@ class IOSCameraController(
     videoOutput?.let { captureSession.removeOutput(it) }
 
     // Set session preset
-    captureSession.sessionPreset = when (configuration.videoQuality) {
-      VideoQuality.SD -> AVCaptureSessionPreset640x480
-      VideoQuality.HD -> AVCaptureSessionPreset1280x720
-      VideoQuality.FHD -> AVCaptureSessionPreset1920x1080
-      VideoQuality.UHD -> AVCaptureSessionPreset3840x2160
+    // Set session preset
+    // If we have a specific photo resolution, we use InputPriority to allow manual format selection.
+    // Otherwise, we effectively fall back to a reasonable default via standard presets,
+    // though we might still want InputPriority for better control in the future.
+    val targetPreset = if (configuration.photoResolution != null) {
+      AVCaptureSessionPresetInputPriority
+    } else {
+      when (configuration.videoQuality) {
+        VideoQuality.SD -> AVCaptureSessionPreset640x480
+        VideoQuality.HD -> AVCaptureSessionPreset1280x720
+        VideoQuality.FHD -> AVCaptureSessionPreset1920x1080
+        VideoQuality.UHD -> AVCaptureSessionPreset3840x2160
+      }
+    }
+    
+    if (captureSession.canSetSessionPreset(targetPreset)) {
+      captureSession.sessionPreset = targetPreset
     }
 
     // Get camera device
@@ -262,10 +274,10 @@ class IOSCameraController(
           currentInput = input
         }
 
+
         // Add photo output
         val photo = AVCapturePhotoOutput()
 
-        // Configure max prioritization
         if (photo.maxPhotoQualityPrioritization < AVCapturePhotoQualityPrioritizationQuality) {
           try {
             photo.maxPhotoQualityPrioritization = AVCapturePhotoQualityPrioritizationQuality
@@ -277,6 +289,20 @@ class IOSCameraController(
         if (captureSession.canAddOutput(photo)) {
           captureSession.addOutput(photo)
           photoOutput = photo
+          
+          // Enable high resolution capture to allow shooting larger than session preset
+          photo.highResolutionCaptureEnabled = true
+          
+          // Explicitly set maxPhotoDimensions on output to the active format's max
+          // This is required on iOS 16+ to prevent "maxPhotoDimensions must not be larger than output's" error
+          currentDevice?.activeFormat?.supportedMaxPhotoDimensions?.lastOrNull()?.let { maxDim ->
+               val dim = (maxDim as NSValue).CMVideoDimensionsValue
+               try {
+                   photo.maxPhotoDimensions = dim
+               } catch (e: Exception) {
+                   // Ignore if setting fails (e.g. not supported on this OS version)
+               }
+          }
         }
 
         // Video Data Output (Frame Analysis)
@@ -309,6 +335,33 @@ class IOSCameraController(
         if (captureSession.canAddOutput(video)) {
           captureSession.addOutput(video)
           videoOutput = video
+        }
+
+        // Manual Format Selection (Moved to end to ensure persistence)
+        // If a specific resolution is requested, we must find a device format that supports it
+        // and manually set the activeFormat. This bypasses the session preset's limitations.
+        configuration.photoResolution?.let { targetRes ->
+          try {
+            device.lockForConfiguration(null)
+            
+            // Find best matching format
+            val bestFormat = device.formats.filterIsInstance<AVCaptureDeviceFormat>().firstOrNull { format ->
+              // Check if format supports high-res photo capture of the target size
+              val supportsPhoto = format.supportedMaxPhotoDimensions.any { 
+                val dim = (it as NSValue).CMVideoDimensionsValue
+                dim.useContents { width } == targetRes.width && dim.useContents { height } == targetRes.height
+              }
+              supportsPhoto
+            }
+
+            if (bestFormat != null) {
+              device.activeFormat = bestFormat
+            }
+            
+            device.unlockForConfiguration()
+          } catch (e: Exception) {
+            // Ignore format selection failure
+          }
         }
 
         // Initial State Update from Device
@@ -396,6 +449,29 @@ class IOSCameraController(
       val dimensions = cValue<CMVideoDimensions> {
         width = res.width
         height = res.height
+      }
+      
+      val isSupported = currentDevice?.activeFormat?.supportedMaxPhotoDimensions?.any { 
+        val dim = (it as NSValue).CMVideoDimensionsValue
+        dim.useContents { width } == dimensions.useContents { width } && 
+        dim.useContents { height } == dimensions.useContents { height }
+      } == true
+
+      if (isSupported) {
+        // Clamp to output's maxPhotoDimensions to prevent crash
+        val outputMax = output.maxPhotoDimensions.useContents { this }
+        val reqWidth = dimensions.useContents { width }
+        val reqHeight = dimensions.useContents { height }
+        
+        if (reqWidth <= outputMax.width && reqHeight <= outputMax.height) {
+            settings.maxPhotoDimensions = dimensions
+        } else {
+            // If requested is larger than output max, use output max or skip
+             settings.maxPhotoDimensions = output.maxPhotoDimensions
+        }
+      } else {
+        // If not supported, we don't set maxPhotoDimensions, effectively falling back 
+        // to the highest resolution supported by the active format (since highResolutionCaptureEnabled=true)
       }
     }
 
