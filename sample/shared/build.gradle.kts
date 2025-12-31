@@ -20,6 +20,7 @@ plugins {
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
@@ -59,6 +60,8 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.materialIconsExtended)
             implementation(compose.components.resources)
+            implementation(libs.navigation.compose)
+            implementation(libs.kotlinx.serialization.json)
         }
 
         androidMain.dependencies {
