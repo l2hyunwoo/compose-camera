@@ -23,82 +23,21 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.cValue
 import kotlinx.cinterop.interpretObjCPointer
+import kotlinx.cinterop.useContents
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import platform.AVFoundation.AVCaptureConnection
-import platform.AVFoundation.AVCaptureDevice
-import platform.AVFoundation.AVCaptureDeviceInput
-import platform.AVFoundation.AVCaptureDevicePositionBack
-import platform.AVFoundation.AVCaptureDevicePositionFront
-import platform.AVFoundation.AVCaptureDeviceTypeBuiltInWideAngleCamera
-import platform.AVFoundation.AVCaptureExposureModeAutoExpose
-import platform.AVFoundation.AVCaptureFileOutput
-import platform.AVFoundation.AVCaptureFileOutputRecordingDelegateProtocol
-import platform.AVFoundation.AVCaptureFlashModeAuto
-import platform.AVFoundation.AVCaptureFlashModeOff
-import platform.AVFoundation.AVCaptureFlashModeOn
-import platform.AVFoundation.AVCaptureFocusModeAutoFocus
-import platform.AVFoundation.AVCaptureMovieFileOutput
-import platform.AVFoundation.AVCaptureOutput
-import platform.AVFoundation.AVCapturePhoto
-import platform.AVFoundation.AVCapturePhotoCaptureDelegateProtocol
-import platform.AVFoundation.AVCapturePhotoOutput
-import platform.AVFoundation.AVCapturePhotoQualityPrioritizationBalanced
-import platform.AVFoundation.AVCapturePhotoQualityPrioritizationQuality
-import platform.AVFoundation.AVCapturePhotoQualityPrioritizationSpeed
-import platform.AVFoundation.AVCapturePhotoSettings
-import platform.AVFoundation.AVCaptureSession
-import platform.AVFoundation.AVCaptureSessionPreset1280x720
-import platform.AVFoundation.AVCaptureSessionPreset1920x1080
-import platform.AVFoundation.AVCaptureSessionPreset3840x2160
-import platform.AVFoundation.AVCaptureSessionPreset640x480
-import platform.AVFoundation.AVCaptureTorchModeOff
-import platform.AVFoundation.AVCaptureTorchModeOn
-import platform.AVFoundation.AVCaptureVideoDataOutput
-import platform.AVFoundation.AVCaptureVideoDataOutputSampleBufferDelegateProtocol
-import platform.AVFoundation.AVMediaTypeVideo
-import platform.AVFoundation.CGImageRepresentation
-import platform.AVFoundation.defaultDeviceWithDeviceType
-import platform.AVFoundation.exposureMode
-import platform.AVFoundation.exposurePointOfInterest
-import platform.AVFoundation.fileDataRepresentation
-import platform.AVFoundation.focusMode
-import platform.AVFoundation.focusPointOfInterest
-import platform.AVFoundation.hasFlash
-import platform.AVFoundation.hasTorch
-import platform.AVFoundation.isExposurePointOfInterestSupported
-import platform.AVFoundation.isFocusPointOfInterestSupported
-import platform.AVFoundation.isTorchAvailable
-import platform.AVFoundation.maxAvailableVideoZoomFactor
-import platform.AVFoundation.maxExposureTargetBias
-import platform.AVFoundation.minAvailableVideoZoomFactor
-import platform.AVFoundation.minExposureTargetBias
-import platform.AVFoundation.setExposureTargetBias
-import platform.AVFoundation.torchMode
-import platform.AVFoundation.videoZoomFactor
-import platform.CoreMedia.CMSampleBufferRef
-import platform.CoreVideo.kCVPixelBufferPixelFormatTypeKey
-import platform.CoreVideo.kCVPixelFormatType_32BGRA
-import platform.Foundation.NSDate
-import platform.Foundation.NSDictionary
-import platform.Foundation.NSError
-import platform.Foundation.NSMutableDictionary
-import platform.Foundation.NSNumber
-import platform.Foundation.NSTemporaryDirectory
-import platform.Foundation.NSURL
-import platform.Foundation.numberWithUnsignedInt
-import platform.Foundation.timeIntervalSince1970
-import platform.Photos.PHAssetChangeRequest
-import platform.Photos.PHPhotoLibrary
-import platform.darwin.DISPATCH_QUEUE_PRIORITY_DEFAULT
-import platform.darwin.NSObject
-import platform.darwin.dispatch_async
-import platform.darwin.dispatch_get_global_queue
-import platform.darwin.dispatch_queue_create
-import platform.posix.memcpy
+import platform.AVFoundation.*
+import platform.CoreGraphics.*
+import platform.CoreMedia.*
+import platform.CoreVideo.*
+import platform.Foundation.*
+import platform.Photos.*
+import platform.UIKit.*
+import platform.darwin.*
+import platform.posix.*
 
 /**
  * iOS implementation of [CameraController] using AVFoundation.
@@ -116,6 +55,26 @@ class IOSCameraController(
     override val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
     override val zoomState: StateFlow<ZoomState> = _zoomState.asStateFlow()
     override val exposureState: StateFlow<ExposureState> = _exposureState.asStateFlow()
+
+    @Suppress("UNCHECKED_CAST")
+    override val supportedPhotoResolutions: List<Resolution>
+      get() = currentDevice?.formats?.flatMap { format ->
+        val deviceFormat = format as AVCaptureDeviceFormat
+        deviceFormat.supportedMaxPhotoDimensions
+          .map { dim ->
+            (dim as NSValue).CMVideoDimensionsValue.useContents {
+              Resolution(width, height)
+            }
+          }
+      }?.distinct() ?: emptyList()
+
+    @OptIn(BetaInteropApi::class)
+    override val supportedVideoResolutions: List<Resolution>
+      get() = currentDevice?.formats?.mapNotNull { format ->
+        val deviceFormat = format as AVCaptureDeviceFormat
+        val dimensions = CMVideoFormatDescriptionGetDimensions(deviceFormat.formatDescription)
+        dimensions.useContents { Resolution(width, height) }
+      }?.distinct() ?: emptyList()
   }
 
   override val cameraInfo: CameraInfo = iosCameraInfo
@@ -275,11 +234,23 @@ class IOSCameraController(
     videoOutput?.let { captureSession.removeOutput(it) }
 
     // Set session preset
-    captureSession.sessionPreset = when (configuration.videoQuality) {
-      VideoQuality.SD -> AVCaptureSessionPreset640x480
-      VideoQuality.HD -> AVCaptureSessionPreset1280x720
-      VideoQuality.FHD -> AVCaptureSessionPreset1920x1080
-      VideoQuality.UHD -> AVCaptureSessionPreset3840x2160
+    // Set session preset
+    // If we have a specific photo resolution, we use InputPriority to allow manual format selection.
+    // Otherwise, we effectively fall back to a reasonable default via standard presets,
+    // though we might still want InputPriority for better control in the future.
+    val targetPreset = if (configuration.photoResolution != null) {
+      AVCaptureSessionPresetInputPriority
+    } else {
+      when (configuration.videoQuality) {
+        VideoQuality.SD -> AVCaptureSessionPreset640x480
+        VideoQuality.HD -> AVCaptureSessionPreset1280x720
+        VideoQuality.FHD -> AVCaptureSessionPreset1920x1080
+        VideoQuality.UHD -> AVCaptureSessionPreset3840x2160
+      }
+    }
+
+    if (captureSession.canSetSessionPreset(targetPreset)) {
+      captureSession.sessionPreset = targetPreset
     }
 
     // Get camera device
@@ -306,7 +277,6 @@ class IOSCameraController(
         // Add photo output
         val photo = AVCapturePhotoOutput()
 
-        // Configure max prioritization
         if (photo.maxPhotoQualityPrioritization < AVCapturePhotoQualityPrioritizationQuality) {
           try {
             photo.maxPhotoQualityPrioritization = AVCapturePhotoQualityPrioritizationQuality
@@ -318,6 +288,22 @@ class IOSCameraController(
         if (captureSession.canAddOutput(photo)) {
           captureSession.addOutput(photo)
           photoOutput = photo
+
+          // Enable high resolution capture to allow shooting larger than session preset
+          photo.highResolutionCaptureEnabled = true
+
+          // Explicitly set maxPhotoDimensions on output to the active format's max
+          // This is required on iOS 16+ to prevent "maxPhotoDimensions must not be larger than output's" error
+          if (isIOS16OrNewer()) {
+            currentDevice?.activeFormat?.supportedMaxPhotoDimensions?.lastOrNull()?.let { maxDim ->
+              val dim = (maxDim as NSValue).CMVideoDimensionsValue
+              try {
+                photo.maxPhotoDimensions = dim
+              } catch (e: Exception) {
+                // Ignore if setting fails
+              }
+            }
+          }
         }
 
         // Video Data Output (Frame Analysis)
@@ -327,7 +313,7 @@ class IOSCameraController(
         val settings = NSMutableDictionary().apply {
           setObject(
             NSNumber.numberWithUnsignedInt(kCVPixelFormatType_32BGRA),
-            forKey = interpretObjCPointer<platform.Foundation.NSString>(kCVPixelBufferPixelFormatTypeKey!!.rawValue),
+            forKey = interpretObjCPointer<NSString>(kCVPixelBufferPixelFormatTypeKey!!.rawValue),
           )
         }
         videoDataOutput.videoSettings = settings as Map<Any?, *>
@@ -350,6 +336,36 @@ class IOSCameraController(
         if (captureSession.canAddOutput(video)) {
           captureSession.addOutput(video)
           videoOutput = video
+        }
+
+        // Manual Format Selection (Moved to end to ensure persistence)
+        // If a specific resolution is requested, we must find a device format that supports it
+        // and manually set the activeFormat. This bypasses the session preset's limitations.
+        // supportedMaxPhotoDimensions is available on iOS 16+
+        if (isIOS16OrNewer()) {
+          configuration.photoResolution?.let { targetRes ->
+            try {
+              device.lockForConfiguration(null)
+
+              // Find best matching format
+              val bestFormat = device.formats.filterIsInstance<AVCaptureDeviceFormat>().firstOrNull { format ->
+                // Check if format supports high-res photo capture of the target size
+                val supportsPhoto = format.supportedMaxPhotoDimensions.any {
+                  val dim = (it as NSValue).CMVideoDimensionsValue
+                  dim.useContents { width } == targetRes.width && dim.useContents { height } == targetRes.height
+                }
+                supportsPhoto
+              }
+
+              if (bestFormat != null) {
+                device.activeFormat = bestFormat
+              }
+
+              device.unlockForConfiguration()
+            } catch (e: Exception) {
+              // Ignore format selection failure
+            }
+          }
         }
 
         // Initial State Update from Device
@@ -432,6 +448,41 @@ class IOSCameraController(
       targetPrioritization
     }
 
+    // Set resolution
+    configuration.photoResolution?.let { res ->
+      val dimensions = cValue<CMVideoDimensions> {
+        width = res.width
+        height = res.height
+      }
+
+      // Verification against active format requires iOS 16+ APIs
+      if (isIOS16OrNewer()) {
+        val isSupported = currentDevice?.activeFormat?.supportedMaxPhotoDimensions?.any {
+          val dim = (it as NSValue).CMVideoDimensionsValue
+          dim.useContents { width } == dimensions.useContents { width } &&
+            dim.useContents { height } == dimensions.useContents { height }
+        } == true
+
+        if (isSupported) {
+          // Clamp to output's maxPhotoDimensions to prevent crash
+          val outputMax = output.maxPhotoDimensions.useContents { this }
+          val reqWidth = dimensions.useContents { width }
+          val reqHeight = dimensions.useContents { height }
+
+          if (reqWidth <= outputMax.width && reqHeight <= outputMax.height) {
+            settings.maxPhotoDimensions = dimensions
+          } else {
+            // If requested is larger than output max, use output max or skip
+            settings.maxPhotoDimensions = output.maxPhotoDimensions
+          }
+        }
+      } else {
+        // Fallback or older iOS handling?
+        // On older iOS, highResolutionCaptureEnabled=true usually just works with max resolution implicitly
+        // or we rely on session preset. We can leave it unset here as safely doing nothing avoids crashes.
+      }
+    }
+
     // Create delegate
     val delegate = PhotoCaptureDelegate { result ->
       completion.complete(result)
@@ -472,7 +523,8 @@ class IOSCameraController(
   }
 
   override fun updateConfiguration(config: CameraConfiguration) {
-    val needsRebind = config.lens != _configuration.lens
+    val needsRebind = config.lens != _configuration.lens ||
+      config.photoResolution != _configuration.photoResolution
     val oldPlugins = _configuration.plugins
     _configuration = config
 
@@ -563,14 +615,12 @@ private class PhotoCaptureDelegate(
 
     // Get dimensions from photo
     val cgImage = didFinishProcessingPhoto.CGImageRepresentation()
-    val width = cgImage?.let { platform.CoreGraphics.CGImageGetWidth(it).toInt() } ?: 0
-    val height = cgImage?.let { platform.CoreGraphics.CGImageGetHeight(it).toInt() } ?: 0
+    val width = cgImage?.let { CGImageGetWidth(it).toInt() } ?: 0
+    val height = cgImage?.let { CGImageGetHeight(it).toInt() } ?: 0
 
-    // Save to Photo Library
-    // Save to Photo Library
     PHPhotoLibrary.sharedPhotoLibrary().performChanges({
       PHAssetChangeRequest.creationRequestForAssetFromImage(
-        platform.UIKit.UIImage(data = data),
+        UIImage(data = data),
       )
     }, completionHandler = { success, error ->
       if (success) {
@@ -719,4 +769,8 @@ private class VideoRecordingDelegate(
   ) {
     onFinished(error?.localizedDescription)
   }
+}
+
+private fun isIOS16OrNewer(): Boolean = NSProcessInfo.processInfo.operatingSystemVersion.useContents {
+  majorVersion >= 16
 }

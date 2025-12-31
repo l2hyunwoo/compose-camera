@@ -24,7 +24,19 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
+import androidx.navigation.compose.*
+import androidx.navigation.toRoute
+import androidx.savedstate.SavedState
+import androidx.savedstate.read
+import androidx.savedstate.write
 import io.github.l2hyunwoo.compose.camera.core.rememberCameraPermissionManager
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlin.reflect.typeOf
 
 /**
  * Sample app entry point composable.
@@ -35,7 +47,6 @@ fun SampleApp() {
   val permissionManager = rememberCameraPermissionManager()
   var hasPermission by remember { mutableStateOf(false) }
   var permissionChecked by remember { mutableStateOf(false) }
-  var currentScreen by remember { mutableStateOf(Screen.Camera) }
 
   LaunchedEffect(Unit) {
     val result = permissionManager.requestCameraPermissions()
@@ -46,64 +57,91 @@ fun SampleApp() {
   MaterialTheme(
     colorScheme = darkColorScheme(),
   ) {
-    when {
-      !permissionChecked -> {
-        // Loading state while checking permissions
-        Box(
-          modifier = Modifier.fillMaxSize(),
-          contentAlignment = Alignment.Center,
-        ) {
-          Text("Checking permissions...", color = MaterialTheme.colorScheme.onBackground)
+    if (!permissionChecked) {
+      Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+      ) {
+        Text("Checking permissions...", color = MaterialTheme.colorScheme.onBackground)
+      }
+    } else if (hasPermission) {
+      val navController = rememberNavController()
+
+      NavHost(
+        navController = navController,
+        startDestination = Destination.Camera,
+      ) {
+        composable<Destination.Camera> {
+          CameraScreen(
+            onGalleryClick = { navController.navigate(Destination.Gallery) },
+            onBarcodeScannerClick = { navController.navigate(Destination.BarcodeScanner) },
+          )
+        }
+
+        composable<Destination.Gallery> {
+          GalleryScreen(
+            onBack = { navController.popBackStack() },
+            onItemClick = { item -> navController.navigate(Destination.MediaDetail(item)) },
+          )
+        }
+
+        composable<Destination.MediaDetail>(
+          typeMap = mapOf(typeOf<MediaItem>() to MediaItemNavType),
+        ) { backStackEntry ->
+          val detail = backStackEntry.toRoute<Destination.MediaDetail>()
+          MediaDetailScreen(
+            item = detail.item,
+            onBack = { navController.popBackStack() },
+          )
+        }
+
+        composable<Destination.BarcodeScanner> {
+          BarcodeScannerScreen(
+            onBack = { navController.popBackStack() },
+          )
         }
       }
-
-      hasPermission -> {
-        when (currentScreen) {
-          Screen.Camera -> {
-            CameraScreen(
-              onGalleryClick = { currentScreen = Screen.Gallery },
-              onBarcodeScannerClick = { currentScreen = Screen.BarcodeScanner },
-            )
-          }
-
-          Screen.Gallery -> {
-            BackHandler(enabled = true) {
-              currentScreen = Screen.Camera
-            }
-            GalleryScreen(
-              onBack = { currentScreen = Screen.Camera },
-              onItemClick = { /* TODO: Show media detail */ },
-            )
-          }
-
-          Screen.BarcodeScanner -> {
-            BackHandler(enabled = true) {
-              currentScreen = Screen.Camera
-            }
-            BarcodeScannerScreen(
-              onBack = { currentScreen = Screen.Camera },
-            )
-          }
-        }
-      }
-
-      else -> {
-        // Permission denied - show settings button
-        Box(
-          modifier = Modifier.fillMaxSize(),
-          contentAlignment = Alignment.Center,
-        ) {
-          Button(onClick = { permissionManager.openAppSettings() }) {
-            Text("Open Camera Permission Settings")
-          }
+    } else {
+      Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+      ) {
+        Button(onClick = { permissionManager.openAppSettings() }) {
+          Text("Open Camera Permission Settings")
         }
       }
     }
   }
 }
 
-private enum class Screen {
-  Camera,
-  Gallery,
-  BarcodeScanner,
+private sealed class Destination {
+  @Serializable
+  data object Camera : Destination()
+
+  @Serializable
+  data object Gallery : Destination()
+
+  @Serializable
+  data object BarcodeScanner : Destination()
+
+  @Serializable
+  data class MediaDetail(val item: MediaItem) : Destination()
+}
+
+private val MediaItemNavType = object : NavType<MediaItem>(isNullableAllowed = false) {
+  override fun get(bundle: SavedState, key: String): MediaItem? = bundle.read {
+    if (contains(key)) getString(key)?.let { Json.decodeFromString(it) } else null
+  }
+
+  @OptIn(ExperimentalEncodingApi::class)
+  override fun parseValue(value: String): MediaItem = Json.decodeFromString(Base64.decode(value).decodeToString())
+
+  override fun put(bundle: SavedState, key: String, value: MediaItem) {
+    bundle.write {
+      putString(key, Json.encodeToString(value))
+    }
+  }
+
+  @OptIn(ExperimentalEncodingApi::class)
+  override fun serializeAsValue(value: MediaItem): String = Base64.encode(Json.encodeToString(value).encodeToByteArray())
 }

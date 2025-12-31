@@ -9,6 +9,7 @@ plugins {
   alias(libs.plugins.kmpNativeCoroutines) apply false
   alias(libs.plugins.vanniktech.mavenPublish) apply false
   alias(libs.plugins.spotless) apply false
+  alias(libs.plugins.kotlin.serialization) apply false
   alias(libs.plugins.binaryCompatibilityValidator) apply false
 }
 

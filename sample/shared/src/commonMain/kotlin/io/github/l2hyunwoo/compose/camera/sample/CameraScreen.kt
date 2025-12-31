@@ -24,8 +24,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -74,6 +76,8 @@ fun CameraScreen(
     ?: remember { mutableStateOf(ExposureState()) }
   val currentExposure = exposureState.exposureCompensation
   val exposureRange = exposureState.exposureCompensationRange
+  val supportedResolutions = cameraController?.cameraInfo?.supportedPhotoResolutions ?: emptyList()
+  var showResolutionDialog by remember { mutableStateOf(false) }
 
   Scaffold(
     modifier = modifier.fillMaxSize(),
@@ -160,7 +164,6 @@ fun CameraScreen(
                 FlashMode.TORCH -> FlashMode.OFF
               }
               cameraConfig = cameraConfig.copy(flashMode = newFlashMode)
-              cameraController?.cameraControl?.setFlashMode(newFlashMode)
             },
           ) {
             val iconAndTint = when (cameraConfig.flashMode) {
@@ -184,7 +187,6 @@ fun CameraScreen(
                 CameraLens.FRONT -> CameraLens.BACK
               }
               cameraConfig = cameraConfig.copy(lens = newLens)
-              cameraController?.setLens(newLens)
             },
           ) {
             Icon(
@@ -203,7 +205,6 @@ fun CameraScreen(
                 CaptureMode.SPEED -> CaptureMode.BALANCED
               }
               cameraConfig = cameraConfig.copy(captureMode = newMode)
-              cameraController?.updateConfiguration(cameraConfig)
               lastCaptureResult = "Mode: ${newMode.name}"
             },
           ) {
@@ -222,8 +223,17 @@ fun CameraScreen(
           // Barcode scanner button
           IconButton(onClick = onBarcodeScannerClick) {
             Icon(
-              imageVector = Icons.Filled.QrCodeScanner,
+              imageVector = Icons.Default.QrCodeScanner,
               contentDescription = "Barcode Scanner",
+              tint = Color.White,
+            )
+          }
+
+          // Resolution button
+          IconButton(onClick = { showResolutionDialog = true }) {
+            Icon(
+              imageVector = Icons.Default.PhotoSizeSelectActual,
+              contentDescription = "Resolution",
               tint = Color.White,
             )
           }
@@ -406,6 +416,51 @@ fun CameraScreen(
             )
           }
         }
+      }
+
+      if (showResolutionDialog) {
+        AlertDialog(
+          onDismissRequest = { showResolutionDialog = false },
+          title = { Text("Select Resolution") },
+          text = {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+              if (supportedResolutions.isEmpty()) {
+                Text(
+                  text = "No resolutions available",
+                  style = MaterialTheme.typography.bodyMedium,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                )
+              } else {
+                supportedResolutions.forEach { resolution ->
+                  Row(
+                    modifier = Modifier
+                      .fillMaxWidth()
+                      .clickable {
+                        cameraConfig = cameraConfig.copy(photoResolution = resolution)
+                        showResolutionDialog = false
+                      }
+                      .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                  ) {
+                    Text(
+                      text = "${resolution.width} x ${resolution.height} (${resolution.megapixels}MP)",
+                      style = MaterialTheme.typography.bodyLarge,
+                      color = if (cameraConfig.photoResolution == resolution) MaterialTheme.colorScheme.primary else Color.Unspecified,
+                    )
+                  }
+                }
+              }
+            }
+          },
+          confirmButton = {
+            TextButton(onClick = { showResolutionDialog = false }) {
+              Text("Close")
+            }
+          },
+        )
       }
     },
   )
