@@ -1,12 +1,14 @@
 [versions]
 agp = "8.13.2"
 kotlin = "2.3.0"
+kotlinx-serialization = "1.9.0"
 android-minSdk = "24"
 android-compileSdk = "36"
 vanniktechMavenPublish = "0.35.0"
 
 # Compose
 compose-multiplatform = "1.9.3"
+navigation-compose = "2.9.1"
 
 # CameraX
 androidx-camerax = "1.5.2"
@@ -91,6 +93,8 @@ coil-video = { module = "io.coil-kt.coil3:coil-video", version.ref = "coil3" }
 # ML Kit
 mlkit-barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkit-barcode-scanning" }
 mlkit-text-recognition = { module = "com.google.mlkit:text-recognition", version.ref = "mlkit-text-recognition" }
+navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 [plugins]
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -102,4 +106,5 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kmpNativeCoroutines = { id = "com.rickclephas.kmp.nativecoroutines", version.ref = "kmpNativeCoroutines" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binaryCompatibilityValidator" }
