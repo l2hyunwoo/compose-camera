@@ -57,6 +57,11 @@ actual fun CameraPreview(
     onCameraControllerReady(controller)
   }
 
+  // Handle configuration updates
+  LaunchedEffect(configuration) {
+    controller.updateConfiguration(configuration)
+  }
+
   // Auto-dismiss focus indicator
   LaunchedEffect(tapPosition) {
     if (tapPosition != Offset.Unspecified) {
