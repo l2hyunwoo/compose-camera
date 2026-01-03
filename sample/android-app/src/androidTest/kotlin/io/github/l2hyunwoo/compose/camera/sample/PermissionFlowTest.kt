@@ -33,16 +33,6 @@ class PermissionFlowTest {
 
   private lateinit var device: UiDevice
 
-  companion object {
-    private const val PACKAGE = "io.github.l2hyunwoo.compose.camera.sample"
-    private const val TIMEOUT = 10_000L
-
-    // Exact resource IDs from Samsung Android 15 permission dialog
-    private const val ALLOW_BUTTON_ID =
-      "com.android.permissioncontroller:id/permission_allow_foreground_only_button"
-    private const val DENY_BUTTON_ID = "com.android.permissioncontroller:id/permission_deny_button"
-  }
-
   @Before
   fun setUp() {
     val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -144,5 +134,15 @@ class PermissionFlowTest {
       ?: device.findObject(By.textContains("Don't allow"))
     denyButton?.click()
     Thread.sleep(300)
+  }
+
+  companion object {
+    private const val PACKAGE = "io.github.l2hyunwoo.compose.camera.sample"
+    private const val TIMEOUT = 10_000L
+
+    // Exact resource IDs from Samsung Android 15 permission dialog
+    private const val ALLOW_BUTTON_ID =
+      "com.android.permissioncontroller:id/permission_allow_foreground_only_button"
+    private const val DENY_BUTTON_ID = "com.android.permissioncontroller:id/permission_deny_button"
   }
 }
