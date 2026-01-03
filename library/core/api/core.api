@@ -57,6 +57,7 @@ public abstract interface class io/github/l2hyunwoo/compose/camera/core/CameraCo
 	public abstract fun focus-k-4lQ0M (J)V
 	public abstract fun setExposureCompensation (F)V
 	public abstract fun setFlashMode (Lio/github/l2hyunwoo/compose/camera/core/FlashMode;)V
+	public abstract fun setLinearZoom (F)V
 	public abstract fun setZoom (F)V
 }
 
@@ -401,6 +402,7 @@ public final class io/github/l2hyunwoo/compose/camera/core/ZoomState {
 	public final fun copy (FFF)Lio/github/l2hyunwoo/compose/camera/core/ZoomState;
 	public static synthetic fun copy$default (Lio/github/l2hyunwoo/compose/camera/core/ZoomState;FFFILjava/lang/Object;)Lio/github/l2hyunwoo/compose/camera/core/ZoomState;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLinearZoom ()F
 	public final fun getMaxZoomRatio ()F
 	public final fun getMinZoomRatio ()F
 	public final fun getZoomRatio ()F
