@@ -107,6 +107,10 @@ class AndroidCameraController(
       camera?.cameraControl?.setZoomRatio(ratio)
     }
 
+    override fun setLinearZoom(linearZoom: Float) {
+      camera?.cameraControl?.setLinearZoom(linearZoom.coerceIn(0f, 1f))
+    }
+
     override fun focus(point: Offset) {
       val cameraControl = camera?.cameraControl ?: return
       val meteringPoint = SurfaceOrientedMeteringPointFactory(1f, 1f)
