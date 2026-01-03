@@ -27,6 +27,12 @@ interface CameraControl {
   fun setZoom(ratio: Float)
 
   /**
+   * Set linear zoom value.
+   * @param linearZoom 0.0 (minimum zoom) to 1.0 (maximum zoom)
+   */
+  fun setLinearZoom(linearZoom: Float)
+
+  /**
    * Focus on a specific point in the preview
    * @param point The normalized point (0-1 range) to focus on
    */
