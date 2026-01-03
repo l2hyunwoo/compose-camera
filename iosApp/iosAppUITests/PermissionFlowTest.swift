@@ -42,6 +42,7 @@ class PermissionFlowTest: XCTestCase {
     override func setUp() {
         continueAfterFailure = false
         app = XCUIApplication()
+        // deleteApp() // Reset permissions by deleting the app
     }
 
     override func tearDown() {
@@ -52,14 +53,22 @@ class PermissionFlowTest: XCTestCase {
      * Test: When camera permission is granted, camera screen should be displayed.
      */
     func testPermissionGranted_showsCameraScreen() {
-        // Delete app to reset permissions (manual step or use reset in Xcode scheme)
-        app.launch()
-
-        // Handle permission alert
-        let allowButton = springboard.buttons["Allow"]
-        if allowButton.waitForExistence(timeout: 5) {
-            allowButton.tap()
+        // Monitor for permission dialogs
+        addUIInterruptionMonitor(withDescription: "Camera Permission") { (alert) -> Bool in
+            let allowButtons = ["Allow", "허용", "확인", "OK"]
+            for label in allowButtons {
+                if alert.buttons[label].exists {
+                    alert.buttons[label].tap()
+                    return true
+                }
+            }
+            return false
         }
+
+        app.launch()
+        
+        // Interact with app to trigger interruption handler
+        app.tap()
 
         // Verify camera screen is displayed (flash button indicates camera UI)
         let flashButton = app.buttons["flash_button"]
@@ -73,14 +82,22 @@ class PermissionFlowTest: XCTestCase {
      * Test: When camera permission is denied, settings button should be displayed.
      */
     func testPermissionDenied_showsSettingsButton() {
-        // Delete app to reset permissions
-        app.launch()
-
-        // Handle permission alert - deny
-        let dontAllowButton = springboard.buttons["Don't Allow"]
-        if dontAllowButton.waitForExistence(timeout: 5) {
-            dontAllowButton.tap()
+        // Monitor for permission dialogs - Deny
+        addUIInterruptionMonitor(withDescription: "Camera Permission Deny") { (alert) -> Bool in
+            let denyButtons = ["Don't Allow", "허용 안 함"]
+            for label in denyButtons {
+                if alert.buttons[label].exists {
+                    alert.buttons[label].tap()
+                    return true
+                }
+            }
+            return false
         }
+
+        app.launch()
+        
+        // Interact to trigger handler
+        app.tap()
 
         // Verify settings button is displayed
         let settingsButton = app.buttons["permission_settings_button"]
@@ -94,14 +111,22 @@ class PermissionFlowTest: XCTestCase {
      * Test: Clicking settings button opens app settings.
      */
     func testSettingsButton_opensAppSettings() {
-        // Ensure we're in denied state
-        app.launch()
-
-        // Deny permission if dialog appears
-        let dontAllowButton = springboard.buttons["Don't Allow"]
-        if dontAllowButton.waitForExistence(timeout: 5) {
-            dontAllowButton.tap()
+        // Monitor for permission dialogs - Deny
+        addUIInterruptionMonitor(withDescription: "Camera Permission Deny") { (alert) -> Bool in
+            let denyButtons = ["Don't Allow", "허용 안 함"]
+            for label in denyButtons {
+                if alert.buttons[label].exists {
+                    alert.buttons[label].tap()
+                    return true
+                }
+            }
+            return false
         }
+
+        app.launch()
+        
+        // Interact to trigger handler
+        app.tap()
 
         // Click settings button
         let settingsButton = app.buttons["permission_settings_button"]
@@ -115,5 +140,50 @@ class PermissionFlowTest: XCTestCase {
             settingsApp.wait(for: .runningForeground, timeout: 10),
             "Settings app should open when settings button is clicked"
         )
+    }
+
+    private func deleteApp() {
+        app.terminate()
+        
+        // Go to home screen
+        XCUIDevice.shared.press(.home)
+        
+        // Use Spotlight to find the app (more reliable than swiping pages)
+        springboard.swipeDown()
+        
+        let searchField = springboard.searchFields.firstMatch
+        if searchField.waitForExistence(timeout: 3) {
+            searchField.typeText("iosApp")
+            
+            let icon = springboard.icons["iosApp"]
+            if icon.waitForExistence(timeout: 3) {
+                icon.press(forDuration: 2)
+                
+                // Handle deletion flow
+                // 1. "Remove App" / "앱 제거"
+                if springboard.buttons["Remove App"].waitForExistence(timeout: 3) {
+                    springboard.buttons["Remove App"].tap()
+                } else if springboard.buttons["앱 제거"].waitForExistence(timeout: 3) {
+                    springboard.buttons["앱 제거"].tap()
+                }
+
+                // 2. "Delete App" / "앱 삭제"
+                if springboard.alerts.buttons["Delete App"].waitForExistence(timeout: 3) {
+                    springboard.alerts.buttons["Delete App"].tap()
+                } else if springboard.alerts.buttons["앱 삭제"].waitForExistence(timeout: 3) {
+                    springboard.alerts.buttons["앱 삭제"].tap()
+                }
+
+                // 3. "Delete" / "삭제"
+                if springboard.alerts.buttons["Delete"].waitForExistence(timeout: 3) {
+                    springboard.alerts.buttons["Delete"].tap()
+                } else if springboard.alerts.buttons["삭제"].waitForExistence(timeout: 3) {
+                    springboard.alerts.buttons["삭제"].tap()
+                }
+            } else {
+                // Cancel search if icon not found
+                if springboard.buttons["Cancel"].exists { springboard.buttons["Cancel"].tap() }
+            }
+        }
     }
 }
