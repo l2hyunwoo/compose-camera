@@ -26,8 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.toRoute
@@ -62,7 +60,7 @@ fun SampleApp() {
     colorScheme = darkColorScheme(),
   ) {
     Box(
-      modifier = Modifier.semantics { testTagsAsResourceId = true },
+      modifier = Modifier.applyTestTagsAsResourceId(),
     ) {
       if (!permissionChecked) {
         Box(
