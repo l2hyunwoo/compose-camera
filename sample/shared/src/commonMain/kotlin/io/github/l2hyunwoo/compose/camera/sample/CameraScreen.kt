@@ -662,6 +662,7 @@ private fun ZoomSliderPanel(
             onZoomChange(it)
           },
           valueRange = 0f..1f,
+          steps = 9,
           modifier = Modifier
             .graphicsLayer {
               rotationZ = -90f
