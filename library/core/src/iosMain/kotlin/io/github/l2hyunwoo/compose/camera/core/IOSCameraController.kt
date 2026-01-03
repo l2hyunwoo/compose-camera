@@ -103,6 +103,29 @@ class IOSCameraController(
       }
     }
 
+    override fun setLinearZoom(linearZoom: Float) {
+      currentDevice?.let { device ->
+        try {
+          device.lockForConfiguration(null)
+          val clampedLinearZoom = linearZoom.coerceIn(0f, 1f)
+          val minZoom = device.minAvailableVideoZoomFactor
+          val maxZoom = device.maxAvailableVideoZoomFactor
+          val zoomFactor = minZoom + (maxZoom - minZoom) * clampedLinearZoom.toDouble()
+          device.videoZoomFactor = zoomFactor
+          device.unlockForConfiguration()
+
+          _zoomState.value = _zoomState.value.copy(zoomRatio = zoomFactor.toFloat())
+
+          val currentState = _cameraState.value
+          if (currentState is CameraState.Ready) {
+            _cameraState.value = currentState.copy(zoomRatio = zoomFactor.toFloat())
+          }
+        } catch (_: Exception) {
+          // Ignore zoom errors
+        }
+      }
+    }
+
     override fun focus(point: Offset) {
       currentDevice?.let { device ->
         try {

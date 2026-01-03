@@ -67,7 +67,18 @@ data class ZoomState(
   val zoomRatio: Float = 1.0f,
   val minZoomRatio: Float = 1.0f,
   val maxZoomRatio: Float = 1.0f,
-)
+) {
+  /**
+   * Linear zoom value (0.0 to 1.0), derived from zoomRatio.
+   * 0.0 = minimum zoom, 1.0 = maximum zoom
+   */
+  val linearZoom: Float
+    get() = if (maxZoomRatio > minZoomRatio) {
+      ((zoomRatio - minZoomRatio) / (maxZoomRatio - minZoomRatio)).coerceIn(0f, 1f)
+    } else {
+      0f
+    }
+}
 
 /**
  * Data class holding exposure information.

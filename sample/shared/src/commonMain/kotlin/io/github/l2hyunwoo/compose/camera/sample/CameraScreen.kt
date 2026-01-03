@@ -79,6 +79,12 @@ fun CameraScreen(
   val supportedResolutions = cameraController?.cameraInfo?.supportedPhotoResolutions ?: emptyList()
   var showResolutionDialog by remember { mutableStateOf(false) }
 
+  // Zoom state
+  var showZoomSlider by remember { mutableStateOf(false) }
+  val zoomState by cameraController?.cameraInfo?.zoomState?.collectAsState()
+    ?: remember { mutableStateOf(ZoomState()) }
+  val currentLinearZoom = zoomState.linearZoom
+
   Scaffold(
     modifier = modifier.fillMaxSize(),
     containerColor = Color.Black,
@@ -416,6 +422,39 @@ fun CameraScreen(
             )
           }
         }
+
+        // Zoom Slider Panel
+        AnimatedVisibility(
+          visible = showZoomSlider,
+          enter = slideInHorizontally(initialOffsetX = { -it }),
+          exit = slideOutHorizontally(targetOffsetX = { -it }),
+          modifier = Modifier.align(Alignment.CenterStart),
+        ) {
+          ZoomSliderPanel(
+            currentLinearZoom = currentLinearZoom,
+            onZoomChange = { zoom ->
+              cameraController?.cameraControl?.setLinearZoom(zoom)
+            },
+            onDismiss = { showZoomSlider = false },
+          )
+        }
+
+        // Zoom toggle button (visible when slider is hidden)
+        if (!showZoomSlider) {
+          IconButton(
+            onClick = { showZoomSlider = true },
+            modifier = Modifier
+              .align(Alignment.CenterStart)
+              .padding(start = 8.dp)
+              .background(Color.Black.copy(alpha = 0.5f), CircleShape),
+          ) {
+            Icon(
+              imageVector = Icons.Filled.ZoomIn,
+              contentDescription = "Zoom",
+              tint = Color.White,
+            )
+          }
+        }
       }
 
       if (showResolutionDialog) {
@@ -543,6 +582,100 @@ private fun ExposureSliderPanel(
           colors = SliderDefaults.colors(
             thumbColor = Color.Yellow,
             activeTrackColor = Color.Yellow,
+            inactiveTrackColor = Color.White.copy(alpha = 0.3f),
+          ),
+        )
+      }
+
+      // Close button
+      IconButton(
+        onClick = onDismiss,
+        modifier = Modifier.size(32.dp),
+      ) {
+        Icon(
+          imageVector = Icons.Filled.Close,
+          contentDescription = "Close",
+          tint = Color.White,
+          modifier = Modifier.size(20.dp),
+        )
+      }
+    }
+  }
+}
+
+@Composable
+private fun ZoomSliderPanel(
+  currentLinearZoom: Float,
+  onZoomChange: (Float) -> Unit,
+  onDismiss: () -> Unit,
+) {
+  var sliderValue by remember(currentLinearZoom) { mutableStateOf(currentLinearZoom) }
+
+  Row(
+    modifier = Modifier
+      .padding(start = 16.dp)
+      .background(
+        Color.Black.copy(alpha = 0.7f),
+        RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp),
+      )
+      .padding(horizontal = 12.dp, vertical = 24.dp)
+      .pointerInput(Unit) {
+        detectHorizontalDragGestures { _, dragAmount ->
+          if (dragAmount < -10) {
+            onDismiss()
+          }
+        }
+      },
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+      // Zoom Label
+      Text(
+        text = "ZOOM",
+        color = Color.White,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Bold,
+      )
+
+      // Current zoom value
+      val displayZoom = round(1f + sliderValue * 9f) / 10f // 1.0x to 10.0x display
+      Text(
+        text = "${displayZoom}x",
+        color = Color.Cyan,
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Bold,
+      )
+
+      // Vertical Slider (rotated)
+      Box(
+        modifier = Modifier
+          .height(200.dp)
+          .width(48.dp),
+      ) {
+        Slider(
+          value = sliderValue,
+          onValueChange = {
+            sliderValue = it
+            onZoomChange(it)
+          },
+          valueRange = 0f..1f,
+          steps = 9,
+          modifier = Modifier
+            .graphicsLayer {
+              rotationZ = -90f
+            }
+            .width(200.dp)
+            .height(48.dp)
+            .offset(x = (-76).dp)
+            .semantics {
+              contentDescription = "Zoom"
+            },
+          colors = SliderDefaults.colors(
+            thumbColor = Color.Cyan,
+            activeTrackColor = Color.Cyan,
             inactiveTrackColor = Color.White.copy(alpha = 0.3f),
           ),
         )

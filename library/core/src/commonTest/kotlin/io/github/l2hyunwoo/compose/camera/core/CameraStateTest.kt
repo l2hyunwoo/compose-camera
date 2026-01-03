@@ -15,6 +15,7 @@
  */
 package io.github.l2hyunwoo.compose.camera.core
 
+import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -111,5 +112,26 @@ class CameraStateTest {
     assertEquals(original.currentLens, adjusted.currentLens)
     assertEquals(original.flashMode, adjusted.flashMode)
     assertEquals(original.zoomRatio, adjusted.zoomRatio)
+  }
+
+  @Test
+  fun testZoomStateLinearZoomComputed() {
+    val state = ZoomState(zoomRatio = 2.5f, minZoomRatio = 1.0f, maxZoomRatio = 4.0f)
+    // (2.5 - 1.0) / (4.0 - 1.0) = 1.5 / 3.0 = 0.5
+    assertTrue(abs(state.linearZoom - 0.5f) < 0.001f)
+  }
+
+  @Test
+  fun testZoomStateLinearZoomAtBoundaries() {
+    val min = ZoomState(zoomRatio = 1.0f, minZoomRatio = 1.0f, maxZoomRatio = 4.0f)
+    val max = ZoomState(zoomRatio = 4.0f, minZoomRatio = 1.0f, maxZoomRatio = 4.0f)
+    assertTrue(abs(min.linearZoom - 0.0f) < 0.001f)
+    assertTrue(abs(max.linearZoom - 1.0f) < 0.001f)
+  }
+
+  @Test
+  fun testZoomStateLinearZoomWhenEqualMinMax() {
+    val state = ZoomState(zoomRatio = 1.0f, minZoomRatio = 1.0f, maxZoomRatio = 1.0f)
+    assertEquals(0.0f, state.linearZoom)
   }
 }
