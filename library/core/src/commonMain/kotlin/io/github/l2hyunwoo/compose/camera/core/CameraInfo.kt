@@ -50,6 +50,18 @@ interface CameraInfo {
     }
 
   /**
+   * Whether current camera has a flash unit.
+   * Use this to determine whether to show flash controls in the UI.
+   */
+  val hasFlashUnit: Boolean
+
+  /**
+   * Whether current camera has a torch (flashlight).
+   * Use this to determine whether to show torch controls in the UI.
+   */
+  val hasTorch: Boolean
+
+  /**
    * List of supported photo resolutions for current camera.
    */
   val supportedPhotoResolutions: List<Resolution>
