@@ -75,6 +75,12 @@ class IOSCameraController(
         val dimensions = CMVideoFormatDescriptionGetDimensions(deviceFormat.formatDescription)
         dimensions.useContents { Resolution(width, height) }
       }?.distinct() ?: emptyList()
+
+    override val hasFlashUnit: Boolean
+      get() = currentDevice?.hasFlash ?: false
+
+    override val hasTorch: Boolean
+      get() = currentDevice?.hasTorch ?: false
   }
 
   override val cameraInfo: CameraInfo = iosCameraInfo

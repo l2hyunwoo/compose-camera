@@ -98,6 +98,12 @@ class AndroidCameraController(
         return map?.getOutputSizes(VIDEO_FORMAT)
           ?.map { Resolution(it.width, it.height) } ?: emptyList()
       }
+
+    override val hasFlashUnit: Boolean
+      get() = camera?.cameraInfo?.hasFlashUnit() ?: false
+
+    override val hasTorch: Boolean
+      get() = camera?.cameraInfo?.hasFlashUnit() ?: false
   }
 
   override val cameraInfo: CameraInfo = androidCameraInfo

@@ -126,6 +126,8 @@ public abstract interface class io/github/l2hyunwoo/compose/camera/core/CameraIn
 	public abstract fun getCameraState ()Lkotlinx/coroutines/flow/StateFlow;
 	public abstract fun getExposureState ()Lkotlinx/coroutines/flow/StateFlow;
 	public fun getFlashMode ()Lio/github/l2hyunwoo/compose/camera/core/FlashMode;
+	public abstract fun getHasFlashUnit ()Z
+	public abstract fun getHasTorch ()Z
 	public abstract fun getSupportedPhotoResolutions ()Ljava/util/List;
 	public abstract fun getSupportedVideoResolutions ()Ljava/util/List;
 	public abstract fun getZoomState ()Lkotlinx/coroutines/flow/StateFlow;
