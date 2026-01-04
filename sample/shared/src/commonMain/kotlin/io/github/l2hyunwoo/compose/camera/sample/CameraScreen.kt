@@ -160,29 +160,33 @@ fun CameraScreen(
             .align(Alignment.TopCenter),
           horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-          // Flash mode button
-          IconButton(
-            onClick = {
-              val newFlashMode = when (cameraConfig.flashMode) {
-                FlashMode.OFF -> FlashMode.ON
-                FlashMode.ON -> FlashMode.AUTO
-                FlashMode.AUTO -> FlashMode.OFF
-                FlashMode.TORCH -> FlashMode.OFF
+          // Flash mode button - only show if camera has flash
+          val hasFlashUnit = cameraController?.cameraInfo?.hasFlashUnit ?: false
+          if (hasFlashUnit) {
+            IconButton(
+              onClick = {
+                val newFlashMode = when (cameraConfig.flashMode) {
+                  FlashMode.OFF -> FlashMode.ON
+                  FlashMode.ON -> FlashMode.AUTO
+                  FlashMode.AUTO -> FlashMode.OFF
+                  FlashMode.TORCH -> FlashMode.OFF
+                }
+                cameraConfig = cameraConfig.copy(flashMode = newFlashMode)
+              },
+              modifier = Modifier.semantics { contentDescription = "Flash Button" },
+            ) {
+              val iconAndTint = when (cameraConfig.flashMode) {
+                FlashMode.OFF -> Icons.Filled.FlashOff to Color.White
+                FlashMode.ON -> Icons.Filled.FlashOn to Color.Yellow
+                FlashMode.AUTO -> Icons.Filled.FlashAuto to Color.White
+                FlashMode.TORCH -> Icons.Filled.Highlight to Color.Yellow
               }
-              cameraConfig = cameraConfig.copy(flashMode = newFlashMode)
-            },
-          ) {
-            val iconAndTint = when (cameraConfig.flashMode) {
-              FlashMode.OFF -> Icons.Filled.FlashOff to Color.White
-              FlashMode.ON -> Icons.Filled.FlashOn to Color.Yellow
-              FlashMode.AUTO -> Icons.Filled.FlashAuto to Color.White
-              FlashMode.TORCH -> Icons.Filled.Highlight to Color.Yellow
+              Icon(
+                imageVector = iconAndTint.first,
+                contentDescription = "Flash Mode",
+                tint = iconAndTint.second,
+              )
             }
-            Icon(
-              imageVector = iconAndTint.first,
-              contentDescription = "Flash Mode",
-              tint = iconAndTint.second,
-            )
           }
 
           // Lens switch button
