@@ -165,10 +165,11 @@ fun CameraScreen(
           if (hasFlashUnit) {
             IconButton(
               onClick = {
+                val hasTorch = cameraController?.cameraInfo?.hasTorch ?: false
                 val newFlashMode = when (cameraConfig.flashMode) {
                   FlashMode.OFF -> FlashMode.ON
                   FlashMode.ON -> FlashMode.AUTO
-                  FlashMode.AUTO -> FlashMode.OFF
+                  FlashMode.AUTO -> if (hasTorch) FlashMode.TORCH else FlashMode.OFF
                   FlashMode.TORCH -> FlashMode.OFF
                 }
                 cameraConfig = cameraConfig.copy(flashMode = newFlashMode)
