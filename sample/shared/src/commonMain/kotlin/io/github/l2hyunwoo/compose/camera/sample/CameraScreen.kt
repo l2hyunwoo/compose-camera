@@ -45,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.l2hyunwoo.camera.plugin.hdr.rememberHDRCapture
 import io.github.l2hyunwoo.compose.camera.core.*
 import io.github.l2hyunwoo.compose.camera.ui.*
 import kotlinx.coroutines.delay
@@ -62,7 +63,8 @@ fun CameraScreen(
   modifier: Modifier = Modifier,
 ) {
   var cameraController by remember { mutableStateOf<CameraController?>(null) }
-  var cameraConfig by remember { mutableStateOf(CameraConfiguration()) }
+  val hdrPlugin = rememberHDRCapture()
+  var cameraConfig by remember { mutableStateOf(CameraConfiguration(plugins = listOf(hdrPlugin))) }
   val cameraState by cameraController?.cameraInfo?.cameraState?.collectAsState()
     ?: remember { mutableStateOf<CameraState>(CameraState.Initializing) }
 
@@ -247,6 +249,23 @@ fun CameraScreen(
               contentDescription = "Resolution",
               tint = Color.White,
             )
+          }
+
+          // HDR button
+          // Only show if HDR is supported by the device/camera
+          val isHdrSupported by hdrPlugin.isSupported.collectAsState()
+
+          if (isHdrSupported) {
+            val hdrEnabled by hdrPlugin.isEnabled.collectAsState()
+            IconButton(
+              onClick = { hdrPlugin.setEnabled(!hdrEnabled) },
+            ) {
+              Icon(
+                imageVector = if (hdrEnabled) Icons.Default.HdrOn else Icons.Default.HdrOff,
+                contentDescription = "HDR",
+                tint = if (hdrEnabled) Color.Yellow else Color.White,
+              )
+            }
           }
         }
 

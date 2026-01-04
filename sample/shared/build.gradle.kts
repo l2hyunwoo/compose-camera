@@ -54,6 +54,7 @@ kotlin {
             implementation(project(":library:core"))
             implementation(project(":library:compose"))
             implementation(project(":plugin:mlkit-barcode"))
+            implementation(project(":plugin:hdr"))
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
