@@ -1,0 +1,32 @@
+/*
+ * Copyright (C) 2025 l2hyunwoo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.github.l2hyunwoo.compose.camera.core.plugin
+
+import androidx.camera.core.CameraSelector
+
+/**
+ * Interface for plugins that need to customize the CameraSelector (e.g., CameraX Extensions).
+ */
+interface ExtensionProvider {
+  /**
+   * Returns a customized CameraSelector based on the base selector.
+   * Plugins should return null if no modification is needed (e.g., extensions are disabled).
+   *
+   * @param baseSelector The base CameraSelector (Front/Back)
+   * @return The modified CameraSelector or null
+   */
+  fun getExtensionCameraSelector(baseSelector: CameraSelector): CameraSelector?
+}

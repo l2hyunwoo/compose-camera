@@ -50,6 +50,7 @@ import androidx.camera.video.VideoRecordEvent
 import androidx.compose.ui.geometry.Offset
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import io.github.l2hyunwoo.compose.camera.core.plugin.ExtensionProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -250,9 +251,16 @@ class AndroidCameraController(
       videoCapture = VideoCapture.withOutput(recorder)
 
       // Select camera
-      val cameraSelector = when (configuration.lens) {
+      var cameraSelector = when (configuration.lens) {
         CameraLens.FRONT -> CameraSelector.DEFAULT_FRONT_CAMERA
         CameraLens.BACK -> CameraSelector.DEFAULT_BACK_CAMERA
+      }
+
+      // Apply extensions from plugins (e.g. HDR, Night mode)
+      configuration.plugins.filterIsInstance<ExtensionProvider>().forEach { provider ->
+        provider.getExtensionCameraSelector(cameraSelector)?.let { newSelector ->
+          cameraSelector = newSelector
+        }
       }
 
       // Attach plugins first to register any analyzers (e.g. for ImageAnalysis)
