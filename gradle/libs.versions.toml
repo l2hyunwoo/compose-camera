@@ -64,6 +64,7 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "coroutines" }
 
 # KMP-NativeCoroutines
 kmp-nativecoroutines-core = { module = "com.rickclephas.kmp:kmp-nativecoroutines-core", version.ref = "kmpNativeCoroutines" }
@@ -75,6 +76,7 @@ camerax-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "an
 camerax-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "androidx-camerax" }
 camerax-video = { module = "androidx.camera:camera-video", version.ref = "androidx-camerax" }
 camerax-compose = { module = "androidx.camera:camera-compose", version.ref = "androidx-camerax" }
+camerax-extensions = { module = "androidx.camera:camera-extensions", version.ref = "androidx-camerax" }
 
 # AndroidX
 androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
