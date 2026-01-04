@@ -1,0 +1,18 @@
+public final class io/github/l2hyunwoo/camera/plugin/hdr/HDRCapture : io/github/l2hyunwoo/compose/camera/core/plugin/CameraPlugin, io/github/l2hyunwoo/compose/camera/core/plugin/ExtensionProvider {
+	public static final field $stable I
+	public fun <init> (Landroid/content/Context;)V
+	public final fun captureHDR (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun getExtensionCameraSelector (Landroidx/camera/core/CameraSelector;)Landroidx/camera/core/CameraSelector;
+	public fun getId ()Ljava/lang/String;
+	public final fun isEnabled ()Lkotlinx/coroutines/flow/StateFlow;
+	public final fun isHDRAvailable (Landroidx/camera/core/CameraSelector;)Z
+	public final fun isSupported ()Lkotlinx/coroutines/flow/StateFlow;
+	public fun onAttach (Lio/github/l2hyunwoo/compose/camera/core/CameraController;)V
+	public fun onDetach ()V
+	public final fun setEnabled (Z)V
+}
+
+public final class io/github/l2hyunwoo/camera/plugin/hdr/HDRCaptureKt {
+	public static final fun rememberHDRCapture (Landroidx/compose/runtime/Composer;I)Lio/github/l2hyunwoo/camera/plugin/hdr/HDRCapture;
+}
+

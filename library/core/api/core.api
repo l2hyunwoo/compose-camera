@@ -443,6 +443,10 @@ public abstract interface class io/github/l2hyunwoo/compose/camera/core/plugin/C
 	public abstract fun onDetach ()V
 }
 
+public abstract interface class io/github/l2hyunwoo/compose/camera/core/plugin/ExtensionProvider {
+	public abstract fun getExtensionCameraSelector (Landroidx/camera/core/CameraSelector;)Landroidx/camera/core/CameraSelector;
+}
+
 public abstract interface class io/github/l2hyunwoo/compose/camera/core/plugin/FrameAnalyzerPlugin : io/github/l2hyunwoo/compose/camera/core/plugin/CameraPlugin {
 	public abstract fun analyze (Lio/github/l2hyunwoo/compose/camera/core/plugin/CameraFrame;)Lkotlinx/coroutines/flow/Flow;
 	public abstract fun isRunning ()Z
