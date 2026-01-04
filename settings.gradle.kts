@@ -19,5 +19,7 @@ include(":library:core")
 include(":library:compose")
 include(":plugin:mlkit-barcode")
 include(":plugin:mlkit-text")
+include(":plugin:hdr")
 include(":sample:shared")
 include(":sample:android-app")
+
