@@ -18,14 +18,88 @@ package io.github.l2hyunwoo.compose.camera.core
 import androidx.compose.runtime.Composable
 
 /**
- * Factory function to create a platform-specific [CameraController].
+ * Factory interface for creating platform-specific [CameraController] instances.
+ * This abstracts the platform-specific controller creation.
+ */
+interface CameraControllerFactory {
+  /**
+   * Create a new CameraController with the given configuration.
+   *
+   * @param configuration The camera configuration to apply
+   * @return A platform-specific CameraController implementation
+   */
+  fun create(configuration: CameraConfiguration): CameraController
+}
+
+/**
+ * Get the platform-specific [CameraControllerFactory] implementation.
+ */
+expect fun createCameraControllerFactory(): CameraControllerFactory
+
+/**
+ * Fake Constructor - Create a CameraController with default configuration.
  *
- * This is the recommended way to create a CameraController as it abstracts
- * the platform-specific implementation details.
+ * This follows the Kotlin "Fake Constructor" pattern - a function named like
+ * a class that provides convenient instantiation.
+ *
+ * Example:
+ * ```kotlin
+ * val controller = CameraController()
+ * controller.initialize()
+ * ```
+ *
+ * @return A platform-specific CameraController with default configuration
+ */
+fun CameraController(): CameraController = createCameraControllerFactory().create(CameraConfiguration())
+
+/**
+ * Fake Constructor with DSL - Create a CameraController with custom configuration.
+ *
+ * This follows the Kotlin "Fake Constructor" pattern combined with DSL for
+ * a clean, readable configuration syntax.
+ *
+ * Example:
+ * ```kotlin
+ * val controller = CameraController {
+ *     configuration = CameraConfiguration(lens = CameraLens.BACK)
+ *
+ *     extensions {
+ *         +ManualFocusExtension()
+ *         +WhiteBalanceExtension()
+ *     }
+ *
+ *     plugins {
+ *         +QRScannerPlugin()
+ *     }
+ *
+ *     imageCaptureUseCase = RawCaptureUseCase()
+ * }
+ * ```
+ *
+ * @param block DSL block for configuring the controller
+ * @return A configured CameraController
+ */
+fun CameraController(block: CameraControllerScope.() -> Unit): CameraController {
+  val scope = CameraControllerScope().apply(block)
+  return scope.build()
+}
+
+/**
+ * Factory function to create a platform-specific [CameraController].
  *
  * @param configuration Initial camera configuration
  * @return A platform-specific CameraController implementation
+ * @deprecated Use rememberCameraController from compose module instead.
+ * This function will be removed in a future release.
  */
+@Deprecated(
+  message = "Use rememberCameraController from io.github.l2hyunwoo.compose.camera.ui package instead",
+  replaceWith = ReplaceWith(
+    "rememberCameraController(configuration)",
+    "io.github.l2hyunwoo.compose.camera.ui.rememberCameraController",
+  ),
+  level = DeprecationLevel.WARNING,
+)
 @Composable
 expect fun rememberCameraController(
   configuration: CameraConfiguration = CameraConfiguration(),
@@ -36,10 +110,3 @@ expect fun rememberCameraController(
  * Must be called before using other camera operations.
  */
 expect suspend fun CameraController.initialize()
-
-/**
- * Get the native preview request object.
- * - Android: SurfaceRequest from CameraX
- * - iOS: AVCaptureSession
- */
-expect val CameraController.nativePreviewRequest: Any?

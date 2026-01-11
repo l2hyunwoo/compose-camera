@@ -39,6 +39,18 @@ interface CameraController {
   val configuration: CameraConfiguration
 
   /**
+   * Custom image capture use case.
+   * Set to override the default image capture behavior.
+   */
+  var imageCaptureUseCase: ImageCaptureUseCase
+
+  /**
+   * Custom video capture use case.
+   * Set to override the default video capture behavior.
+   */
+  var videoCaptureUseCase: VideoCaptureUseCase
+
+  /**
    * Capture a photo
    * @return The result of the image capture operation
    */
@@ -70,6 +82,41 @@ interface CameraController {
    * Release camera resources
    */
   fun release()
+
+  // Extension Management
+
+  /**
+   * Register a camera control extension.
+   *
+   * @param extension The extension to register
+   * @throws IllegalArgumentException if an extension with the same ID is already registered
+   */
+  fun registerExtension(extension: CameraControlExtension)
+
+  /**
+   * Unregister a camera control extension.
+   *
+   * @param id The ID of the extension to unregister
+   */
+  fun unregisterExtension(id: String)
+
+  /**
+   * Get a registered extension by ID.
+   *
+   * @param T The type of extension
+   * @param id The ID of the extension
+   * @return The extension, or null if not found
+   */
+  fun <T : CameraControlExtension> getExtension(id: String): T?
+
+  // Preview Surface Provider
+
+  /**
+   * Set the preview surface provider for custom preview implementations.
+   *
+   * @param provider The provider, or null to clear
+   */
+  fun setPreviewSurfaceProvider(provider: PreviewSurfaceProvider?)
 }
 
 /**
@@ -130,12 +177,26 @@ interface VideoRecording {
   suspend fun stop(): VideoRecordingResult
 
   /**
-   * Pause the recording (if supported)
+   * Pause the recording (if supported by the platform).
+   *
+   * Platform support:
+   * - **Android**: Supported via CameraX Recording API
+   * - **iOS 18+**: Supported via AVCaptureMovieFileOutput.pauseRecording()
+   * - **iOS 17 and below**: Not supported. This method is a no-op.
+   *   For pause/resume on older iOS versions, a custom implementation
+   *   using AVCaptureVideoDataOutput + AVAssetWriter would be required.
    */
   fun pause()
 
   /**
-   * Resume a paused recording
+   * Resume a paused recording (if supported by the platform).
+   *
+   * Platform support:
+   * - **Android**: Supported via CameraX Recording API
+   * - **iOS 18+**: Supported via AVCaptureMovieFileOutput.resumeRecording()
+   * - **iOS 17 and below**: Not supported. This method is a no-op.
+   *   For pause/resume on older iOS versions, a custom implementation
+   *   using AVCaptureVideoDataOutput + AVAssetWriter would be required.
    */
   fun resume()
 }

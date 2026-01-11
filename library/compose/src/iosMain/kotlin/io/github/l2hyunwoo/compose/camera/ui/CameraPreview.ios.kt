@@ -31,9 +31,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.interop.UIKitView
 import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
 import io.github.l2hyunwoo.compose.camera.core.CameraController
+import io.github.l2hyunwoo.compose.camera.core.FocusPoint
 import io.github.l2hyunwoo.compose.camera.core.captureSession
 import io.github.l2hyunwoo.compose.camera.core.initialize
-import io.github.l2hyunwoo.compose.camera.core.rememberCameraController
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.cValue
 import kotlinx.cinterop.useContents
@@ -104,9 +104,9 @@ actual fun CameraPreview(
               controller.cameraControl.setZoom(newZoom)
             }
           },
-          onTap = { offset, normalizedPoint ->
+          onTap = { offset, focusPoint ->
             tapPosition = offset
-            controller.cameraControl.focus(normalizedPoint)
+            controller.cameraControl.focus(focusPoint)
           },
         )
         cameraView
@@ -126,7 +126,7 @@ actual fun CameraPreview(
 private class CameraView(
   captureSession: AVCaptureSession,
   private val onZoomChange: (Float, Boolean) -> Unit,
-  private val onTap: (Offset, Offset) -> Unit,
+  private val onTap: (Offset, FocusPoint) -> Unit,
 ) : UIView(frame = cValue { CGRectZero }) {
 
   private val previewLayer = AVCaptureVideoPreviewLayer(session = captureSession).apply {
@@ -175,10 +175,13 @@ private class CameraView(
   fun handleTap(gesture: platform.UIKit.UITapGestureRecognizer) {
     val location = gesture.locationInView(this)
     val point = previewLayer.captureDevicePointOfInterestForPoint(location)
-    val normalizedPoint = Offset(point.useContents { x }.toFloat(), point.useContents { y }.toFloat())
+    val focusPoint = FocusPoint.clamped(
+      point.useContents { x }.toFloat(),
+      point.useContents { y }.toFloat(),
+    )
 
     val tapPoint = Offset(location.useContents { x }.toFloat(), location.useContents { y }.toFloat())
-    onTap(tapPoint, normalizedPoint)
+    onTap(tapPoint, focusPoint)
   }
 
   override fun layoutSubviews() {

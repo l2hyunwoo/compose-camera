@@ -218,6 +218,226 @@ cameraController?.setExposureCompensation(1.5f) // Brighten
 cameraController?.setExposureCompensation(-1.0f) // Darken
 ```
 
+## Advanced Usage
+
+### Custom Preview (Core-Only)
+
+For advanced use cases where you need full control over the preview, you can use the core module directly without the compose UI module.
+
+**Android with CameraXViewfinder:**
+
+```kotlin
+// Required imports
+import io.github.l2hyunwoo.compose.camera.core.*
+import androidx.camera.compose.CameraXViewfinder // from androidx.camera:camera-compose artifact
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+
+@Composable
+fun CustomPreview(controller: CameraController, modifier: Modifier = Modifier) {
+    // Access the SurfaceRequest flow from the controller
+    val surfaceRequest by controller.surfaceRequestFlow.collectAsState()
+
+    surfaceRequest?.let { request ->
+        CameraXViewfinder(
+            surfaceRequest = request,
+            modifier = modifier,
+        )
+    }
+}
+```
+
+**iOS with AVCaptureVideoPreviewLayer:**
+
+```kotlin
+// Required imports (iOS/Swift interop)
+import platform.AVFoundation.AVCaptureVideoPreviewLayer
+import platform.AVFoundation.AVLayerVideoGravityResizeAspectFill
+
+// Access the capture session directly
+val previewLayer = AVCaptureVideoPreviewLayer(session = controller.captureSession)
+previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
+view.layer.addSublayer(previewLayer)
+```
+
+### DSL Configuration
+
+Create camera controllers with a clean, declarative DSL syntax:
+
+```kotlin
+import io.github.l2hyunwoo.compose.camera.core.*
+import io.github.l2hyunwoo.compose.camera.ui.rememberCameraController
+
+// In Compose: Use rememberCameraController with DSL
+@Composable
+fun CameraScreen() {
+    val controller = rememberCameraController {
+        configuration = CameraConfiguration(lens = CameraLens.BACK)
+
+        extensions {
+            +ExposureLockExtension()
+        }
+
+        plugins {
+            +QRScannerPlugin()
+        }
+    }
+
+    LaunchedEffect(controller) {
+        controller.initialize()
+    }
+}
+
+// Outside Compose: Initialize context first, then use CameraController factory
+// Note: AndroidCameraControllerContext.initialize(context, lifecycleOwner) must be called first on Android
+val simpleController = CameraController()
+
+// Full DSL configuration
+val configuredController = CameraController {
+    // Set camera configuration
+    configuration = CameraConfiguration(
+        lens = CameraLens.BACK,
+        flashMode = FlashMode.AUTO,
+    )
+
+    // Register extensions
+    extensions {
+        +ExposureLockExtension()
+        +ManualFocusExtension()
+    }
+
+    // Register plugins for frame processing
+    plugins {
+        +QRScannerPlugin()
+        +TextRecognitionPlugin()
+    }
+
+    // Custom capture implementations (optional)
+    imageCaptureUseCase = CustomImageCaptureUseCase()
+    videoCaptureUseCase = CustomVideoCaptureUseCase()
+}
+
+// Initialize and use
+configuredController.initialize()
+```
+
+### Extending Controls
+
+Create custom camera control extensions by implementing `CameraControlExtension`:
+
+```kotlin
+import io.github.l2hyunwoo.compose.camera.core.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
+class ExposureLockExtension : CameraControlExtension {
+    override val id: String = "exposure-lock"
+
+    private var controller: CameraController? = null
+    private var lockedExposureValue: Float? = null
+
+    private val _isLocked = MutableStateFlow(false)
+    val isLocked: StateFlow<Boolean> = _isLocked.asStateFlow()
+
+    override fun onAttach(controller: CameraController) {
+        this.controller = controller
+    }
+
+    override fun onDetach() {
+        controller = null
+        _isLocked.value = false
+    }
+
+    override fun onCameraReady() {
+        // Camera is ready, can access hardware features
+    }
+
+    override fun onCameraReleased() {
+        // Clean up before camera release
+        lockedExposureValue = null
+    }
+
+    fun lock() {
+        controller?.let { ctrl ->
+            lockedExposureValue = ctrl.cameraInfo.exposureState.value.exposureCompensation
+            _isLocked.value = true
+        }
+    }
+
+    fun unlock() {
+        lockedExposureValue = null
+        _isLocked.value = false
+    }
+
+    fun toggle() {
+        if (_isLocked.value) unlock() else lock()
+    }
+}
+```
+
+**Using Extensions:**
+
+```kotlin
+// Create extension instance
+val exposureLock = ExposureLockExtension()
+
+// Register with controller
+controller.registerExtension(exposureLock)
+
+// Or use DSL
+val controller = CameraController {
+    extensions {
+        +exposureLock
+    }
+}
+
+// Use the extension
+exposureLock.lock()
+val isLocked by exposureLock.isLocked.collectAsState()
+
+// Retrieve extension from controller
+val ext = controller.getExtension<ExposureLockExtension>()
+
+// Unregister when done
+controller.unregisterExtension(exposureLock)
+```
+
+### Custom Capture Use Cases
+
+Implement custom image or video capture logic:
+
+```kotlin
+import io.github.l2hyunwoo.compose.camera.core.*
+
+class BurstCaptureUseCase : ImageCaptureUseCase {
+    override suspend fun capture(config: CaptureConfig?): ImageCaptureResult {
+        // Custom burst capture implementation
+        // Access platform-specific APIs as needed
+        return ImageCaptureResult.Success(
+            filePath = outputPath,
+            width = width,
+            height = height
+        )
+    }
+}
+
+// Use custom capture
+val controller = CameraController {
+    imageCaptureUseCase = BurstCaptureUseCase()
+}
+```
+
+## Sample Applications
+
+Explore the sample applications for complete implementation examples:
+
+| Sample | Description |
+|--------|-------------|
+| [android-app](sample/android-app/) | Basic camera app with all features |
+| [core-only-android](sample/core-only-android/) | Core module usage without compose UI |
+| [custom-extensions](sample/custom-extensions/) | Custom extension implementation examples |
+
 ## License
 
 ```

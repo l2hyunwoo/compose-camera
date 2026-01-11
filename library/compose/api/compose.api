@@ -12,3 +12,13 @@ public final class io/github/l2hyunwoo/compose/camera/ui/FocusIndicatorKt {
 	public static final fun DefaultFocusIndicator-uuAPwAo (Landroidx/compose/foundation/layout/BoxScope;JFJFLandroidx/compose/runtime/Composer;II)V
 }
 
+public final class io/github/l2hyunwoo/compose/camera/ui/FocusPointExtensionsKt {
+	public static final fun toFocusPoint-k-4lQ0M (J)Lio/github/l2hyunwoo/compose/camera/core/FocusPoint;
+	public static final fun toOffset (Lio/github/l2hyunwoo/compose/camera/core/FocusPoint;)J
+}
+
+public final class io/github/l2hyunwoo/compose/camera/ui/RememberCameraController_androidKt {
+	public static final fun rememberCameraController (Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;Landroidx/compose/runtime/Composer;II)Lio/github/l2hyunwoo/compose/camera/core/CameraController;
+	public static final fun rememberCameraController (Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;I)Lio/github/l2hyunwoo/compose/camera/core/CameraController;
+}
+

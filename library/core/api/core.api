@@ -6,15 +6,30 @@ public final class io/github/l2hyunwoo/compose/camera/core/AndroidCameraControll
 	public fun getCameraControl ()Lio/github/l2hyunwoo/compose/camera/core/CameraControl;
 	public fun getCameraInfo ()Lio/github/l2hyunwoo/compose/camera/core/CameraInfo;
 	public fun getConfiguration ()Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
+	public fun getExtension (Ljava/lang/String;)Lio/github/l2hyunwoo/compose/camera/core/CameraControlExtension;
+	public fun getImageCaptureUseCase ()Lio/github/l2hyunwoo/compose/camera/core/ImageCaptureUseCase;
+	public fun getVideoCaptureUseCase ()Lio/github/l2hyunwoo/compose/camera/core/VideoCaptureUseCase;
+	public fun registerExtension (Lio/github/l2hyunwoo/compose/camera/core/CameraControlExtension;)V
 	public fun release ()V
 	public final fun removeAnalyzer (Landroidx/camera/core/ImageAnalysis$Analyzer;)V
+	public fun setImageCaptureUseCase (Lio/github/l2hyunwoo/compose/camera/core/ImageCaptureUseCase;)V
 	public fun setLens (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;)V
+	public fun setPreviewSurfaceProvider (Lio/github/l2hyunwoo/compose/camera/core/PreviewSurfaceProvider;)V
+	public fun setVideoCaptureUseCase (Lio/github/l2hyunwoo/compose/camera/core/VideoCaptureUseCase;)V
 	public fun startRecording (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun takePicture (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun unregisterExtension (Ljava/lang/String;)V
 	public fun updateConfiguration (Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;)V
 }
 
 public final class io/github/l2hyunwoo/compose/camera/core/AndroidCameraController$Companion {
+}
+
+public final class io/github/l2hyunwoo/compose/camera/core/AndroidCameraControllerContext {
+	public static final field $stable I
+	public static final field INSTANCE Lio/github/l2hyunwoo/compose/camera/core/AndroidCameraControllerContext;
+	public final fun clear ()V
+	public final fun initialize (Landroid/content/Context;Landroidx/lifecycle/LifecycleOwner;)V
 }
 
 public final class io/github/l2hyunwoo/compose/camera/core/CameraConfiguration {
@@ -54,29 +69,81 @@ public final class io/github/l2hyunwoo/compose/camera/core/CameraConfiguration {
 
 public abstract interface class io/github/l2hyunwoo/compose/camera/core/CameraControl {
 	public abstract fun enableTorch (Z)V
-	public abstract fun focus-k-4lQ0M (J)V
+	public abstract fun focus (Lio/github/l2hyunwoo/compose/camera/core/FocusPoint;)V
+	public fun focus-k-4lQ0M (J)V
 	public abstract fun setExposureCompensation (F)V
 	public abstract fun setFlashMode (Lio/github/l2hyunwoo/compose/camera/core/FlashMode;)V
 	public abstract fun setLinearZoom (F)V
 	public abstract fun setZoom (F)V
 }
 
+public final class io/github/l2hyunwoo/compose/camera/core/CameraControl$DefaultImpls {
+	public static fun focus-k-4lQ0M (Lio/github/l2hyunwoo/compose/camera/core/CameraControl;J)V
+}
+
+public abstract interface class io/github/l2hyunwoo/compose/camera/core/CameraControlExtension {
+	public abstract fun getId ()Ljava/lang/String;
+	public abstract fun onAttach (Lio/github/l2hyunwoo/compose/camera/core/CameraController;)V
+	public fun onCameraReady ()V
+	public fun onCameraReleased ()V
+	public abstract fun onDetach ()V
+}
+
+public final class io/github/l2hyunwoo/compose/camera/core/CameraControlExtension$DefaultImpls {
+	public static fun onCameraReady (Lio/github/l2hyunwoo/compose/camera/core/CameraControlExtension;)V
+	public static fun onCameraReleased (Lio/github/l2hyunwoo/compose/camera/core/CameraControlExtension;)V
+}
+
 public abstract interface class io/github/l2hyunwoo/compose/camera/core/CameraController {
 	public abstract fun getCameraControl ()Lio/github/l2hyunwoo/compose/camera/core/CameraControl;
 	public abstract fun getCameraInfo ()Lio/github/l2hyunwoo/compose/camera/core/CameraInfo;
 	public abstract fun getConfiguration ()Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
+	public abstract fun getExtension (Ljava/lang/String;)Lio/github/l2hyunwoo/compose/camera/core/CameraControlExtension;
+	public abstract fun getImageCaptureUseCase ()Lio/github/l2hyunwoo/compose/camera/core/ImageCaptureUseCase;
+	public abstract fun getVideoCaptureUseCase ()Lio/github/l2hyunwoo/compose/camera/core/VideoCaptureUseCase;
+	public abstract fun registerExtension (Lio/github/l2hyunwoo/compose/camera/core/CameraControlExtension;)V
 	public abstract fun release ()V
+	public abstract fun setImageCaptureUseCase (Lio/github/l2hyunwoo/compose/camera/core/ImageCaptureUseCase;)V
 	public abstract fun setLens (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;)V
+	public abstract fun setPreviewSurfaceProvider (Lio/github/l2hyunwoo/compose/camera/core/PreviewSurfaceProvider;)V
+	public abstract fun setVideoCaptureUseCase (Lio/github/l2hyunwoo/compose/camera/core/VideoCaptureUseCase;)V
 	public abstract fun startRecording (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun takePicture (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun unregisterExtension (Ljava/lang/String;)V
 	public abstract fun updateConfiguration (Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;)V
 }
 
+public abstract interface annotation class io/github/l2hyunwoo/compose/camera/core/CameraControllerDsl : java/lang/annotation/Annotation {
+}
+
+public abstract interface class io/github/l2hyunwoo/compose/camera/core/CameraControllerFactory {
+	public abstract fun create (Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;)Lio/github/l2hyunwoo/compose/camera/core/CameraController;
+}
+
+public final class io/github/l2hyunwoo/compose/camera/core/CameraControllerFactoryKt {
+	public static final fun CameraController ()Lio/github/l2hyunwoo/compose/camera/core/CameraController;
+	public static final fun CameraController (Lkotlin/jvm/functions/Function1;)Lio/github/l2hyunwoo/compose/camera/core/CameraController;
+}
+
 public final class io/github/l2hyunwoo/compose/camera/core/CameraControllerFactory_androidKt {
-	public static final fun getNativePreviewRequest (Lio/github/l2hyunwoo/compose/camera/core/CameraController;)Ljava/lang/Object;
+	public static final fun createCameraControllerFactory ()Lio/github/l2hyunwoo/compose/camera/core/CameraControllerFactory;
 	public static final fun getSurfaceRequestFlow (Lio/github/l2hyunwoo/compose/camera/core/CameraController;)Lkotlinx/coroutines/flow/StateFlow;
 	public static final fun initialize (Lio/github/l2hyunwoo/compose/camera/core/CameraController;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun rememberCameraController (Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;Landroidx/compose/runtime/Composer;II)Lio/github/l2hyunwoo/compose/camera/core/CameraController;
+}
+
+public final class io/github/l2hyunwoo/compose/camera/core/CameraControllerScope {
+	public static final field $stable I
+	public fun <init> ()V
+	public final fun build ()Lio/github/l2hyunwoo/compose/camera/core/CameraController;
+	public final fun extensions (Lkotlin/jvm/functions/Function1;)V
+	public final fun getConfiguration ()Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
+	public final fun getImageCaptureUseCase ()Lio/github/l2hyunwoo/compose/camera/core/ImageCaptureUseCase;
+	public final fun getVideoCaptureUseCase ()Lio/github/l2hyunwoo/compose/camera/core/VideoCaptureUseCase;
+	public final fun plugins (Lkotlin/jvm/functions/Function1;)V
+	public final fun setConfiguration (Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;)V
+	public final fun setImageCaptureUseCase (Lio/github/l2hyunwoo/compose/camera/core/ImageCaptureUseCase;)V
+	public final fun setVideoCaptureUseCase (Lio/github/l2hyunwoo/compose/camera/core/VideoCaptureUseCase;)V
 }
 
 public abstract class io/github/l2hyunwoo/compose/camera/core/CameraException : java/lang/Exception {
@@ -211,6 +278,26 @@ public final class io/github/l2hyunwoo/compose/camera/core/CameraState$Ready : i
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class io/github/l2hyunwoo/compose/camera/core/CaptureConfig {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (Lio/github/l2hyunwoo/compose/camera/core/FlashMode;Lio/github/l2hyunwoo/compose/camera/core/Resolution;Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;Ljava/util/Map;)V
+	public synthetic fun <init> (Lio/github/l2hyunwoo/compose/camera/core/FlashMode;Lio/github/l2hyunwoo/compose/camera/core/Resolution;Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lio/github/l2hyunwoo/compose/camera/core/FlashMode;
+	public final fun component2 ()Lio/github/l2hyunwoo/compose/camera/core/Resolution;
+	public final fun component3 ()Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;
+	public final fun component4 ()Ljava/util/Map;
+	public final fun copy (Lio/github/l2hyunwoo/compose/camera/core/FlashMode;Lio/github/l2hyunwoo/compose/camera/core/Resolution;Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;Ljava/util/Map;)Lio/github/l2hyunwoo/compose/camera/core/CaptureConfig;
+	public static synthetic fun copy$default (Lio/github/l2hyunwoo/compose/camera/core/CaptureConfig;Lio/github/l2hyunwoo/compose/camera/core/FlashMode;Lio/github/l2hyunwoo/compose/camera/core/Resolution;Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;Ljava/util/Map;ILjava/lang/Object;)Lio/github/l2hyunwoo/compose/camera/core/CaptureConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getExtras ()Ljava/util/Map;
+	public final fun getFlashMode ()Lio/github/l2hyunwoo/compose/camera/core/FlashMode;
+	public final fun getOutputFormat ()Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;
+	public final fun getResolution ()Lio/github/l2hyunwoo/compose/camera/core/Resolution;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class io/github/l2hyunwoo/compose/camera/core/CaptureMode : java/lang/Enum {
 	public static final field BALANCED Lio/github/l2hyunwoo/compose/camera/core/CaptureMode;
 	public static final field QUALITY Lio/github/l2hyunwoo/compose/camera/core/CaptureMode;
@@ -248,6 +335,13 @@ public final class io/github/l2hyunwoo/compose/camera/core/ExposureState {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class io/github/l2hyunwoo/compose/camera/core/ExtensionsScope {
+	public static final field $stable I
+	public fun <init> (Ljava/util/List;)V
+	public final fun add (Lio/github/l2hyunwoo/compose/camera/core/CameraControlExtension;)V
+	public final fun unaryPlus (Lio/github/l2hyunwoo/compose/camera/core/CameraControlExtension;)V
+}
+
 public final class io/github/l2hyunwoo/compose/camera/core/FlashMode : java/lang/Enum {
 	public static final field AUTO Lio/github/l2hyunwoo/compose/camera/core/FlashMode;
 	public static final field OFF Lio/github/l2hyunwoo/compose/camera/core/FlashMode;
@@ -256,6 +350,26 @@ public final class io/github/l2hyunwoo/compose/camera/core/FlashMode : java/lang
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/github/l2hyunwoo/compose/camera/core/FlashMode;
 	public static fun values ()[Lio/github/l2hyunwoo/compose/camera/core/FlashMode;
+}
+
+public final class io/github/l2hyunwoo/compose/camera/core/FocusPoint {
+	public static final field $stable I
+	public static final field Companion Lio/github/l2hyunwoo/compose/camera/core/FocusPoint$Companion;
+	public fun <init> (FF)V
+	public final fun component1 ()F
+	public final fun component2 ()F
+	public final fun copy (FF)Lio/github/l2hyunwoo/compose/camera/core/FocusPoint;
+	public static synthetic fun copy$default (Lio/github/l2hyunwoo/compose/camera/core/FocusPoint;FFILjava/lang/Object;)Lio/github/l2hyunwoo/compose/camera/core/FocusPoint;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getX ()F
+	public final fun getY ()F
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/l2hyunwoo/compose/camera/core/FocusPoint$Companion {
+	public final fun clamped (FF)Lio/github/l2hyunwoo/compose/camera/core/FocusPoint;
+	public final fun getCENTER ()Lio/github/l2hyunwoo/compose/camera/core/FocusPoint;
 }
 
 public abstract class io/github/l2hyunwoo/compose/camera/core/ImageCaptureResult {
@@ -295,6 +409,10 @@ public final class io/github/l2hyunwoo/compose/camera/core/ImageCaptureResult$Su
 	public fun toString ()Ljava/lang/String;
 }
 
+public abstract interface class io/github/l2hyunwoo/compose/camera/core/ImageCaptureUseCase {
+	public abstract fun capture (Lio/github/l2hyunwoo/compose/camera/core/CameraController;Lio/github/l2hyunwoo/compose/camera/core/CaptureConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public final class io/github/l2hyunwoo/compose/camera/core/ImageFormat : java/lang/Enum {
 	public static final field JPEG Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;
 	public static final field PNG Lio/github/l2hyunwoo/compose/camera/core/ImageFormat;
@@ -327,6 +445,40 @@ public final class io/github/l2hyunwoo/compose/camera/core/PermissionStatus : ja
 	public static fun values ()[Lio/github/l2hyunwoo/compose/camera/core/PermissionStatus;
 }
 
+public final class io/github/l2hyunwoo/compose/camera/core/PluginsScope {
+	public static final field $stable I
+	public fun <init> (Ljava/util/List;)V
+	public final fun add (Lio/github/l2hyunwoo/compose/camera/core/plugin/CameraPlugin;)V
+	public final fun unaryPlus (Lio/github/l2hyunwoo/compose/camera/core/plugin/CameraPlugin;)V
+}
+
+public abstract interface class io/github/l2hyunwoo/compose/camera/core/PreviewSurfaceProvider {
+	public abstract fun onSurfaceAvailable (Ljava/lang/Object;)V
+	public abstract fun onSurfaceDestroyed ()V
+}
+
+public final class io/github/l2hyunwoo/compose/camera/core/RecordingConfig {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (Lio/github/l2hyunwoo/compose/camera/core/VideoQuality;ZLjava/lang/Long;Ljava/lang/Long;Ljava/util/Map;)V
+	public synthetic fun <init> (Lio/github/l2hyunwoo/compose/camera/core/VideoQuality;ZLjava/lang/Long;Ljava/lang/Long;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lio/github/l2hyunwoo/compose/camera/core/VideoQuality;
+	public final fun component2 ()Z
+	public final fun component3 ()Ljava/lang/Long;
+	public final fun component4 ()Ljava/lang/Long;
+	public final fun component5 ()Ljava/util/Map;
+	public final fun copy (Lio/github/l2hyunwoo/compose/camera/core/VideoQuality;ZLjava/lang/Long;Ljava/lang/Long;Ljava/util/Map;)Lio/github/l2hyunwoo/compose/camera/core/RecordingConfig;
+	public static synthetic fun copy$default (Lio/github/l2hyunwoo/compose/camera/core/RecordingConfig;Lio/github/l2hyunwoo/compose/camera/core/VideoQuality;ZLjava/lang/Long;Ljava/lang/Long;Ljava/util/Map;ILjava/lang/Object;)Lio/github/l2hyunwoo/compose/camera/core/RecordingConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEnableAudio ()Z
+	public final fun getExtras ()Ljava/util/Map;
+	public final fun getMaxDurationMs ()Ljava/lang/Long;
+	public final fun getMaxFileSizeBytes ()Ljava/lang/Long;
+	public final fun getQuality ()Lio/github/l2hyunwoo/compose/camera/core/VideoQuality;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class io/github/l2hyunwoo/compose/camera/core/Resolution {
 	public static final field $stable I
 	public static final field Companion Lio/github/l2hyunwoo/compose/camera/core/Resolution$Companion;
@@ -344,6 +496,10 @@ public final class io/github/l2hyunwoo/compose/camera/core/Resolution {
 }
 
 public final class io/github/l2hyunwoo/compose/camera/core/Resolution$Companion {
+}
+
+public abstract interface class io/github/l2hyunwoo/compose/camera/core/VideoCaptureUseCase {
+	public abstract fun startRecording (Lio/github/l2hyunwoo/compose/camera/core/CameraController;Lio/github/l2hyunwoo/compose/camera/core/RecordingConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class io/github/l2hyunwoo/compose/camera/core/VideoQuality : java/lang/Enum {

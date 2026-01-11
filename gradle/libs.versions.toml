@@ -53,8 +53,13 @@ androidx-test-rules = "1.7.0"
 [libraries]
 # Compose BOM (version management)
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+compose-ui = { module = "androidx.compose.ui:ui" }
+compose-foundation = { module = "androidx.compose.foundation:foundation" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
+lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose" }
 
 # Kotest
+kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 

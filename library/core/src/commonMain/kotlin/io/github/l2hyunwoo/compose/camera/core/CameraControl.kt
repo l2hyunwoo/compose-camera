@@ -33,10 +33,23 @@ interface CameraControl {
   fun setLinearZoom(linearZoom: Float)
 
   /**
-   * Focus on a specific point in the preview
+   * Focus on a specific point in the preview.
+   * Uses platform-agnostic [FocusPoint] type.
+   *
    * @param point The normalized point (0-1 range) to focus on
    */
-  fun focus(point: Offset)
+  fun focus(point: FocusPoint)
+
+  /**
+   * Focus on a specific point in the preview
+   * @param point The normalized point (0-1 range) to focus on
+   * @deprecated Use [focus(FocusPoint)] instead for platform-agnostic focus control.
+   */
+  @Deprecated(
+    message = "Use focus(FocusPoint) instead for platform-agnostic focus control",
+    replaceWith = ReplaceWith("focus(FocusPoint(point.x, point.y))"),
+  )
+  fun focus(point: Offset) = focus(FocusPoint.clamped(point.x, point.y))
 
   /**
    * Set exposure compensation value.

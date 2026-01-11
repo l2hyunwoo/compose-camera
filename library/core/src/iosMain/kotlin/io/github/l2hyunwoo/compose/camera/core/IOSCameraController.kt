@@ -17,7 +17,6 @@
 
 package io.github.l2hyunwoo.compose.camera.core
 
-import androidx.compose.ui.geometry.Offset
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
@@ -132,7 +131,7 @@ class IOSCameraController(
       }
     }
 
-    override fun focus(point: Offset) {
+    override fun focus(point: FocusPoint) {
       currentDevice?.let { device ->
         try {
           device.lockForConfiguration(null)
@@ -227,6 +226,27 @@ class IOSCameraController(
 
   // Video recording
   private var activeVideoRecording: IOSVideoRecording? = null
+
+  // Extension registry
+  private val extensionRegistry = mutableMapOf<String, CameraControlExtension>()
+
+  // UseCase properties with defaults
+  private var _imageCaptureUseCase: ImageCaptureUseCase = DefaultIOSImageCaptureUseCase(this)
+  override var imageCaptureUseCase: ImageCaptureUseCase
+    get() = _imageCaptureUseCase
+    set(value) {
+      _imageCaptureUseCase = value
+    }
+
+  private var _videoCaptureUseCase: VideoCaptureUseCase = DefaultIOSVideoCaptureUseCase(this)
+  override var videoCaptureUseCase: VideoCaptureUseCase
+    get() = _videoCaptureUseCase
+    set(value) {
+      _videoCaptureUseCase = value
+    }
+
+  // Preview surface provider
+  private var previewSurfaceProvider: PreviewSurfaceProvider? = null
 
   /**
    * Initialize the camera with the given configuration
@@ -433,6 +453,11 @@ class IOSCameraController(
       zoomRatio = 1.0f,
     )
 
+    // Notify already-registered extensions that camera is ready
+    extensionRegistry.values.toList().forEach { extension ->
+      extension.onCameraReady()
+    }
+
     // Attach plugins
     configuration.plugins.forEach { plugin ->
       plugin.onAttach(this)
@@ -440,6 +465,19 @@ class IOSCameraController(
   }
 
   override suspend fun takePicture(): ImageCaptureResult {
+    val config = CaptureConfig(
+      flashMode = configuration.flashMode,
+      resolution = configuration.photoResolution,
+      outputFormat = ImageFormat.JPEG,
+    )
+    return imageCaptureUseCase.capture(this, config)
+  }
+
+  /**
+   * Internal implementation of image capture.
+   * Called by DefaultIOSImageCaptureUseCase.
+   */
+  internal suspend fun takePictureInternal(): ImageCaptureResult {
     val output = photoOutput ?: return ImageCaptureResult.Error(
       CameraException.CaptureFailed(IllegalStateException("PhotoOutput not initialized")),
     )
@@ -525,6 +563,18 @@ class IOSCameraController(
   }
 
   override suspend fun startRecording(): VideoRecording {
+    val config = RecordingConfig(
+      quality = configuration.videoQuality,
+      enableAudio = true,
+    )
+    return videoCaptureUseCase.startRecording(this, config)
+  }
+
+  /**
+   * Internal implementation of video recording.
+   * Called by DefaultIOSVideoCaptureUseCase.
+   */
+  internal suspend fun startRecordingInternal(): VideoRecording {
     val output = videoOutput ?: throw CameraException.RecordingFailed(
       IllegalStateException("VideoOutput not initialized"),
     )
@@ -590,11 +640,62 @@ class IOSCameraController(
     }
   }
 
+  // Extension Management
+
+  override fun registerExtension(extension: CameraControlExtension) {
+    require(extension.id !in extensionRegistry) {
+      "Extension with id '${extension.id}' is already registered"
+    }
+    extensionRegistry[extension.id] = extension
+    extension.onAttach(this)
+
+    // If camera is already ready, notify extension
+    if (_cameraState.value is CameraState.Ready) {
+      extension.onCameraReady()
+    }
+  }
+
+  override fun unregisterExtension(id: String) {
+    extensionRegistry.remove(id)?.let { extension ->
+      extension.onDetach()
+    }
+  }
+
+  @Suppress("UNCHECKED_CAST")
+  override fun <T : CameraControlExtension> getExtension(id: String): T? = extensionRegistry[id] as? T
+
+  // Preview Surface Provider
+
+  override fun setPreviewSurfaceProvider(provider: PreviewSurfaceProvider?) {
+    // Notify old provider that surface is destroyed before replacing
+    previewSurfaceProvider?.onSurfaceDestroyed()
+
+    previewSurfaceProvider = provider
+
+    // Notify new provider of the capture session
+    provider?.onSurfaceAvailable(captureSession)
+  }
+
   override fun release() {
+    // Notify extensions of camera release (use defensive copy to avoid ConcurrentModificationException)
+    extensionRegistry.values.toList().forEach { extension ->
+      extension.onCameraReleased()
+    }
+
+    // Detach all extensions (use defensive copy to avoid ConcurrentModificationException)
+    extensionRegistry.values.toList().forEach { extension ->
+      extension.onDetach()
+    }
+    extensionRegistry.clear()
+
     // Detach plugins
     configuration.plugins.forEach { plugin ->
       plugin.onDetach()
     }
+
+    // Notify preview provider
+    previewSurfaceProvider?.onSurfaceDestroyed()
+    previewSurfaceProvider = null
 
     activeVideoRecording?.stopImmediate()
     captureSession.stopRunning()
@@ -754,12 +855,36 @@ internal class IOSVideoRecording(
     }
   }
 
+  /**
+   * Pause the current recording.
+   *
+   * **Platform Support:**
+   * - **iOS 18+**: Supported via AVCaptureMovieFileOutput.pauseRecording()
+   * - **iOS 17 and below**: Not supported. This method is a no-op.
+   *
+   * For pause/resume on iOS 17 and below, a custom implementation using
+   * AVCaptureVideoDataOutput + AVAssetWriter would be required.
+   */
   override fun pause() {
-    output.pauseRecording()
+    if (_isRecording && isIOS18OrNewer()) {
+      output.pauseRecording()
+    }
   }
 
+  /**
+   * Resume a paused recording.
+   *
+   * **Platform Support:**
+   * - **iOS 18+**: Supported via AVCaptureMovieFileOutput.resumeRecording()
+   * - **iOS 17 and below**: Not supported. This method is a no-op.
+   *
+   * For pause/resume on iOS 17 and below, a custom implementation using
+   * AVCaptureVideoDataOutput + AVAssetWriter would be required.
+   */
   override fun resume() {
-    output.resumeRecording()
+    if (_isRecording && isIOS18OrNewer()) {
+      output.resumeRecording()
+    }
   }
 }
 
@@ -802,4 +927,8 @@ private class VideoRecordingDelegate(
 
 private fun isIOS16OrNewer(): Boolean = NSProcessInfo.processInfo.operatingSystemVersion.useContents {
   majorVersion >= 16
+}
+
+private fun isIOS18OrNewer(): Boolean = NSProcessInfo.processInfo.operatingSystemVersion.useContents {
+  majorVersion >= 18
 }
