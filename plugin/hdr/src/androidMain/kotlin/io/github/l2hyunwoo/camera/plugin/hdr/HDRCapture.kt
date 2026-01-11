@@ -122,12 +122,15 @@ actual class HDRCapture(
 
   actual fun setEnabled(enabled: Boolean) {
     if (_isSupported.value && enabled != _isEnabled.value) {
+      // Update state BEFORE rebind so getExtensionCameraSelector() reads correct value
+      val previousState = _isEnabled.value
+      _isEnabled.value = enabled
+
       // Attempt to rebind camera with new HDR state
       val rebindSuccess = androidController?.rebindCamera() ?: false
-      if (rebindSuccess) {
-        _isEnabled.value = enabled
-      } else {
-        // Rebind was skipped (e.g., during active recording), state unchanged
+      if (!rebindSuccess) {
+        // Rebind was skipped (e.g., during active recording), revert state
+        _isEnabled.value = previousState
         Log.w(TAG, "HDR state change skipped: camera rebind not possible at this time")
       }
     }
@@ -172,7 +175,7 @@ actual class HDRCapture(
    * @param baseSelector The camera selector to check
    * @return true if HDR is available
    */
-  fun isHDRAvailable(baseSelector: CameraSelector): Boolean = extensionsManager?.isExtensionAvailable(baseSelector, ExtensionMode.HDR) == true
+  fun isHDRAvailable(baseSelector: CameraSelector): Boolean = extensionsManager?.isExtensionAvailable(baseSelector, ExtensionMode.HDR) ?: false
 
   private companion object {
     private const val TAG = "HDRCapture"
