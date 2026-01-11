@@ -34,7 +34,6 @@ import io.github.l2hyunwoo.compose.camera.core.CameraController
 import io.github.l2hyunwoo.compose.camera.core.FocusPoint
 import io.github.l2hyunwoo.compose.camera.core.captureSession
 import io.github.l2hyunwoo.compose.camera.core.initialize
-import io.github.l2hyunwoo.compose.camera.core.rememberCameraController
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.cValue
 import kotlinx.cinterop.useContents

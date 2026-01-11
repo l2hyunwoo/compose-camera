@@ -87,12 +87,19 @@ fun CameraController(block: CameraControllerScope.() -> Unit): CameraController 
 /**
  * Factory function to create a platform-specific [CameraController].
  *
- * This is the recommended way to create a CameraController as it abstracts
- * the platform-specific implementation details.
- *
  * @param configuration Initial camera configuration
  * @return A platform-specific CameraController implementation
+ * @deprecated Use rememberCameraController from compose module instead.
+ * This function will be removed in a future release.
  */
+@Deprecated(
+  message = "Use rememberCameraController from io.github.l2hyunwoo.compose.camera.ui package instead",
+  replaceWith = ReplaceWith(
+    "rememberCameraController(configuration)",
+    "io.github.l2hyunwoo.compose.camera.ui.rememberCameraController",
+  ),
+  level = DeprecationLevel.WARNING,
+)
 @Composable
 expect fun rememberCameraController(
   configuration: CameraConfiguration = CameraConfiguration(),

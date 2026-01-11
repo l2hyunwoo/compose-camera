@@ -35,7 +35,6 @@ import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
 import io.github.l2hyunwoo.compose.camera.core.CameraController
 import io.github.l2hyunwoo.compose.camera.core.FocusPoint
 import io.github.l2hyunwoo.compose.camera.core.initialize
-import io.github.l2hyunwoo.compose.camera.core.rememberCameraController
 import io.github.l2hyunwoo.compose.camera.core.surfaceRequestFlow
 import kotlinx.coroutines.delay
 

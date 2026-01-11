@@ -39,7 +39,17 @@ actual fun createCameraControllerFactory(): CameraControllerFactory = IOSCameraC
  *
  * Note: The controller is created once and configuration updates
  * should be applied via [CameraController.updateConfiguration].
+ *
+ * @deprecated Use rememberCameraController from compose module instead.
  */
+@Deprecated(
+  message = "Use rememberCameraController from io.github.l2hyunwoo.compose.camera.ui package instead",
+  replaceWith = ReplaceWith(
+    "rememberCameraController(configuration)",
+    "io.github.l2hyunwoo.compose.camera.ui.rememberCameraController",
+  ),
+  level = DeprecationLevel.WARNING,
+)
 @Composable
 actual fun rememberCameraController(
   configuration: CameraConfiguration,
