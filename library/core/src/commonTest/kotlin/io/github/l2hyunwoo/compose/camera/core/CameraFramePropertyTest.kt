@@ -15,6 +15,7 @@
  */
 package io.github.l2hyunwoo.compose.camera.core
 
+import io.github.l2hyunwoo.compose.camera.core.plugin.CameraFrame
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.property.Arb
@@ -29,7 +30,7 @@ class CameraFramePropertyTest {
   fun cameraFrameEqualityWithSameData() = runTest {
     checkAll(Arb.string(), Arb.int(1, 1920), Arb.int(1, 1080)) { format, width, height ->
       val data = byteArrayOf(1, 2, 3)
-      val frame1 = io.github.l2hyunwoo.compose.camera.core.plugin.CameraFrame(
+      val frame1 = CameraFrame(
         data = data,
         width = width,
         height = height,
@@ -37,7 +38,7 @@ class CameraFramePropertyTest {
         rotation = 0,
         timestamp = 0L,
       )
-      val frame2 = io.github.l2hyunwoo.compose.camera.core.plugin.CameraFrame(
+      val frame2 = CameraFrame(
         data = data,
         width = width,
         height = height,
@@ -56,7 +57,7 @@ class CameraFramePropertyTest {
     val data1 = byteArrayOf(1, 2, 3)
     val data2 = byteArrayOf(4, 5, 6)
 
-    val frame1 = io.github.l2hyunwoo.compose.camera.core.plugin.CameraFrame(
+    val frame1 = CameraFrame(
       data = data1,
       width = 100,
       height = 100,
@@ -64,7 +65,7 @@ class CameraFramePropertyTest {
       rotation = 0,
       timestamp = 0L,
     )
-    val frame2 = io.github.l2hyunwoo.compose.camera.core.plugin.CameraFrame(
+    val frame2 = CameraFrame(
       data = data2,
       width = 100,
       height = 100,
