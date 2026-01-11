@@ -105,9 +105,9 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-2xl bg-fd-secondary flex items-center justify-center mb-6 text-fd-foreground">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">Permissions Solved</h3>
+                <h3 className="text-xl font-bold mb-2">Unified API</h3>
                 <p className="text-fd-muted-foreground">
-                  Rememberable permission state that handles the platform complexities for you.
+                  A single, consistent API surface for Android and iOS. Write your camera logic once in Kotlin and run it everywhere.
                 </p>
            </div>
            
@@ -116,9 +116,9 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-2xl bg-fd-secondary flex items-center justify-center mb-6 text-fd-foreground">
                   <Layers className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">Plugin System</h3>
+                <h3 className="text-xl font-bold mb-2">Extensible Architecture</h3>
                 <p className="text-fd-muted-foreground">
-                  Easily extend functionality with image analysis plugins for MLKit and more.
+                  Designed for scalability. Beyond simple plugins, the event-driven architecture allows deeply integrated custom features.
                 </p>
            </div>
            
@@ -128,9 +128,9 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform">
                   <Camera className="w-6 h-6" />
                 </div>
-                <h3 className="text-2xl font-bold mb-2">Composable Preview</h3>
+                <h3 className="text-2xl font-bold mb-2">Declarative Control</h3>
                 <p className="text-fd-muted-foreground text-lg">
-                  Just drop `CameraPreview` into your UI. It handles the lifecycle, surface, and orientation changes automatically.
+                  Control hardware via Compose state. Flash, zoom, and focus are managed reactively, eliminating complex view-based imperative calls.
                 </p>
              </div>
               <div className="absolute right-0 bottom-0 opacity-10 group-hover:opacity-20 transition-opacity">

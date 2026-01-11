@@ -11,17 +11,17 @@ description: Visual feedback for tap-to-focus.
 
 A default square indicator is provided if no custom indicator is specified.
 
-## Custom Customization
+## Custom Indicator
 
 You can provide your own composable to render the focus indicator.
 
 ```kotlin
 CameraPreview(
-    focusIndicator = { tapOffset ->
-        // Draw a circle at tapOffset
+    focusIndicator = { tapPosition ->
+        // Draw a circle at tapPosition
         Box(
             modifier = Modifier
-                .offset { IntOffset(tapOffset.x.toInt(), tapOffset.y.toInt()) }
+                .offset { IntOffset(tapPosition.x.roundToInt(), tapPosition.y.roundToInt()) }
                 .size(50.dp)
                 .border(2.dp, Color.Red, CircleShape)
         )

@@ -9,13 +9,20 @@ description: Reading camera state and capabilities.
 
 ## Properties
 
-| Property        | Type                       | Description                         |
-| --------------- | -------------------------- | ----------------------------------- |
-| `zoomState`     | `StateFlow<ZoomState>`     | Current zoom ratio and range.       |
-| `exposureState` | `StateFlow<ExposureState>` | Current exposure index and range.   |
-| `torchState`    | `StateFlow<TorchState>`    | Current torch status (`ON`, `OFF`). |
-| `cameraState`   | `StateFlow<CameraState>`   | General camera lifecycle state.     |
+| Property        | Type                       | Description                                 |
+| --------------- | -------------------------- | ------------------------------------------- |
+| `zoomState`     | `StateFlow<ZoomState>`     | Current zoom ratio and range.               |
+| `exposureState` | `StateFlow<ExposureState>` | Current exposure index and range.           |
+| `cameraState`   | `StateFlow<CameraState>`   | General camera lifecycle state.             |
+| `hasFlashUnit`  | `Boolean`                  | Whether the active camera has a flash unit. |
+| `hasTorch`      | `Boolean`                  | Whether the active camera has a torch unit. |
 
 ## Checking Capabilities
 
-You can inspect `CameraInfo` to determine if features are supported (e.g., if the device has a flash unit).
+You can inspect `CameraInfo` to determine if features are supported.
+
+```kotlin
+if (cameraInfo.hasFlashUnit) {
+    // Show flash button
+}
+```

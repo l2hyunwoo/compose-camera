@@ -33,7 +33,10 @@ On iOS, you can attach the `AVCaptureVideoPreviewLayer` to your generic `UIView`
 
 ```kotlin
 // iOS Implementation
-val previewLayer = AVCaptureVideoPreviewLayer(session = controller.captureSession)
+// 'controller' is your UIViewController
+// 'view' is the controller's view
+val captureSession = (cameraController as IOSCameraController).captureSession
+val previewLayer = AVCaptureVideoPreviewLayer(session = captureSession)
 previewLayer.frame = view.bounds
 view.layer.addSublayer(previewLayer)
 ```

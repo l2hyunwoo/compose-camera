@@ -12,10 +12,11 @@ A utility to simplify permission requests across Android and iOS.
 ```kotlin
 val manager = rememberCameraPermissionManager()
 
-// Check status
-if (manager.cameraPermission.isGranted) { ... }
-
-// Request
-manager.requestCameraPermissions()
-manager.openSettings() // Opens app settings if denied permanently
+LaunchedEffect(Unit) {
+    // Request returns a result
+    val result = manager.requestCameraPermissions()
+    if (!result.cameraGranted) {
+        manager.openAppSettings()
+    }
+}
 ```
