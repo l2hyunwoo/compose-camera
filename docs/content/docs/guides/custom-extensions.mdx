@@ -50,10 +50,17 @@ class ManualFocusExtension : CameraControlExtension {
     override fun onCameraReady() {
         val ctrl = controller ?: return
 
-        // Access underlying Camera object via reflection or internal API
-        // Then get Camera2CameraControl
-        val camera = ctrl.camera // implementation detail
-        camera2Control = Camera2CameraControl.from(camera.cameraControl)
+        // Access internal Camera object via reflection
+        // This is a workaround as the Camera object is not exposed in the public API
+        try {
+            val cameraField = ctrl::class.java.getDeclaredField("camera")
+            cameraField.isAccessible = true
+            val camera = cameraField.get(ctrl) as? androidx.camera.core.Camera ?: return
+
+            camera2Control = Camera2CameraControl.from(camera.cameraControl)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun setFocusDistance(distance: Float) {

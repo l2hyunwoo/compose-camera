@@ -18,22 +18,20 @@ export function LLMCopyButton({
 }) {
   const [isLoading, setLoading] = useState(false);
   const [checked, onClick] = useCopyButton(async () => {
-    const cached = cache.get(markdownUrl);
-    if (cached) return navigator.clipboard.writeText(cached);
-
     setLoading(true);
-
     try {
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          'text/plain': fetch(markdownUrl).then(async (res) => {
-            const content = await res.text();
-            cache.set(markdownUrl, content);
+      const cached = cache.get(markdownUrl);
+      let content = cached;
+      
+      if (!content) {
+        const res = await fetch(markdownUrl);
+        content = await res.text();
+        cache.set(markdownUrl, content);
+      }
 
-            return content;
-          }),
-        }),
-      ]);
+      await navigator.clipboard.writeText(content);
+    } catch (e) {
+      console.error('Failed to copy markdown:', e);
     } finally {
       setLoading(false);
     }
@@ -41,6 +39,7 @@ export function LLMCopyButton({
 
   return (
     <button
+      type="button"
       disabled={isLoading}
       className={cn(
         buttonVariants({

@@ -40,8 +40,8 @@ fun IOSCustomCamera(controller: CameraController) {
         factory = {
             val view = UIView()
 
-            // 1. Get the session
-            val session = (controller as IOSCameraController).captureSession
+            // 1. Get the session (safe cast)
+            val session = (controller as? IOSCameraController)?.captureSession ?: return@UIKitView view
 
             // 2. Create the layer
             val previewLayer = AVCaptureVideoPreviewLayer(session = session)
@@ -55,7 +55,7 @@ fun IOSCustomCamera(controller: CameraController) {
         modifier = Modifier.fillMaxSize(),
         onResize = { view, rect ->
             view.layer.sublayers?.firstOrNull()?.let { layer ->
-                (layer as CALayer).frame = rect
+                layer.frame = rect
             }
         }
     )
