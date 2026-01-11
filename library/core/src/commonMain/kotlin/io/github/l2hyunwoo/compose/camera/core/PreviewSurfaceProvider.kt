@@ -19,25 +19,26 @@ package io.github.l2hyunwoo.compose.camera.core
  * Interface for providing a preview surface to the camera controller.
  * This allows custom preview implementations without depending on the compose module.
  *
- * Platform-specific interfaces extend this with typed access:
- * - Android: [AndroidPreviewSurfaceProvider] with SurfaceRequest support
- * - iOS: [IOSPreviewSurfaceProvider] with AVCaptureSession access
+ * For most use cases, prefer using the platform-specific extension properties:
+ * - Android: `controller.surfaceRequestFlow` returns `StateFlow<SurfaceRequest?>`
+ * - iOS: `controller.captureSession` returns `AVCaptureSession`
  *
- * Example usage (Android):
+ * Example usage (Android with CameraXViewfinder):
  * ```kotlin
- * class CustomPreviewView(context: Context) : SurfaceView(context) {
- *     private val provider = object : AndroidPreviewSurfaceProvider {
- *         override fun onSurfaceRequestAvailable(request: SurfaceRequest) {
- *             request.provideSurface(holder.surface, executor) { result -> }
- *         }
- *         override fun onSurfaceAvailable(surface: Any) {}
- *         override fun onSurfaceDestroyed() {}
- *     }
- *
- *     fun attach(controller: CameraController) {
- *         controller.setPreviewSurfaceProvider(provider)
+ * @Composable
+ * fun CustomPreview(controller: CameraController) {
+ *     val surfaceRequest by controller.surfaceRequestFlow.collectAsState()
+ *     surfaceRequest?.let { request ->
+ *         CameraXViewfinder(surfaceRequest = request)
  *     }
  * }
+ * ```
+ *
+ * Example usage (iOS with AVCaptureVideoPreviewLayer):
+ * ```kotlin
+ * val previewLayer = AVCaptureVideoPreviewLayer(session = controller.captureSession)
+ * previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
+ * view.layer.addSublayer(previewLayer)
  * ```
  */
 interface PreviewSurfaceProvider {

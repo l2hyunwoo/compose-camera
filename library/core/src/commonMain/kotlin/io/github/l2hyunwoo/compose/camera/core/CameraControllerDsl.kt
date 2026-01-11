@@ -98,9 +98,13 @@ class CameraControllerScope {
   /**
    * Build the CameraController from this scope's configuration.
    *
+   * This is typically called internally by the `CameraController { }` factory function
+   * or `rememberCameraController { }` composable. You generally don't need to call
+   * this directly unless building custom factory functions.
+   *
    * @return A configured CameraController
    */
-  internal fun build(): CameraController {
+  fun build(): CameraController {
     // Merge plugins from DSL with any plugins in configuration
     val mergedConfig = configuration.copy(
       plugins = configuration.plugins + _plugins,
