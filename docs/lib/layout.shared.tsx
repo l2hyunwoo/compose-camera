@@ -7,7 +7,7 @@ export function baseOptions(): BaseLayoutProps {
       title: (
         <div className="flex items-center gap-2">
           <Image
-            src="/logo.png"
+            src="/compose-camera/logo.png"
             alt="Compose Camera Logo"
             width={32}
             height={32}

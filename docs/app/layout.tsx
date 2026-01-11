@@ -7,6 +7,12 @@ const inter = Inter({
   subsets: ['latin'],
 });
 
+export const metadata = {
+  metadataBase: new URL('https://l2hyunwoo.github.io/compose-camera'),
+  title: 'Compose Camera',
+  description: 'The Jetpack Compose Camera Library',
+};
+
 export default function Layout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={inter.className} suppressHydrationWarning>
