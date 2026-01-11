@@ -1,0 +1,27 @@
+---
+title: ZoomState
+description: Documentation for ZoomState data class.
+---
+
+# `ZoomState`
+
+Holds the current status of the camera's zoom level.
+
+```kotlin
+data class ZoomState(
+    val zoomRatio: Float,
+    val maxZoomRatio: Float,
+    val minZoomRatio: Float
+) {
+    val linearZoom: Float // 0.0 to 1.0
+}
+```
+
+## Properties
+
+| Property       | Type    | Description                                                               |
+| :------------- | :------ | :------------------------------------------------------------------------ |
+| `zoomRatio`    | `Float` | The current zoom magnification factor (e.g., 1.0x, 2.5x).                 |
+| `minZoomRatio` | `Float` | The minimum supported zoom ratio for the current camera.                  |
+| `maxZoomRatio` | `Float` | The maximum supported zoom ratio for the current camera.                  |
+| `linearZoom`   | `Float` | The current zoom level represented as a linear value between 0.0 and 1.0. |

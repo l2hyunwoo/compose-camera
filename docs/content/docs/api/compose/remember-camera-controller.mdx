@@ -1,0 +1,21 @@
+---
+title: rememberCameraController
+description: Creating a CameraController in Compose.
+---
+
+# rememberCameraController
+
+Creates and remembers a `CameraController` instance, managing its lifecycle.
+
+## Usage
+
+```kotlin
+val controller = rememberCameraController {
+    // Optional configuration block
+    configuration = CameraConfiguration(lens = CameraLens.FRONT)
+}
+
+LaunchedEffect(controller) {
+    controller.initialize()
+}
+```

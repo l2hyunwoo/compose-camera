@@ -1,0 +1,22 @@
+---
+title: TextLine
+description: API reference for TextLine data class.
+---
+
+# `TextLine`
+
+Represents a single line of text within a block.
+
+```kotlin
+data class TextLine(
+    val text: String,
+    val elements: List<TextElement>
+)
+```
+
+## Properties
+
+| Property   | Type                | Description                                          |
+| :--------- | :------------------ | :--------------------------------------------------- |
+| `text`     | `String`            | The text content of the line.                        |
+| `elements` | `List<TextElement>` | The individual elements (words/symbols) in the line. |

@@ -1,0 +1,20 @@
+---
+title: TextRecognizer
+description: API reference for TextRecognizer class.
+---
+
+# `TextRecognizer`
+
+The main plugin class for text recognition.
+
+```kotlin
+expect class TextRecognizer : CameraPlugin {
+    val text: StateFlow<TextResult?>
+}
+```
+
+## Properties
+
+| Property | Type                     | Description                                                                              |
+| :------- | :----------------------- | :--------------------------------------------------------------------------------------- |
+| `text`   | `StateFlow<TextResult?>` | A flow emitting the `TextResult` for the current frame, or null if no text was detected. |

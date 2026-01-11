@@ -1,0 +1,50 @@
+---
+title: CameraController
+description: Controlling the camera lifecycle and operations.
+---
+
+# CameraController
+
+The `CameraController` is the central component of the library. It manages the camera lifecycle, binds use cases (preview, capture), and provides access to camera controls.
+
+## Initialization
+
+You can create a `CameraController` using the factory function or the DSL.
+
+```kotlin
+val controller = CameraController {
+    configuration = CameraConfiguration(lens = CameraLens.BACK)
+    // Register plugins/extensions
+}
+
+// Initialize (Required before use)
+suspend fun initialize() {
+    controller.initialize()
+}
+```
+
+## Methods
+
+### `takePicture`
+
+Captures an image.
+
+```kotlin
+suspend fun takePicture(config: ImageCaptureConfig? = null): ImageCaptureResult
+```
+
+### `startRecording`
+
+Starts video recording.
+
+```kotlin
+fun startRecording(config: VideoCaptureConfig? = null): Recording
+```
+
+### `setLens`
+
+Switches the active camera lens.
+
+```kotlin
+fun setLens(lens: CameraLens)
+```

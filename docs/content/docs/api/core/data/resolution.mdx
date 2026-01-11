@@ -1,0 +1,23 @@
+---
+title: Resolution
+description: Documentation for Resolution data class.
+---
+
+# `Resolution`
+
+Represents dimensions in pixels.
+
+```kotlin
+data class Resolution(
+    val width: Int,
+    val height: Int
+)
+```
+
+## Properties
+
+| Property     | Type    | Description                                              |
+| :----------- | :------ | :------------------------------------------------------- |
+| `width`      | `Int`   | The width in pixels.                                     |
+| `height`     | `Int`   | The height in pixels.                                    |
+| `megapixels` | `Float` | The calculated megapixels (width \* height / 1,000,000). |

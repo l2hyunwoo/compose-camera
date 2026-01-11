@@ -1,0 +1,12 @@
+{
+  "title": "Exceptions",
+  "pages": [
+    "camera-exception",
+    "no-camera-available",
+    "permission-denied",
+    "initialization-failed",
+    "capture-failed",
+    "recording-failed",
+    "unknown"
+  ]
+}

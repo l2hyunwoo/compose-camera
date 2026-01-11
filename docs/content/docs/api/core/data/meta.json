@@ -1,0 +1,12 @@
+{
+  "title": "Data Classes",
+  "pages": [
+    "resolution",
+    "focus-point",
+    "zoom-state",
+    "exposure-state",
+    "capture-config",
+    "recording-config",
+    "permission-result"
+  ]
+}

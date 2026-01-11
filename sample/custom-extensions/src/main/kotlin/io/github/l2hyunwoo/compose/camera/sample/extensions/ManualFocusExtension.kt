@@ -72,13 +72,10 @@ class ManualFocusExtension : CameraControlExtension {
     camera2Info = null
   }
 
+  @ExperimentalCamera2Interop
   override fun onCameraReady() {
     val ctrl = controller ?: return
 
-    // Access Camera2 interop APIs
-    val cameraInfo = ctrl.cameraInfo
-    // We need to get the internal camera object - accessing via reflection or exposed API
-    // For now, we'll get it when the camera is ready via the controller's internal camera
     try {
       val cameraField = ctrl::class.java.getDeclaredField("camera")
       cameraField.isAccessible = true
@@ -113,6 +110,7 @@ class ManualFocusExtension : CameraControlExtension {
    * Enable manual focus mode.
    * This disables auto-focus and allows manual control of focus distance.
    */
+  @androidx.annotation.OptIn(ExperimentalCamera2Interop::class)
   fun enableManualFocus() {
     if (!_isSupported.value) return
 
@@ -136,6 +134,7 @@ class ManualFocusExtension : CameraControlExtension {
   /**
    * Disable manual focus and return to auto-focus mode.
    */
+  @androidx.annotation.OptIn(ExperimentalCamera2Interop::class)
   fun disableManualFocus() {
     val control = camera2Control ?: return
 
@@ -171,6 +170,7 @@ class ManualFocusExtension : CameraControlExtension {
    *
    * Only works when manual focus is enabled.
    */
+  @androidx.annotation.OptIn(ExperimentalCamera2Interop::class)
   fun setFocusDistance(distance: Float) {
     if (!_isManualFocusEnabled.value) return
 

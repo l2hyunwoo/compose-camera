@@ -1,0 +1,34 @@
+---
+title: CameraConfiguration
+description: Defining camera settings.
+---
+
+# CameraConfiguration
+
+The `CameraConfiguration` data class holds the target state of the camera.
+
+## Properties
+
+| Property      | Type          | Description                                 | Default |
+| ------------- | ------------- | ------------------------------------------- | ------- |
+| `lens`        | `CameraLens`  | The active camera lens (`FRONT` or `BACK`). | `BACK`  |
+| `flashMode`   | `FlashMode`   | The flash mode (`ON`, `OFF`, `AUTO`).       | `OFF`   |
+| `captureMode` | `CaptureMode` | The operational mode (`IMAGE`, `VIDEO`).    | `IMAGE` |
+
+## Enums
+
+### `CameraLens`
+
+- `FRONT`: Front-facing camera.
+- `BACK`: Back-facing camera.
+
+### `FlashMode`
+
+- `ON`: Flash/Torch always on (if supported).
+- `OFF`: Flash disabled.
+- `AUTO`: Flash fires automatically based on lighting.
+
+### `CaptureMode`
+
+- `IMAGE`: Still photo capture mode.
+- `VIDEO`: Video recording mode.

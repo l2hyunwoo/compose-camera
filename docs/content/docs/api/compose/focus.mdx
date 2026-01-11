@@ -1,0 +1,30 @@
+---
+title: Focus Indicators
+description: Visual feedback for tap-to-focus.
+---
+
+# Focus Indicators
+
+`CameraPreview` supports customizable visual feedback when the user taps to focus.
+
+## Default Implementation
+
+A default square indicator is provided if no custom indicator is specified.
+
+## Custom Indicator
+
+You can provide your own composable to render the focus indicator.
+
+```kotlin
+CameraPreview(
+    focusIndicator = { tapPosition ->
+        // Draw a circle at tapPosition
+        Box(
+            modifier = Modifier
+                .offset { IntOffset(tapPosition.x.roundToInt(), tapPosition.y.roundToInt()) }
+                .size(50.dp)
+                .border(2.dp, Color.Red, CircleShape)
+        )
+    }
+)
+```

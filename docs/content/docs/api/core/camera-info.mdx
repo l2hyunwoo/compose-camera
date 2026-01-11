@@ -1,0 +1,28 @@
+---
+title: CameraInfo
+description: Reading camera state and capabilities.
+---
+
+# CameraInfo
+
+`CameraInfo` provides observable state regarding the camera's current status and capabilities.
+
+## Properties
+
+| Property        | Type                       | Description                                 |
+| --------------- | -------------------------- | ------------------------------------------- |
+| `zoomState`     | `StateFlow<ZoomState>`     | Current zoom ratio and range.               |
+| `exposureState` | `StateFlow<ExposureState>` | Current exposure index and range.           |
+| `cameraState`   | `StateFlow<CameraState>`   | General camera lifecycle state.             |
+| `hasFlashUnit`  | `Boolean`                  | Whether the active camera has a flash unit. |
+| `hasTorch`      | `Boolean`                  | Whether the active camera has a torch unit. |
+
+## Checking Capabilities
+
+You can inspect `CameraInfo` to determine if features are supported.
+
+```kotlin
+if (cameraInfo.hasFlashUnit) {
+    // Show flash button
+}
+```

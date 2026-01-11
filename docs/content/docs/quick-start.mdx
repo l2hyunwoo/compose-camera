@@ -1,0 +1,97 @@
+---
+title: Quick Start
+description: Get started with Compose Camera in minutes.
+---
+
+## Installation
+
+Add the following dependencies to your `build.gradle.kts`:
+
+### Gradle (Version Catalog)
+
+```toml
+# libs.versions.toml
+[versions]
+compose-camera = "1.2.2"
+
+[libraries]
+compose-camera-core = { module = "io.github.l2hyunwoo:compose-camera-core", version.ref = "compose-camera" }
+compose-camera-ui = { module = "io.github.l2hyunwoo:compose-camera-ui", version.ref = "compose-camera" }
+```
+
+```kotlin
+// build.gradle.kts (commonMain)
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.compose.camera.core)
+            implementation(libs.compose.camera.ui)
+        }
+    }
+}
+```
+
+### Gradle (Direct)
+
+```kotlin
+// build.gradle.kts (commonMain)
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("io.github.l2hyunwoo:compose-camera-core:1.2.2")
+            implementation("io.github.l2hyunwoo:compose-camera-ui:1.2.2")
+        }
+    }
+}
+```
+
+## Setup
+
+### Android (`AndroidManifest.xml`)
+
+Add necessary permissions:
+
+```xml
+<uses-permission android:name="android.permission.CAMERA" />
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+```
+
+### iOS (`Info.plist`)
+
+Add usage descriptions and high-refresh-rate support:
+
+```xml
+<key>NSCameraUsageDescription</key>
+<string>This app needs camera access to capture photos.</string>
+<key>NSMicrophoneUsageDescription</key>
+<string>This app needs microphone access to record videos.</string>
+
+<!-- Important for smooth preview on iPhone Pro models -->
+<key>CADisableMinimumFrameDurationOnPhone</key>
+<true/>
+```
+
+## Basic Usage
+
+Detailed usage guides can be found in the [Use Cases](./use-cases/basic) section.
+
+```kotlin
+import io.github.l2hyunwoo.compose.camera.ui.CameraPreview
+import io.github.l2hyunwoo.compose.camera.core.rememberCameraPermissionManager
+
+@Composable
+fun CameraScreen() {
+  val permissionManager = rememberCameraPermissionManager()
+
+  LaunchedEffect(Unit) {
+    permissionManager.requestCameraPermissions()
+  }
+
+  CameraPreview(
+    modifier = Modifier.fillMaxSize(),
+    onCameraControllerReady = { controller ->
+        // Use controller
+    }
+  )
+}
+```

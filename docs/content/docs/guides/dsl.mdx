@@ -1,0 +1,59 @@
+---
+title: DSL Configuration
+description: Configuring the camera using Kotlin DSL.
+---
+
+# DSL Configuration
+
+Compose Camera provides a type-safe Kotlin DSL for configuring the `CameraController`. This approach is cleaner and more readable than imperative setup calls.
+
+## Basic Setup
+
+Use `rememberCameraController` in your Composable to create and configure the controller.
+
+```kotlin
+val controller = rememberCameraController {
+    // 1. Core Configuration
+    configuration = CameraConfiguration(
+        lens = CameraLens.BACK,
+        flashMode = FlashMode.AUTO,
+        captureMode = CaptureMode.IMAGE
+    )
+
+    // 2. Plugins
+    plugins {
+        +QRScannerPlugin()
+        +TextRecognizer()
+    }
+
+    // 3. Extensions
+    extensions {
+        +ExposureLockExtension()
+    }
+
+    // 4. Custom Use Cases (Optional)
+    imageCaptureUseCase = MyCustomImageCapture()
+    videoCaptureUseCase = MyCustomVideoCapture()
+}
+```
+
+## Initialization
+
+The controller created via `rememberCameraController` handles its own lifecycle within the Composable scope. However, if you are creating a `CameraController` manually (outside of Compose), you must initialize and release it explicitly.
+
+```kotlin
+// Manual creation (e.g., in a ViewModel or non-Compose context)
+val controller = CameraController()
+
+// Initialize
+// On Android, this requires Context and LifecycleOwner
+// On iOS, it handles AVFoundation setup
+suspend fun setup() {
+    controller.initialize()
+}
+
+// Release
+fun cleanup() {
+    controller.release()
+}
+```

@@ -1,0 +1,74 @@
+---
+title: Video Recording
+description: How to record videos with Compose Camera.
+---
+
+# Video Recording
+
+Compose Camera supports high-quality video recording with configurable options.
+
+## Setup
+
+First, ensure your `CameraConfiguration` includes the `VIDEO` capture mode for optimal performance (though `BALANCED` or `IMAGE` may also work depending on the underlying implementation, `VIDEO` is recommended).
+
+```kotlin
+val config = CameraConfiguration(
+    captureMode = CaptureMode.VIDEO,
+    videoQuality = VideoQuality.FHD // 1080p
+)
+```
+
+## Start Recording
+
+Call `startRecording()` on your `CameraController`. This is a suspend function that returns a `VideoRecording` object representing the active session.
+
+```kotlin
+scope.launch {
+    try {
+        val recording = controller.startRecording()
+        // Recording has started
+    } catch (e: Exception) {
+        // Handle start failure
+    }
+}
+```
+
+## Stop Recording
+
+The `VideoRecording` object has a `stop()` function which returns the result of the session.
+
+```kotlin
+scope.launch {
+    // ... inside recording scope or stored reference
+    val result = recording.stop()
+
+    when (result) {
+        is VideoRecordingResult.Success -> {
+            println("Video saved to: ${result.uri}") // File URI/Path
+            println("Duration: ${result.durationMs}ms")
+        }
+        is VideoRecordingResult.Error -> {
+            println("Recording failed: ${result.exception}")
+        }
+    }
+}
+```
+
+## Pause / Resume
+
+Supports pausing and resuming if the platform allows.
+
+```kotlin
+recording.pause()
+// ...
+recording.resume()
+```
+
+## Recording Configuration
+
+You can pass a `RecordingConfig` to customized behavior:
+
+```kotlin
+// This would be passed to a custom VideoCaptureUseCase if you implement one
+// Default implementation uses standard settings
+```

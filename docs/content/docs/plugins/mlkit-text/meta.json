@@ -1,0 +1,11 @@
+{
+  "title": "MLKit Text",
+  "pages": [
+    "index",
+    "api/text-recognizer",
+    "api/text-result",
+    "api/text-block",
+    "api/text-line",
+    "api/text-element"
+  ]
+}

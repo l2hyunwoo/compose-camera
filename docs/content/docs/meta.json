@@ -1,0 +1,12 @@
+{
+  "root": true,
+  "pages": [
+    "index",
+    "quick-start",
+    "guides",
+    "use-cases",
+    "plugins",
+    "api",
+    "architecture"
+  ]
+}

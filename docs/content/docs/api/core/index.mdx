@@ -1,0 +1,25 @@
+---
+title: Core Module
+description: Documentation for compose-camera-core.
+---
+
+# Core Module
+
+The `compose-camera-core` module provides the fundamental building blocks for camera integration. It abstracts the platform-specific implementations (CameraX for Android, AVFoundation for iOS) into a unified, Kotlin-first API.
+
+## Installation
+
+```kotlin
+implementation("io.github.l2hyunwoo:compose-camera-core:1.2.2")
+```
+
+## Key Components
+
+- **[CameraController](./core/camera-controller)**: The main entry point for controlling the camera.
+- **[CameraConfiguration](./core/camera-configuration)**: Data class defining the desired camera state.
+- **[CameraControl](./core/camera-control)**: Interface for runtime camera adjustments.
+- **[CameraInfo](./core/camera-info)**: Read-only observable camera state.
+- **[Enums](./core/enums/camera-lens)**: Definitions for `CameraLens`, `FlashMode`, etc.
+- **[Data Classes](./core/data/resolution)**: `Resolution`, `FocusPoint`, etc.
+- **[Exceptions](./core/exceptions/camera-exception)**: Error handling.
+- **[Plugin Interfaces](./core/plugins)**: Base interfaces for extending functionality.

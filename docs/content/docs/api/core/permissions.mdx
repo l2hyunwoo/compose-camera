@@ -1,0 +1,22 @@
+---
+title: Permission Manager
+description: Handling camera permissions.
+---
+
+# CameraPermissionManager
+
+A utility to simplify permission requests across Android and iOS.
+
+## Usage
+
+```kotlin
+val manager = rememberCameraPermissionManager()
+
+LaunchedEffect(Unit) {
+    // Request returns a result
+    val result = manager.requestCameraPermissions()
+    if (!result.cameraGranted) {
+        manager.openAppSettings()
+    }
+}
+```

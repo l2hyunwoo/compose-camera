@@ -1,0 +1,24 @@
+---
+title: ExposureState
+description: Documentation for ExposureState data class.
+---
+
+# `ExposureState`
+
+Holds the current status of the camera's exposure compensation.
+
+```kotlin
+data class ExposureState(
+    val exposureCompensation: Float,
+    val exposureCompensationRange: Range<Float>,
+    val exposureStep: Float
+)
+```
+
+## Properties
+
+| Property                    | Type           | Description                                                                 |
+| :-------------------------- | :------------- | :-------------------------------------------------------------------------- |
+| `exposureCompensation`      | `Float`        | The current exposure compensation index/value.                              |
+| `exposureCompensationRange` | `Range<Float>` | The supported range of exposure compensation values (min, max).             |
+| `exposureStep`              | `Float`        | The smallest increment/step by which exposure compensation can be adjusted. |
