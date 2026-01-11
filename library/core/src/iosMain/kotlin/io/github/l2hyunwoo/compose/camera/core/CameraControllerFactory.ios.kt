@@ -65,12 +65,6 @@ actual suspend fun CameraController.initialize() {
 }
 
 /**
- * Get the native AVCaptureSession for iOS preview.
- */
-actual val CameraController.nativePreviewRequest: Any?
-  get() = (this as IOSCameraController).captureSession
-
-/**
  * Extension to get typed AVCaptureSession for iOS.
  */
 val CameraController.captureSession: AVCaptureSession

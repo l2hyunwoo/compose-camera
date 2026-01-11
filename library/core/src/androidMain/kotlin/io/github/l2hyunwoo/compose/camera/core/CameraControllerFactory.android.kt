@@ -125,12 +125,6 @@ actual suspend fun CameraController.initialize() {
 }
 
 /**
- * Get the native SurfaceRequest for CameraX Viewfinder.
- */
-actual val CameraController.nativePreviewRequest: Any?
-  get() = (this as AndroidCameraController).surfaceRequest.value
-
-/**
  * Extension to get typed SurfaceRequest StateFlow for Android.
  */
 val CameraController.surfaceRequestFlow: StateFlow<SurfaceRequest?>

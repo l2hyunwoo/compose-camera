@@ -110,10 +110,3 @@ expect fun rememberCameraController(
  * Must be called before using other camera operations.
  */
 expect suspend fun CameraController.initialize()
-
-/**
- * Get the native preview request object.
- * - Android: SurfaceRequest from CameraX
- * - iOS: AVCaptureSession
- */
-expect val CameraController.nativePreviewRequest: Any?
