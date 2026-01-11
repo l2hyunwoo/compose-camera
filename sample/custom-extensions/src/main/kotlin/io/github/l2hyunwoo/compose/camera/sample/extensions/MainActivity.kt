@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +30,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -72,6 +75,7 @@ class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    enableEdgeToEdge()
     checkPermissionAndShowCamera()
   }
 
@@ -155,6 +159,7 @@ fun CustomExtensionsScreen() {
         .align(Alignment.TopCenter)
         .fillMaxWidth()
         .background(Color.Black.copy(alpha = 0.5f))
+        .statusBarsPadding()
         .padding(16.dp),
     ) {
       Text(
@@ -173,6 +178,7 @@ fun CustomExtensionsScreen() {
       modifier = Modifier
         .align(Alignment.BottomCenter)
         .fillMaxWidth()
+        .navigationBarsPadding()
         .padding(16.dp),
       horizontalArrangement = Arrangement.SpaceEvenly,
     ) {

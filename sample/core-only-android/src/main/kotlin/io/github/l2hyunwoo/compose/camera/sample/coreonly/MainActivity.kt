@@ -21,10 +21,13 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -73,6 +76,7 @@ class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    enableEdgeToEdge()
     checkPermissionAndShowCamera()
   }
 
@@ -159,6 +163,7 @@ fun CoreOnlyCameraScreen() {
       },
       modifier = Modifier
         .align(Alignment.BottomCenter)
+        .navigationBarsPadding()
         .padding(32.dp),
     ) {
       Text("Take Picture")
@@ -170,6 +175,7 @@ fun CoreOnlyCameraScreen() {
         text = result,
         modifier = Modifier
           .align(Alignment.TopCenter)
+          .statusBarsPadding()
           .padding(16.dp),
         color = MaterialTheme.colorScheme.onSurface,
       )
