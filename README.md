@@ -227,8 +227,11 @@ For advanced use cases where you need full control over the preview, you can use
 **Android with CameraXViewfinder:**
 
 ```kotlin
+// Required imports
 import io.github.l2hyunwoo.compose.camera.core.*
-import androidx.camera.compose.CameraXViewfinder
+import androidx.camera.compose.CameraXViewfinder // from androidx.camera:camera-compose artifact
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 @Composable
 fun CustomPreview(controller: CameraController, modifier: Modifier = Modifier) {
@@ -247,6 +250,10 @@ fun CustomPreview(controller: CameraController, modifier: Modifier = Modifier) {
 **iOS with AVCaptureVideoPreviewLayer:**
 
 ```kotlin
+// Required imports (iOS/Swift interop)
+import platform.AVFoundation.AVCaptureVideoPreviewLayer
+import platform.AVFoundation.AVLayerVideoGravityResizeAspectFill
+
 // Access the capture session directly
 val previewLayer = AVCaptureVideoPreviewLayer(session = controller.captureSession)
 previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill

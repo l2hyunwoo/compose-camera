@@ -49,14 +49,21 @@ internal class AndroidCameraControllerFactory(
  *
  * Note: LifecycleOwner is held via WeakReference and automatically cleared
  * when the lifecycle is destroyed to prevent Activity leaks.
+ *
+ * Thread-safety: All access is synchronized to prevent race conditions.
  */
 object AndroidCameraControllerContext {
+  private val lock = Any()
+
+  @Volatile
   internal var context: Context? = null
+    private set
+
   private var lifecycleOwnerRef: WeakReference<LifecycleOwner>? = null
   private var lifecycleObserver: LifecycleEventObserver? = null
 
   internal val lifecycleOwner: LifecycleOwner?
-    get() = lifecycleOwnerRef?.get()
+    get() = synchronized(lock) { lifecycleOwnerRef?.get() }
 
   /**
    * Initialize the Android camera controller context.
@@ -69,32 +76,36 @@ object AndroidCameraControllerContext {
    * @param lifecycleOwner Lifecycle owner for camera binding
    */
   fun initialize(context: Context, lifecycleOwner: LifecycleOwner) {
-    // Remove observer from previous lifecycle owner if any
-    clearLifecycleObserver()
+    synchronized(lock) {
+      // Remove observer from previous lifecycle owner if any
+      clearLifecycleObserverLocked()
 
-    this.context = context.applicationContext
-    this.lifecycleOwnerRef = WeakReference(lifecycleOwner)
+      this.context = context.applicationContext
+      this.lifecycleOwnerRef = WeakReference(lifecycleOwner)
 
-    // Register observer to auto-clear when lifecycle is destroyed
-    val observer = LifecycleEventObserver { _, event ->
-      if (event == Lifecycle.Event.ON_DESTROY) {
-        clear()
+      // Register observer to auto-clear when lifecycle is destroyed
+      val observer = LifecycleEventObserver { _, event ->
+        if (event == Lifecycle.Event.ON_DESTROY) {
+          clear()
+        }
       }
+      this.lifecycleObserver = observer
+      lifecycleOwner.lifecycle.addObserver(observer)
     }
-    this.lifecycleObserver = observer
-    lifecycleOwner.lifecycle.addObserver(observer)
   }
 
   /**
    * Clear the context. Called automatically when lifecycle owner is destroyed.
    */
   fun clear() {
-    clearLifecycleObserver()
-    this.context = null
-    this.lifecycleOwnerRef = null
+    synchronized(lock) {
+      clearLifecycleObserverLocked()
+      this.context = null
+      this.lifecycleOwnerRef = null
+    }
   }
 
-  private fun clearLifecycleObserver() {
+  private fun clearLifecycleObserverLocked() {
     lifecycleObserver?.let { observer ->
       lifecycleOwnerRef?.get()?.lifecycle?.removeObserver(observer)
     }

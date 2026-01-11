@@ -181,10 +181,13 @@ fun CoreOnlyCameraScreen() {
  * Create and remember a CameraController for core-only usage.
  *
  * This demonstrates using AndroidCameraControllerContext for non-compose usage patterns.
+ *
+ * Note: The controller is created once with the initial configuration.
+ * To update settings after creation, use [CameraController.updateConfiguration].
  */
 @Composable
 fun rememberCoreOnlyController(
-  configuration: CameraConfiguration,
+  initialConfiguration: CameraConfiguration,
 ): CameraController {
   val context = androidx.compose.ui.platform.LocalContext.current
   val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
@@ -197,7 +200,7 @@ fun rememberCoreOnlyController(
     AndroidCameraController(
       context = context,
       lifecycleOwner = lifecycleOwner,
-      initialConfiguration = configuration,
+      initialConfiguration = initialConfiguration,
     )
   }
 }
