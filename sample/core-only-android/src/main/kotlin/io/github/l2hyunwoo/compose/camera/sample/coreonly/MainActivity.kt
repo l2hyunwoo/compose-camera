@@ -119,7 +119,7 @@ fun CoreOnlyCameraScreen() {
 
   // Create controller using the DSL pattern
   val controller = rememberCoreOnlyController(
-    configuration = CameraConfiguration(
+    initialConfiguration = CameraConfiguration(
       lens = CameraLens.BACK,
       flashMode = FlashMode.OFF,
     ),

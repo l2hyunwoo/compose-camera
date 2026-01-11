@@ -437,7 +437,6 @@ Explore the sample applications for complete implementation examples:
 | [android-app](sample/android-app/) | Basic camera app with all features |
 | [core-only-android](sample/core-only-android/) | Core module usage without compose UI |
 | [custom-extensions](sample/custom-extensions/) | Custom extension implementation examples |
-| [ios-app](sample/ios-app/) | iOS sample application |
 
 ## License
 
