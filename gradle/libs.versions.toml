@@ -55,6 +55,7 @@ androidx-test-rules = "1.7.0"
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
 
 # Kotest
+kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 

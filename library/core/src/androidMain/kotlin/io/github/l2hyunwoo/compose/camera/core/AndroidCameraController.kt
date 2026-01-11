@@ -19,7 +19,6 @@ import android.Manifest
 import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.ImageFormat
 import android.hardware.camera2.CameraCharacteristics
 import android.provider.MediaStore
 import android.util.Size
@@ -59,6 +58,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
+import android.graphics.ImageFormat as AndroidImageFormat
 
 /**
  * Android implementation of [CameraController] using CameraX.
@@ -117,7 +117,7 @@ class AndroidCameraController(
       camera?.cameraControl?.setLinearZoom(linearZoom.coerceIn(0f, 1f))
     }
 
-    override fun focus(point: Offset) {
+    override fun focus(point: FocusPoint) {
       val cameraControl = camera?.cameraControl ?: return
       val meteringPoint = SurfaceOrientedMeteringPointFactory(1f, 1f)
         .createPoint(point.x, point.y)
@@ -187,6 +187,27 @@ class AndroidCameraController(
   // Surface request for Compose viewfinder
   private val _surfaceRequest = MutableStateFlow<SurfaceRequest?>(null)
   internal val surfaceRequest: StateFlow<SurfaceRequest?> = _surfaceRequest.asStateFlow()
+
+  // Extension registry
+  private val extensionRegistry = mutableMapOf<String, CameraControlExtension>()
+
+  // UseCase properties with defaults
+  private var _imageCaptureUseCase: ImageCaptureUseCase = DefaultAndroidImageCaptureUseCase(this)
+  override var imageCaptureUseCase: ImageCaptureUseCase
+    get() = _imageCaptureUseCase
+    set(value) {
+      _imageCaptureUseCase = value
+    }
+
+  private var _videoCaptureUseCase: VideoCaptureUseCase = DefaultAndroidVideoCaptureUseCase(this)
+  override var videoCaptureUseCase: VideoCaptureUseCase
+    get() = _videoCaptureUseCase
+    set(value) {
+      _videoCaptureUseCase = value
+    }
+
+  // Preview surface provider
+  private var previewSurfaceProvider: PreviewSurfaceProvider? = null
 
   /**
    * Initialize the camera with the given configuration
@@ -327,6 +348,19 @@ class AndroidCameraController(
   }
 
   override suspend fun takePicture(): ImageCaptureResult {
+    val config = CaptureConfig(
+      flashMode = configuration.flashMode,
+      resolution = configuration.photoResolution,
+      outputFormat = ImageFormat.JPEG,
+    )
+    return imageCaptureUseCase.capture(this, config)
+  }
+
+  /**
+   * Internal implementation of image capture.
+   * Called by DefaultAndroidImageCaptureUseCase.
+   */
+  internal suspend fun takePictureInternal(): ImageCaptureResult {
     val capture = imageCapture ?: return ImageCaptureResult.Error(
       CameraException.CaptureFailed(IllegalStateException("ImageCapture not initialized")),
     )
@@ -390,6 +424,18 @@ class AndroidCameraController(
   }
 
   override suspend fun startRecording(): VideoRecording {
+    val config = RecordingConfig(
+      quality = configuration.videoQuality,
+      enableAudio = true, // Default to true, permission check happens inside
+    )
+    return videoCaptureUseCase.startRecording(this, config)
+  }
+
+  /**
+   * Internal implementation of video recording.
+   * Called by DefaultAndroidVideoCaptureUseCase.
+   */
+  internal suspend fun startRecordingInternal(): VideoRecording {
     val capture = videoCapture ?: throw CameraException.RecordingFailed(
       IllegalStateException("VideoCapture not initialized"),
     )
@@ -536,11 +582,60 @@ class AndroidCameraController(
     }
   }
 
+  // Extension Management
+
+  override fun registerExtension(extension: CameraControlExtension) {
+    require(extension.id !in extensionRegistry) {
+      "Extension with id '${extension.id}' is already registered"
+    }
+    extensionRegistry[extension.id] = extension
+    extension.onAttach(this)
+
+    // If camera is already ready, notify extension
+    if (_cameraState.value is CameraState.Ready) {
+      extension.onCameraReady()
+    }
+  }
+
+  override fun unregisterExtension(id: String) {
+    extensionRegistry.remove(id)?.let { extension ->
+      extension.onDetach()
+    }
+  }
+
+  @Suppress("UNCHECKED_CAST")
+  override fun <T : CameraControlExtension> getExtension(id: String): T? = extensionRegistry[id] as? T
+
+  // Preview Surface Provider
+
+  override fun setPreviewSurfaceProvider(provider: PreviewSurfaceProvider?) {
+    previewSurfaceProvider = provider
+    // If we have a current surface request, notify the new provider
+    _surfaceRequest.value?.let { request ->
+      provider?.onSurfaceAvailable(request)
+    }
+  }
+
   override fun release() {
+    // Notify extensions of camera release
+    extensionRegistry.values.forEach { extension ->
+      extension.onCameraReleased()
+    }
+
+    // Detach all extensions
+    extensionRegistry.values.toList().forEach { extension ->
+      extension.onDetach()
+    }
+    extensionRegistry.clear()
+
     // Detach plugins
     configuration.plugins.forEach { plugin ->
       plugin.onDetach()
     }
+
+    // Notify preview provider
+    previewSurfaceProvider?.onSurfaceDestroyed()
+    previewSurfaceProvider = null
 
     activeRecording?.stop()
     cameraProvider?.unbindAll()
@@ -548,8 +643,8 @@ class AndroidCameraController(
   }
 
   companion object {
-    private const val PHOTO_FORMAT = ImageFormat.JPEG
-    private const val VIDEO_FORMAT = ImageFormat.PRIVATE
+    private const val PHOTO_FORMAT = AndroidImageFormat.JPEG
+    private const val VIDEO_FORMAT = AndroidImageFormat.PRIVATE
   }
 }
 
