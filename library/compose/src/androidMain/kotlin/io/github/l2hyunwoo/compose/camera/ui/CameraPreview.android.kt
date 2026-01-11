@@ -33,6 +33,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
 import io.github.l2hyunwoo.compose.camera.core.CameraController
+import io.github.l2hyunwoo.compose.camera.core.FocusPoint
 import io.github.l2hyunwoo.compose.camera.core.initialize
 import io.github.l2hyunwoo.compose.camera.core.rememberCameraController
 import io.github.l2hyunwoo.compose.camera.core.surfaceRequestFlow
@@ -111,11 +112,11 @@ actual fun CameraPreview(
               // CameraX's CoordinateTransformer (preview <-> sensor coordinates) should be used.
               val viewWidth = size.width.toFloat()
               val viewHeight = size.height.toFloat()
-              val normalizedPoint = Offset(
+              val focusPoint = FocusPoint.clamped(
                 x = offset.x / viewWidth,
                 y = offset.y / viewHeight,
               )
-              controller.cameraControl.focus(normalizedPoint)
+              controller.cameraControl.focus(focusPoint)
             }
           },
       )
