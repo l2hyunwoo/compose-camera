@@ -20,6 +20,20 @@ import androidx.compose.runtime.remember
 import platform.AVFoundation.AVCaptureSession
 
 /**
+ * iOS implementation of [CameraControllerFactory].
+ * Creates IOSCameraController instances.
+ */
+internal class IOSCameraControllerFactory : CameraControllerFactory {
+
+  override fun create(configuration: CameraConfiguration): CameraController = IOSCameraController(initialConfiguration = configuration)
+}
+
+/**
+ * Get the iOS [CameraControllerFactory].
+ */
+actual fun createCameraControllerFactory(): CameraControllerFactory = IOSCameraControllerFactory()
+
+/**
  * iOS implementation of [rememberCameraController].
  * Creates and remembers an [IOSCameraController] instance.
  *

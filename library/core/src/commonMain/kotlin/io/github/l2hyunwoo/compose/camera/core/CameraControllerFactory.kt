@@ -18,6 +18,73 @@ package io.github.l2hyunwoo.compose.camera.core
 import androidx.compose.runtime.Composable
 
 /**
+ * Factory interface for creating platform-specific [CameraController] instances.
+ * This abstracts the platform-specific controller creation.
+ */
+interface CameraControllerFactory {
+  /**
+   * Create a new CameraController with the given configuration.
+   *
+   * @param configuration The camera configuration to apply
+   * @return A platform-specific CameraController implementation
+   */
+  fun create(configuration: CameraConfiguration): CameraController
+}
+
+/**
+ * Get the platform-specific [CameraControllerFactory] implementation.
+ */
+expect fun createCameraControllerFactory(): CameraControllerFactory
+
+/**
+ * Fake Constructor - Create a CameraController with default configuration.
+ *
+ * This follows the Kotlin "Fake Constructor" pattern - a function named like
+ * a class that provides convenient instantiation.
+ *
+ * Example:
+ * ```kotlin
+ * val controller = CameraController()
+ * controller.initialize()
+ * ```
+ *
+ * @return A platform-specific CameraController with default configuration
+ */
+fun CameraController(): CameraController = createCameraControllerFactory().create(CameraConfiguration())
+
+/**
+ * Fake Constructor with DSL - Create a CameraController with custom configuration.
+ *
+ * This follows the Kotlin "Fake Constructor" pattern combined with DSL for
+ * a clean, readable configuration syntax.
+ *
+ * Example:
+ * ```kotlin
+ * val controller = CameraController {
+ *     configuration = CameraConfiguration(lens = CameraLens.BACK)
+ *
+ *     extensions {
+ *         +ManualFocusExtension()
+ *         +WhiteBalanceExtension()
+ *     }
+ *
+ *     plugins {
+ *         +QRScannerPlugin()
+ *     }
+ *
+ *     imageCaptureUseCase = RawCaptureUseCase()
+ * }
+ * ```
+ *
+ * @param block DSL block for configuring the controller
+ * @return A configured CameraController
+ */
+fun CameraController(block: CameraControllerScope.() -> Unit): CameraController {
+  val scope = CameraControllerScope().apply(block)
+  return scope.build()
+}
+
+/**
  * Factory function to create a platform-specific [CameraController].
  *
  * This is the recommended way to create a CameraController as it abstracts
