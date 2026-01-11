@@ -855,16 +855,34 @@ internal class IOSVideoRecording(
     }
   }
 
+  /**
+   * Pause the current recording.
+   *
+   * **Platform Support:**
+   * - **iOS 18+**: Supported via AVCaptureMovieFileOutput.pauseRecording()
+   * - **iOS 17 and below**: Not supported. This method is a no-op.
+   *
+   * For pause/resume on iOS 17 and below, a custom implementation using
+   * AVCaptureVideoDataOutput + AVAssetWriter would be required.
+   */
   override fun pause() {
-    // pauseRecording() is only available on iOS 18+
-    if (isIOS18OrNewer()) {
+    if (_isRecording && isIOS18OrNewer()) {
       output.pauseRecording()
     }
   }
 
+  /**
+   * Resume a paused recording.
+   *
+   * **Platform Support:**
+   * - **iOS 18+**: Supported via AVCaptureMovieFileOutput.resumeRecording()
+   * - **iOS 17 and below**: Not supported. This method is a no-op.
+   *
+   * For pause/resume on iOS 17 and below, a custom implementation using
+   * AVCaptureVideoDataOutput + AVAssetWriter would be required.
+   */
   override fun resume() {
-    // resumeRecording() is only available on iOS 18+
-    if (isIOS18OrNewer()) {
+    if (_isRecording && isIOS18OrNewer()) {
       output.resumeRecording()
     }
   }

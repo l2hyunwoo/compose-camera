@@ -177,12 +177,26 @@ interface VideoRecording {
   suspend fun stop(): VideoRecordingResult
 
   /**
-   * Pause the recording (if supported)
+   * Pause the recording (if supported by the platform).
+   *
+   * Platform support:
+   * - **Android**: Supported via CameraX Recording API
+   * - **iOS 18+**: Supported via AVCaptureMovieFileOutput.pauseRecording()
+   * - **iOS 17 and below**: Not supported. This method is a no-op.
+   *   For pause/resume on older iOS versions, a custom implementation
+   *   using AVCaptureVideoDataOutput + AVAssetWriter would be required.
    */
   fun pause()
 
   /**
-   * Resume a paused recording
+   * Resume a paused recording (if supported by the platform).
+   *
+   * Platform support:
+   * - **Android**: Supported via CameraX Recording API
+   * - **iOS 18+**: Supported via AVCaptureMovieFileOutput.resumeRecording()
+   * - **iOS 17 and below**: Not supported. This method is a no-op.
+   *   For pause/resume on older iOS versions, a custom implementation
+   *   using AVCaptureVideoDataOutput + AVAssetWriter would be required.
    */
   fun resume()
 }
