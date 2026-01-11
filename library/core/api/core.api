@@ -127,7 +127,6 @@ public final class io/github/l2hyunwoo/compose/camera/core/CameraControllerFacto
 
 public final class io/github/l2hyunwoo/compose/camera/core/CameraControllerFactory_androidKt {
 	public static final fun createCameraControllerFactory ()Lio/github/l2hyunwoo/compose/camera/core/CameraControllerFactory;
-	public static final fun getNativePreviewRequest (Lio/github/l2hyunwoo/compose/camera/core/CameraController;)Ljava/lang/Object;
 	public static final fun getSurfaceRequestFlow (Lio/github/l2hyunwoo/compose/camera/core/CameraController;)Lkotlinx/coroutines/flow/StateFlow;
 	public static final fun initialize (Lio/github/l2hyunwoo/compose/camera/core/CameraController;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun rememberCameraController (Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;Landroidx/compose/runtime/Composer;II)Lio/github/l2hyunwoo/compose/camera/core/CameraController;
