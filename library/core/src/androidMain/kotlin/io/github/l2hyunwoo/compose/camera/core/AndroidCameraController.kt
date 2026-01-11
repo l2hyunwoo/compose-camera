@@ -339,6 +339,11 @@ class AndroidCameraController(
         isRecording = false,
         zoomRatio = camera?.cameraInfo?.zoomState?.value?.zoomRatio ?: 1.0f,
       )
+
+      // Notify already-registered extensions that camera is ready
+      extensionRegistry.values.toList().forEach { extension ->
+        extension.onCameraReady()
+      }
     } catch (e: Exception) {
       _cameraState.value = CameraState.Error(
         CameraException.InitializationFailed(e),
@@ -608,7 +613,11 @@ class AndroidCameraController(
   // Preview Surface Provider
 
   override fun setPreviewSurfaceProvider(provider: PreviewSurfaceProvider?) {
+    // Notify old provider that surface is destroyed before replacing
+    previewSurfaceProvider?.onSurfaceDestroyed()
+
     previewSurfaceProvider = provider
+
     // If we have a current surface request, notify the new provider
     _surfaceRequest.value?.let { request ->
       provider?.onSurfaceAvailable(request)
@@ -616,12 +625,12 @@ class AndroidCameraController(
   }
 
   override fun release() {
-    // Notify extensions of camera release
-    extensionRegistry.values.forEach { extension ->
+    // Notify extensions of camera release (use defensive copy to avoid ConcurrentModificationException)
+    extensionRegistry.values.toList().forEach { extension ->
       extension.onCameraReleased()
     }
 
-    // Detach all extensions
+    // Detach all extensions (use defensive copy to avoid ConcurrentModificationException)
     extensionRegistry.values.toList().forEach { extension ->
       extension.onDetach()
     }

@@ -281,11 +281,12 @@ fun CameraScreen() {
     }
 }
 
-// Outside Compose: Use CameraController factory
-val controller = CameraController()  // Simple instantiation
+// Outside Compose: Initialize context first, then use CameraController factory
+// Note: AndroidCameraControllerContext.initialize(context, lifecycleOwner) must be called first on Android
+val simpleController = CameraController()
 
 // Full DSL configuration
-val controller = CameraController {
+val configuredController = CameraController {
     // Set camera configuration
     configuration = CameraConfiguration(
         lens = CameraLens.BACK,
@@ -310,7 +311,7 @@ val controller = CameraController {
 }
 
 // Initialize and use
-controller.initialize()
+configuredController.initialize()
 ```
 
 ### Extending Controls

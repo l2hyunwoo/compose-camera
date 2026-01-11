@@ -28,6 +28,12 @@ import kotlinx.coroutines.flow.asStateFlow
  * - Maintains its own state (locked/unlocked)
  * - Interacts with the camera controller
  * - Exposes observable state via StateFlow
+ *
+ * Note: This is a demonstration extension that tracks lock state.
+ * It stores the current exposure value but does not enforce it on the camera.
+ * To actually prevent auto-exposure changes, you would need to use
+ * platform-specific APIs (e.g., AVCaptureDevice.exposureMode on iOS,
+ * or Camera2 CONTROL_AE_LOCK on Android).
  */
 class ExposureLockExtension : CameraControlExtension {
   override val id: String = "exposure-lock"
@@ -57,11 +63,14 @@ class ExposureLockExtension : CameraControlExtension {
 
   /**
    * Lock the current exposure value.
-   * The exposure will remain at the current value until unlocked.
+   *
+   * Note: This stores the current exposure compensation value for tracking purposes.
+   * It does NOT actually lock the camera's auto-exposure. To implement true AE lock,
+   * you would need platform-specific code (Camera2 CONTROL_AE_LOCK or AVCaptureDevice.exposureMode).
    */
   fun lock() {
     controller?.let { ctrl ->
-      // Store current exposure value
+      // Store current exposure value for tracking (demonstration only)
       lockedExposureValue = ctrl.cameraInfo.exposureState.value.exposureCompensation
       _isLocked.value = true
     }

@@ -453,6 +453,11 @@ class IOSCameraController(
       zoomRatio = 1.0f,
     )
 
+    // Notify already-registered extensions that camera is ready
+    extensionRegistry.values.toList().forEach { extension ->
+      extension.onCameraReady()
+    }
+
     // Attach plugins
     configuration.plugins.forEach { plugin ->
       plugin.onAttach(this)
@@ -662,18 +667,22 @@ class IOSCameraController(
   // Preview Surface Provider
 
   override fun setPreviewSurfaceProvider(provider: PreviewSurfaceProvider?) {
+    // Notify old provider that surface is destroyed before replacing
+    previewSurfaceProvider?.onSurfaceDestroyed()
+
     previewSurfaceProvider = provider
-    // Notify provider of the capture session
+
+    // Notify new provider of the capture session
     provider?.onSurfaceAvailable(captureSession)
   }
 
   override fun release() {
-    // Notify extensions of camera release
-    extensionRegistry.values.forEach { extension ->
+    // Notify extensions of camera release (use defensive copy to avoid ConcurrentModificationException)
+    extensionRegistry.values.toList().forEach { extension ->
       extension.onCameraReleased()
     }
 
-    // Detach all extensions
+    // Detach all extensions (use defensive copy to avoid ConcurrentModificationException)
     extensionRegistry.values.toList().forEach { extension ->
       extension.onDetach()
     }
@@ -847,11 +856,17 @@ internal class IOSVideoRecording(
   }
 
   override fun pause() {
-    output.pauseRecording()
+    // pauseRecording() is only available on iOS 18+
+    if (isIOS18OrNewer()) {
+      output.pauseRecording()
+    }
   }
 
   override fun resume() {
-    output.resumeRecording()
+    // resumeRecording() is only available on iOS 18+
+    if (isIOS18OrNewer()) {
+      output.resumeRecording()
+    }
   }
 }
 
@@ -894,4 +909,8 @@ private class VideoRecordingDelegate(
 
 private fun isIOS16OrNewer(): Boolean = NSProcessInfo.processInfo.operatingSystemVersion.useContents {
   majorVersion >= 16
+}
+
+private fun isIOS18OrNewer(): Boolean = NSProcessInfo.processInfo.operatingSystemVersion.useContents {
+  majorVersion >= 18
 }

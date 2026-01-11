@@ -25,12 +25,15 @@ import io.github.l2hyunwoo.compose.camera.core.FocusPoint
  */
 class FakeCameraControl(
   val minZoomRatio: Float = 1.0f,
-  val maxZoomRatio: Float = 10.0f,
+  maxZoomRatio: Float = 10.0f,
   val exposureRange: Pair<Float, Float> = -2.0f to 2.0f,
 ) : CameraControl {
 
-  // Recorded state
-  var currentZoomRatio: Float = 1.0f
+  // Ensure maxZoomRatio is at least minZoomRatio
+  val maxZoomRatio: Float = maxOf(maxZoomRatio, minZoomRatio)
+
+  // Recorded state - initialize currentZoomRatio to minZoomRatio for consistency
+  var currentZoomRatio: Float = minZoomRatio
     private set
   var currentLinearZoom: Float = 0.0f
     private set
@@ -92,7 +95,7 @@ class FakeCameraControl(
    * Reset all recorded state for testing.
    */
   fun reset() {
-    currentZoomRatio = 1.0f
+    currentZoomRatio = minZoomRatio
     currentLinearZoom = 0.0f
     currentFocusPoint = null
     currentExposureCompensation = 0.0f
