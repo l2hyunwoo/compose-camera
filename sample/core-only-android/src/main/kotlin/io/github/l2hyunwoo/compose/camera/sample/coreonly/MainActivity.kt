@@ -52,6 +52,7 @@ import io.github.l2hyunwoo.compose.camera.core.CameraController
 import io.github.l2hyunwoo.compose.camera.core.CameraLens
 import io.github.l2hyunwoo.compose.camera.core.FlashMode
 import io.github.l2hyunwoo.compose.camera.core.ImageCaptureResult
+import io.github.l2hyunwoo.compose.camera.core.Resolution
 import io.github.l2hyunwoo.compose.camera.core.initialize
 import io.github.l2hyunwoo.compose.camera.core.surfaceRequestFlow
 import kotlinx.coroutines.launch
@@ -126,6 +127,7 @@ fun CoreOnlyCameraScreen() {
     initialConfiguration = CameraConfiguration(
       lens = CameraLens.BACK,
       flashMode = FlashMode.OFF,
+      photoResolution = Resolution(1920, 1080),
     ),
   )
 
