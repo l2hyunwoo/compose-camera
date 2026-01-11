@@ -74,6 +74,7 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.lifecycle.runtime.compose)
 
-    // CameraX Viewfinder
+    // CameraX Viewfinder and Camera2 interop
     implementation(libs.camerax.compose)
+    implementation(libs.camerax.camera2)
 }
