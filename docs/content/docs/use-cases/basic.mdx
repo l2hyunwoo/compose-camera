@@ -1,0 +1,36 @@
+---
+title: Basic Use Case
+description: Quickly implement camera functionality with CameraPreview.
+---
+
+## Using `CameraPreview`
+
+The easiest way to integrate a camera is using the `CameraPreview` composable.
+
+```kotlin
+import io.github.l2hyunwoo.compose.camera.ui.CameraPreview
+import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
+import io.github.l2hyunwoo.compose.camera.core.CameraLens
+import io.github.l2hyunwoo.compose.camera.core.rememberCameraPermissionManager
+
+@Composable
+fun CameraScreen() {
+    // 1. Handle Permissions
+    val permissionManager = rememberCameraPermissionManager()
+    LaunchedEffect(Unit) {
+        permissionManager.requestCameraPermissions()
+    }
+
+    // 2. Configure Camera
+    var config by remember { mutableStateOf(CameraConfiguration(lens = CameraLens.BACK)) }
+
+    // 3. Render Preview
+    CameraPreview(
+        modifier = Modifier.fillMaxSize(),
+        configuration = config,
+        onCameraControllerReady = { controller ->
+            // Use controller to take pictures, record video, etc.
+        }
+    )
+}
+```

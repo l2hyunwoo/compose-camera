@@ -1,0 +1,43 @@
+---
+title: CameraControl
+description: Runtime camera adjustments.
+---
+
+# CameraControl
+
+The `CameraControl` interface allows modifying camera parameters while the camera is active.
+
+## Capabilities
+
+### Zoom
+
+Control the zoom ratio.
+
+```kotlin
+fun setZoomRatio(ratio: Float)
+fun setLinearZoom(linearZoom: Float) // 0.0 to 1.0
+```
+
+### Focus
+
+Focus on a specific point.
+
+```kotlin
+fun startFocusAndMetering(point: FocusPoint)
+```
+
+### Exposure
+
+Adjust exposure compensation.
+
+```kotlin
+fun setExposureCompensation(index: Int)
+```
+
+### Torch
+
+Enable or disable the torch (flashlight).
+
+```kotlin
+fun enableTorch(enabled: Boolean)
+```

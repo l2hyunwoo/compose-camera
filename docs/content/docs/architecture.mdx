@@ -1,0 +1,28 @@
+---
+title: Architecture
+description: Understanding the Core and UI modules.
+---
+
+## Modules Overview
+
+Compose Camera is divided into two primary modules to provide flexibility and separation of concerns.
+
+### `compose-camera-core`
+
+This module contains the platform-independent business logic, data models, and controller implementations. It is responsible for:
+
+- **Hardware Control**: Interacting with CameraX (Android) and AVFoundation (iOS).
+- **State Management**: Managing camera state (lens, flash, zoom, etc.).
+- **Consistency**: Ensuring unified behavior across platforms.
+
+Use this module directly if you want to implement your own UI or integrate camera functionality into a non-standard view hierarchy.
+
+### `compose-camera-ui`
+
+This module provides the Jetpack Compose / Compose Multiplatform UI components. It depends on `core` and provides:
+
+- **`CameraPreview`**: A ready-to-use Composable that handles the surface provider and preview display.
+- **`FocusIndicator`**: Visual feedback for tap-to-focus.
+- **`Pinch to Zoom`**: Gesture handling for zoom control.
+
+For most applications, you will use both modules together.

@@ -1,0 +1,29 @@
+---
+title: CameraPreview
+description: The main camera composable.
+---
+
+# CameraPreview
+
+`CameraPreview` renders the camera stream and handles touch interactions (focus, zoom).
+
+## Parameters
+
+| Parameter                 | Type                                   | Description                                  |
+| ------------------------- | -------------------------------------- | -------------------------------------------- |
+| `modifier`                | `Modifier`                             | Layout modifier.                             |
+| `configuration`           | `CameraConfiguration`                  | The desired camera configuration.            |
+| `onCameraControllerReady` | `(CameraController) -> Unit`           | Callback when the controller is initialized. |
+| `focusIndicator`          | `@Composable (offset: Offset) -> Unit` | Custom focus indicator.                      |
+
+## Usage
+
+```kotlin
+CameraPreview(
+    modifier = Modifier.fillMaxSize(),
+    configuration = cameraConfiguration,
+    onCameraControllerReady = { controller ->
+        // Camera is ready
+    }
+)
+```

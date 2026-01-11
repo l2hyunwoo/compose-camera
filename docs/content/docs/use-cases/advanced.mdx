@@ -1,0 +1,39 @@
+---
+title: Advanced Use Case
+description: Custom implementation using the Core module.
+---
+
+## Core-Only Implementation
+
+If you need complete control over the UI or are building a custom viewfinder, you can use the `core` module directly.
+
+### Android: `CameraXViewfinder`
+
+You can use `androidx.camera:camera-viewfinder-compose` or similar libraries to render the surface.
+
+```kotlin
+// Android Implementation
+@Composable
+fun AndroidCustomCamera(controller: CameraController) {
+    val surfaceRequest by controller.surfaceRequestFlow.collectAsState()
+
+    surfaceRequest?.let { request ->
+        // Use CameraX Viewfinder or SurfaceView directly
+        CameraXViewfinder(
+            surfaceRequest = request,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+```
+
+### iOS: `AVCaptureVideoPreviewLayer`
+
+On iOS, you can attach the `AVCaptureVideoPreviewLayer` to your generic `UIView` or `CALayer`.
+
+```kotlin
+// iOS Implementation
+val previewLayer = AVCaptureVideoPreviewLayer(session = controller.captureSession)
+previewLayer.frame = view.bounds
+view.layer.addSublayer(previewLayer)
+```
