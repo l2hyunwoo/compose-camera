@@ -6,7 +6,7 @@ public final class io/github/l2hyunwoo/compose/camera/core/AndroidCameraControll
 	public fun getCameraControl ()Lio/github/l2hyunwoo/compose/camera/core/CameraControl;
 	public fun getCameraInfo ()Lio/github/l2hyunwoo/compose/camera/core/CameraInfo;
 	public fun getConfiguration ()Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;
-	public final fun rebindCamera ()V
+	public final fun rebindCamera ()Z
 	public fun release ()V
 	public final fun removeAnalyzer (Landroidx/camera/core/ImageAnalysis$Analyzer;)V
 	public fun setLens (Lio/github/l2hyunwoo/compose/camera/core/CameraLens;)V

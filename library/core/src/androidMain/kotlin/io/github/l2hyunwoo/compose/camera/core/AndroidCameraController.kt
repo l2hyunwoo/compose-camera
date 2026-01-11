@@ -524,9 +524,18 @@ class AndroidCameraController(
    * Rebind the camera with current configuration.
    * This is useful when plugin state changes (e.g., HDR enabled/disabled)
    * require camera rebinding to apply new extensions.
+   *
+   * Note: This method will not rebind if a recording is currently active,
+   * as doing so would abruptly stop the recording without proper finalization.
+   *
+   * @return true if rebind was performed, false if skipped due to active recording
    */
-  fun rebindCamera() {
+  fun rebindCamera(): Boolean {
+    if (activeRecording != null) {
+      return false
+    }
     bindCamera()
+    return true
   }
 
   fun addAnalyzer(analyzer: ImageAnalysis.Analyzer) {

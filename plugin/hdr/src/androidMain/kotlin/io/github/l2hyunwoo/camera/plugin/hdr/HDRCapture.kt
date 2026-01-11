@@ -16,6 +16,7 @@
 package io.github.l2hyunwoo.camera.plugin.hdr
 
 import android.content.Context
+import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.extensions.ExtensionMode
 import androidx.camera.extensions.ExtensionsManager
@@ -34,8 +35,8 @@ import io.github.l2hyunwoo.compose.camera.core.plugin.ExtensionProvider
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -62,7 +63,8 @@ actual class HDRCapture(
   private var androidController: AndroidCameraController? = null
   private val _isEnabled = MutableStateFlow(false)
   private val _isSupported = MutableStateFlow(false)
-  private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+  private var scopeJob: Job? = null
+  private var scope: CoroutineScope? = null
 
   @NativeCoroutinesState
   actual val isSupported: StateFlow<Boolean> = _isSupported.asStateFlow()
@@ -73,15 +75,20 @@ actual class HDRCapture(
   actual override fun onAttach(controller: CameraController) {
     if (controller is AndroidCameraController) {
       androidController = controller
+      // Create a new scope for each attachment to handle re-attachment scenarios
+      scopeJob = SupervisorJob()
+      scope = CoroutineScope(Dispatchers.Main + scopeJob!!)
       // Initialize ExtensionsManager using coroutines
-      scope.launch {
+      scope?.launch {
         initializeExtensions()
       }
     }
   }
 
   actual override fun onDetach() {
-    scope.cancel()
+    scopeJob?.cancel()
+    scopeJob = null
+    scope = null
     extensionsManager = null
     cameraProvider = null
     androidController = null
@@ -108,15 +115,21 @@ actual class HDRCapture(
     } catch (e: CancellationException) {
       throw e // Re-throw for structured concurrency
     } catch (e: Exception) {
+      Log.e(TAG, "Failed to initialize HDR extensions", e)
       _isSupported.value = false
     }
   }
 
   actual fun setEnabled(enabled: Boolean) {
     if (_isSupported.value && enabled != _isEnabled.value) {
-      _isEnabled.value = enabled
-      // Trigger camera rebinding to apply/remove HDR extension
-      androidController?.rebindCamera()
+      // Attempt to rebind camera with new HDR state
+      val rebindSuccess = androidController?.rebindCamera() ?: false
+      if (rebindSuccess) {
+        _isEnabled.value = enabled
+      } else {
+        // Rebind was skipped (e.g., during active recording), state unchanged
+        Log.w(TAG, "HDR state change skipped: camera rebind not possible at this time")
+      }
     }
   }
 
@@ -160,6 +173,10 @@ actual class HDRCapture(
    * @return true if HDR is available
    */
   fun isHDRAvailable(baseSelector: CameraSelector): Boolean = extensionsManager?.isExtensionAvailable(baseSelector, ExtensionMode.HDR) == true
+
+  private companion object {
+    private const val TAG = "HDRCapture"
+  }
 }
 
 @Composable
