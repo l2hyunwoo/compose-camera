@@ -30,64 +30,64 @@ import kotlinx.coroutines.flow.asStateFlow
  * - Exposes observable state via StateFlow
  */
 class ExposureLockExtension : CameraControlExtension {
-    override val id: String = "exposure-lock"
+  override val id: String = "exposure-lock"
 
-    private var controller: CameraController? = null
-    private var lockedExposureValue: Float? = null
+  private var controller: CameraController? = null
+  private var lockedExposureValue: Float? = null
 
-    private val _isLocked = MutableStateFlow(false)
-    val isLocked: StateFlow<Boolean> = _isLocked.asStateFlow()
+  private val _isLocked = MutableStateFlow(false)
+  val isLocked: StateFlow<Boolean> = _isLocked.asStateFlow()
 
-    override fun onAttach(controller: CameraController) {
-        this.controller = controller
+  override fun onAttach(controller: CameraController) {
+    this.controller = controller
+  }
+
+  override fun onDetach() {
+    unlock()
+    controller = null
+  }
+
+  override fun onCameraReady() {
+    // Camera is ready, we can now interact with it
+  }
+
+  override fun onCameraReleased() {
+    unlock()
+  }
+
+  /**
+   * Lock the current exposure value.
+   * The exposure will remain at the current value until unlocked.
+   */
+  fun lock() {
+    controller?.let { ctrl ->
+      // Store current exposure value
+      lockedExposureValue = ctrl.cameraInfo.exposureState.value.exposureCompensation
+      _isLocked.value = true
     }
+  }
 
-    override fun onDetach() {
-        unlock()
-        controller = null
+  /**
+   * Unlock the exposure, allowing it to adjust automatically again.
+   */
+  fun unlock() {
+    lockedExposureValue = null
+    _isLocked.value = false
+  }
+
+  /**
+   * Toggle the lock state.
+   */
+  fun toggle() {
+    if (_isLocked.value) {
+      unlock()
+    } else {
+      lock()
     }
+  }
 
-    override fun onCameraReady() {
-        // Camera is ready, we can now interact with it
-    }
-
-    override fun onCameraReleased() {
-        unlock()
-    }
-
-    /**
-     * Lock the current exposure value.
-     * The exposure will remain at the current value until unlocked.
-     */
-    fun lock() {
-        controller?.let { ctrl ->
-            // Store current exposure value
-            lockedExposureValue = ctrl.cameraInfo.exposureState.value.exposureCompensation
-            _isLocked.value = true
-        }
-    }
-
-    /**
-     * Unlock the exposure, allowing it to adjust automatically again.
-     */
-    fun unlock() {
-        lockedExposureValue = null
-        _isLocked.value = false
-    }
-
-    /**
-     * Toggle the lock state.
-     */
-    fun toggle() {
-        if (_isLocked.value) {
-            unlock()
-        } else {
-            lock()
-        }
-    }
-
-    /**
-     * Get the locked exposure value, if any.
-     */
-    fun getLockedValue(): Float? = lockedExposureValue
+  /**
+   * Get the locked exposure value, if any.
+   */
+  fun getLockedValue(): Float? = lockedExposureValue
 }

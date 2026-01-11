@@ -60,154 +60,155 @@ import io.github.l2hyunwoo.compose.camera.core.surfaceRequestFlow
  */
 class MainActivity : ComponentActivity() {
 
-    private val permissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            showCamera()
-        } else {
-            Toast.makeText(this, "Camera permission required", Toast.LENGTH_SHORT).show()
-        }
+  private val permissionLauncher = registerForActivityResult(
+    ActivityResultContracts.RequestPermission(),
+  ) { granted ->
+    if (granted) {
+      showCamera()
+    } else {
+      Toast.makeText(this, "Camera permission required", Toast.LENGTH_SHORT).show()
     }
+  }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        checkPermissionAndShowCamera()
-    }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    checkPermissionAndShowCamera()
+  }
 
-    private fun checkPermissionAndShowCamera() {
-        when {
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                showCamera()
-            }
-            else -> {
-                permissionLauncher.launch(Manifest.permission.CAMERA)
-            }
-        }
-    }
+  private fun checkPermissionAndShowCamera() {
+    when {
+      ContextCompat.checkSelfPermission(
+        this,
+        Manifest.permission.CAMERA,
+      ) == PackageManager.PERMISSION_GRANTED -> {
+        showCamera()
+      }
 
-    private fun showCamera() {
-        setContent {
-            MaterialTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    CustomExtensionsScreen()
-                }
-            }
-        }
+      else -> {
+        permissionLauncher.launch(Manifest.permission.CAMERA)
+      }
     }
+  }
+
+  private fun showCamera() {
+    setContent {
+      MaterialTheme {
+        Surface(
+          modifier = Modifier.fillMaxSize(),
+          color = MaterialTheme.colorScheme.background,
+        ) {
+          CustomExtensionsScreen()
+        }
+      }
+    }
+  }
 }
 
 @Composable
 fun CustomExtensionsScreen() {
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+  val context = LocalContext.current
+  val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Create extensions
-    val exposureLockExtension = remember { ExposureLockExtension() }
-    val tapCounterExtension = remember { TapCounterExtension() }
+  // Create extensions
+  val exposureLockExtension = remember { ExposureLockExtension() }
+  val tapCounterExtension = remember { TapCounterExtension() }
 
-    // Create controller and register extensions
-    val controller = remember {
-        AndroidCameraController(
-            context = context,
-            lifecycleOwner = lifecycleOwner,
-            initialConfiguration = CameraConfiguration(lens = CameraLens.BACK),
-        ).also { ctrl ->
-            ctrl.registerExtension(exposureLockExtension)
-            ctrl.registerExtension(tapCounterExtension)
-        }
+  // Create controller and register extensions
+  val controller = remember {
+    AndroidCameraController(
+      context = context,
+      lifecycleOwner = lifecycleOwner,
+      initialConfiguration = CameraConfiguration(lens = CameraLens.BACK),
+    ).also { ctrl ->
+      ctrl.registerExtension(exposureLockExtension)
+      ctrl.registerExtension(tapCounterExtension)
+    }
+  }
+
+  // Observe extension states
+  val isExposureLocked by exposureLockExtension.isLocked.collectAsState()
+  val tapCount by tapCounterExtension.tapCount.collectAsState()
+
+  // Initialize camera
+  LaunchedEffect(controller) {
+    controller.initialize()
+  }
+
+  // Cleanup
+  DisposableEffect(controller) {
+    onDispose {
+      controller.release()
+    }
+  }
+
+  Box(modifier = Modifier.fillMaxSize()) {
+    // Camera preview
+    CustomPreviewWithExtensions(
+      controller = controller,
+      tapCounterExtension = tapCounterExtension,
+      modifier = Modifier.fillMaxSize(),
+    )
+
+    // Extension controls overlay
+    Column(
+      modifier = Modifier
+        .align(Alignment.TopCenter)
+        .fillMaxWidth()
+        .background(Color.Black.copy(alpha = 0.5f))
+        .padding(16.dp),
+    ) {
+      Text(
+        text = "Tap count: $tapCount",
+        color = Color.White,
+      )
+
+      Text(
+        text = "Exposure: ${if (isExposureLocked) "LOCKED" else "AUTO"}",
+        color = if (isExposureLocked) Color.Yellow else Color.White,
+      )
     }
 
-    // Observe extension states
-    val isExposureLocked by exposureLockExtension.isLocked.collectAsState()
-    val tapCount by tapCounterExtension.tapCount.collectAsState()
-
-    // Initialize camera
-    LaunchedEffect(controller) {
-        controller.initialize()
-    }
-
-    // Cleanup
-    DisposableEffect(controller) {
-        onDispose {
-            controller.release()
-        }
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Camera preview
-        CustomPreviewWithExtensions(
-            controller = controller,
-            tapCounterExtension = tapCounterExtension,
-            modifier = Modifier.fillMaxSize()
+    // Control buttons
+    Row(
+      modifier = Modifier
+        .align(Alignment.BottomCenter)
+        .fillMaxWidth()
+        .padding(16.dp),
+      horizontalArrangement = Arrangement.SpaceEvenly,
+    ) {
+      Button(
+        onClick = { exposureLockExtension.toggle() },
+        colors = ButtonDefaults.buttonColors(
+          containerColor = if (isExposureLocked) Color.Yellow else MaterialTheme.colorScheme.primary,
+        ),
+      ) {
+        Text(
+          text = if (isExposureLocked) "Unlock AE" else "Lock AE",
+          color = if (isExposureLocked) Color.Black else Color.White,
         )
+      }
 
-        // Extension controls overlay
-        Column(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .fillMaxWidth()
-                .background(Color.Black.copy(alpha = 0.5f))
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Tap count: $tapCount",
-                color = Color.White
-            )
-
-            Text(
-                text = "Exposure: ${if (isExposureLocked) "LOCKED" else "AUTO"}",
-                color = if (isExposureLocked) Color.Yellow else Color.White
-            )
-        }
-
-        // Control buttons
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Button(
-                onClick = { exposureLockExtension.toggle() },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isExposureLocked) Color.Yellow else MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Text(
-                    text = if (isExposureLocked) "Unlock AE" else "Lock AE",
-                    color = if (isExposureLocked) Color.Black else Color.White
-                )
-            }
-
-            Button(
-                onClick = { tapCounterExtension.reset() }
-            ) {
-                Text("Reset Counter")
-            }
-        }
+      Button(
+        onClick = { tapCounterExtension.reset() },
+      ) {
+        Text("Reset Counter")
+      }
     }
+  }
 }
 
 @Composable
 fun CustomPreviewWithExtensions(
-    controller: CameraController,
-    tapCounterExtension: TapCounterExtension,
-    modifier: Modifier = Modifier,
+  controller: CameraController,
+  tapCounterExtension: TapCounterExtension,
+  modifier: Modifier = Modifier,
 ) {
-    val surfaceRequest by controller.surfaceRequestFlow.collectAsState()
+  val surfaceRequest by controller.surfaceRequestFlow.collectAsState()
 
-    surfaceRequest?.let { request ->
-        androidx.camera.compose.CameraXViewfinder(
-            surfaceRequest = request,
-            modifier = modifier,
-        )
-    }
+  surfaceRequest?.let { request ->
+    androidx.camera.compose.CameraXViewfinder(
+      surfaceRequest = request,
+      modifier = modifier,
+    )
+  }
 }

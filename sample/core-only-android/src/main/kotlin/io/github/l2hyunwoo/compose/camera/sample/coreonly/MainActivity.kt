@@ -61,47 +61,48 @@ import kotlinx.coroutines.launch
  */
 class MainActivity : ComponentActivity() {
 
-    private val permissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            showCamera()
-        } else {
-            Toast.makeText(this, "Camera permission required", Toast.LENGTH_SHORT).show()
-        }
+  private val permissionLauncher = registerForActivityResult(
+    ActivityResultContracts.RequestPermission(),
+  ) { granted ->
+    if (granted) {
+      showCamera()
+    } else {
+      Toast.makeText(this, "Camera permission required", Toast.LENGTH_SHORT).show()
     }
+  }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        checkPermissionAndShowCamera()
-    }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    checkPermissionAndShowCamera()
+  }
 
-    private fun checkPermissionAndShowCamera() {
-        when {
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                showCamera()
-            }
-            else -> {
-                permissionLauncher.launch(Manifest.permission.CAMERA)
-            }
-        }
-    }
+  private fun checkPermissionAndShowCamera() {
+    when {
+      ContextCompat.checkSelfPermission(
+        this,
+        Manifest.permission.CAMERA,
+      ) == PackageManager.PERMISSION_GRANTED -> {
+        showCamera()
+      }
 
-    private fun showCamera() {
-        setContent {
-            MaterialTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    CoreOnlyCameraScreen()
-                }
-            }
-        }
+      else -> {
+        permissionLauncher.launch(Manifest.permission.CAMERA)
+      }
     }
+  }
+
+  private fun showCamera() {
+    setContent {
+      MaterialTheme {
+        Surface(
+          modifier = Modifier.fillMaxSize(),
+          color = MaterialTheme.colorScheme.background,
+        ) {
+          CoreOnlyCameraScreen()
+        }
+      }
+    }
+  }
 }
 
 /**
@@ -114,66 +115,66 @@ class MainActivity : ComponentActivity() {
  */
 @Composable
 fun CoreOnlyCameraScreen() {
-    val scope = rememberCoroutineScope()
+  val scope = rememberCoroutineScope()
 
-    // Create controller using the DSL pattern
-    val controller = rememberCoreOnlyController(
-        configuration = CameraConfiguration(
-            lens = CameraLens.BACK,
-            flashMode = FlashMode.OFF,
-        )
+  // Create controller using the DSL pattern
+  val controller = rememberCoreOnlyController(
+    configuration = CameraConfiguration(
+      lens = CameraLens.BACK,
+      flashMode = FlashMode.OFF,
+    ),
+  )
+
+  var captureResult by remember { mutableStateOf<String?>(null) }
+
+  // Initialize camera
+  LaunchedEffect(controller) {
+    controller.initialize()
+  }
+
+  // Cleanup on dispose
+  DisposableEffect(controller) {
+    onDispose {
+      controller.release()
+    }
+  }
+
+  Box(modifier = Modifier.fillMaxSize()) {
+    // Custom preview using CameraXViewfinder directly
+    CoreOnlyPreview(
+      controller = controller,
+      modifier = Modifier.fillMaxSize(),
     )
 
-    var captureResult by remember { mutableStateOf<String?>(null) }
-
-    // Initialize camera
-    LaunchedEffect(controller) {
-        controller.initialize()
+    // Capture button
+    Button(
+      onClick = {
+        scope.launch {
+          val result = controller.takePicture()
+          captureResult = when (result) {
+            is ImageCaptureResult.Success -> "Captured: ${result.width}x${result.height}"
+            is ImageCaptureResult.Error -> "Error: ${result.exception.message}"
+          }
+        }
+      },
+      modifier = Modifier
+        .align(Alignment.BottomCenter)
+        .padding(32.dp),
+    ) {
+      Text("Take Picture")
     }
 
-    // Cleanup on dispose
-    DisposableEffect(controller) {
-        onDispose {
-            controller.release()
-        }
+    // Show capture result
+    captureResult?.let { result ->
+      Text(
+        text = result,
+        modifier = Modifier
+          .align(Alignment.TopCenter)
+          .padding(16.dp),
+        color = MaterialTheme.colorScheme.onSurface,
+      )
     }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Custom preview using CameraXViewfinder directly
-        CoreOnlyPreview(
-            controller = controller,
-            modifier = Modifier.fillMaxSize()
-        )
-
-        // Capture button
-        Button(
-            onClick = {
-                scope.launch {
-                    val result = controller.takePicture()
-                    captureResult = when (result) {
-                        is ImageCaptureResult.Success -> "Captured: ${result.width}x${result.height}"
-                        is ImageCaptureResult.Error -> "Error: ${result.exception.message}"
-                    }
-                }
-            },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(32.dp)
-        ) {
-            Text("Take Picture")
-        }
-
-        // Show capture result
-        captureResult?.let { result ->
-            Text(
-                text = result,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(16.dp),
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-    }
+  }
 }
 
 /**
@@ -183,22 +184,22 @@ fun CoreOnlyCameraScreen() {
  */
 @Composable
 fun rememberCoreOnlyController(
-    configuration: CameraConfiguration
+  configuration: CameraConfiguration,
 ): CameraController {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+  val context = androidx.compose.ui.platform.LocalContext.current
+  val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
 
-    return remember {
-        // Initialize the context holder for factory usage
-        AndroidCameraControllerContext.initialize(context, lifecycleOwner)
+  return remember {
+    // Initialize the context holder for factory usage
+    AndroidCameraControllerContext.initialize(context, lifecycleOwner)
 
-        // Create controller directly
-        AndroidCameraController(
-            context = context,
-            lifecycleOwner = lifecycleOwner,
-            initialConfiguration = configuration,
-        )
-    }
+    // Create controller directly
+    AndroidCameraController(
+      context = context,
+      lifecycleOwner = lifecycleOwner,
+      initialConfiguration = configuration,
+    )
+  }
 }
 
 /**
@@ -208,15 +209,15 @@ fun rememberCoreOnlyController(
  */
 @Composable
 fun CoreOnlyPreview(
-    controller: CameraController,
-    modifier: Modifier = Modifier,
+  controller: CameraController,
+  modifier: Modifier = Modifier,
 ) {
-    val surfaceRequest by controller.surfaceRequestFlow.collectAsState()
+  val surfaceRequest by controller.surfaceRequestFlow.collectAsState()
 
-    surfaceRequest?.let { request ->
-        androidx.camera.compose.CameraXViewfinder(
-            surfaceRequest = request,
-            modifier = modifier,
-        )
-    }
+  surfaceRequest?.let { request ->
+    androidx.camera.compose.CameraXViewfinder(
+      surfaceRequest = request,
+      modifier = modifier,
+    )
+  }
 }

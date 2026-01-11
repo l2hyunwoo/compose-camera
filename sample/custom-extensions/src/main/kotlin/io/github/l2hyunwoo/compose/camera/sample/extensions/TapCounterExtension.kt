@@ -31,43 +31,43 @@ import kotlinx.coroutines.flow.asStateFlow
  * - Exposes analytics data
  */
 class TapCounterExtension : CameraControlExtension {
-    override val id: String = "tap-counter"
+  override val id: String = "tap-counter"
 
-    private var controller: CameraController? = null
+  private var controller: CameraController? = null
 
-    private val _tapCount = MutableStateFlow(0)
-    val tapCount: StateFlow<Int> = _tapCount.asStateFlow()
+  private val _tapCount = MutableStateFlow(0)
+  val tapCount: StateFlow<Int> = _tapCount.asStateFlow()
 
-    private val _focusHistory = MutableStateFlow<List<FocusPoint>>(emptyList())
-    val focusHistory: StateFlow<List<FocusPoint>> = _focusHistory.asStateFlow()
+  private val _focusHistory = MutableStateFlow<List<FocusPoint>>(emptyList())
+  val focusHistory: StateFlow<List<FocusPoint>> = _focusHistory.asStateFlow()
 
-    override fun onAttach(controller: CameraController) {
-        this.controller = controller
-    }
+  override fun onAttach(controller: CameraController) {
+    this.controller = controller
+  }
 
-    override fun onDetach() {
-        controller = null
-    }
+  override fun onDetach() {
+    controller = null
+  }
 
-    /**
-     * Record a tap-to-focus event.
-     * Call this from your UI when the user taps to focus.
-     */
-    fun recordTap(focusPoint: FocusPoint) {
-        _tapCount.value++
-        _focusHistory.value = _focusHistory.value + focusPoint
-    }
+  /**
+   * Record a tap-to-focus event.
+   * Call this from your UI when the user taps to focus.
+   */
+  fun recordTap(focusPoint: FocusPoint) {
+    _tapCount.value++
+    _focusHistory.value = _focusHistory.value + focusPoint
+  }
 
-    /**
-     * Reset the tap counter and history.
-     */
-    fun reset() {
-        _tapCount.value = 0
-        _focusHistory.value = emptyList()
-    }
+  /**
+   * Reset the tap counter and history.
+   */
+  fun reset() {
+    _tapCount.value = 0
+    _focusHistory.value = emptyList()
+  }
 
-    /**
-     * Get the most recent focus point, if any.
-     */
-    fun getLastFocusPoint(): FocusPoint? = _focusHistory.value.lastOrNull()
+  /**
+   * Get the most recent focus point, if any.
+   */
+  fun getLastFocusPoint(): FocusPoint? = _focusHistory.value.lastOrNull()
 }
