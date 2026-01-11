@@ -115,9 +115,8 @@ actual class HDRCapture(
   actual fun setEnabled(enabled: Boolean) {
     if (_isSupported.value && enabled != _isEnabled.value) {
       _isEnabled.value = enabled
-      // Note: Camera rebinding with HDR extension should be handled by the controller
-      // when it detects the HDR plugin state change.
-      // This design avoids tight coupling between plugin and controller internals.
+      // Trigger camera rebinding to apply/remove HDR extension
+      androidController?.rebindCamera()
     }
   }
 

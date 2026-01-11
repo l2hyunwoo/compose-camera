@@ -23,7 +23,9 @@ kernel void calculateExposureWeight(
     texture2d<float, access::write> output [[texture(1)]],
     uint2 gid [[thread_position_in_grid]]
 ) {
-    if (gid.x >= input.get_width() || gid.y >= input.get_height()) {
+    // Validate both input and output texture bounds
+    if (gid.x >= input.get_width() || gid.y >= input.get_height() ||
+        gid.x >= output.get_width() || gid.y >= output.get_height()) {
         return;
     }
     
@@ -63,10 +65,17 @@ kernel void blendWeightedImages(
     texture2d<float, access::write> output [[texture(6)]],
     uint2 gid [[thread_position_in_grid]]
 ) {
-    if (gid.x >= output.get_width() || gid.y >= output.get_height()) {
+    // Validate all texture dimensions to prevent OOB access
+    if (gid.x >= output.get_width() || gid.y >= output.get_height() ||
+        gid.x >= image1.get_width() || gid.y >= image1.get_height() ||
+        gid.x >= weight1.get_width() || gid.y >= weight1.get_height() ||
+        gid.x >= image2.get_width() || gid.y >= image2.get_height() ||
+        gid.x >= weight2.get_width() || gid.y >= weight2.get_height() ||
+        gid.x >= image3.get_width() || gid.y >= image3.get_height() ||
+        gid.x >= weight3.get_width() || gid.y >= weight3.get_height()) {
         return;
     }
-    
+
     float4 c1 = image1.read(gid);
     float w1 = weight1.read(gid).r;
     
@@ -95,17 +104,20 @@ kernel void reinhardToneMap(
     constant float& gamma [[buffer(0)]],
     uint2 gid [[thread_position_in_grid]]
 ) {
-    if (gid.x >= input.get_width() || gid.y >= input.get_height()) {
+    // Validate both input and output texture bounds
+    if (gid.x >= input.get_width() || gid.y >= input.get_height() ||
+        gid.x >= output.get_width() || gid.y >= output.get_height()) {
         return;
     }
-    
+
     float4 hdr = input.read(gid);
-    
+
     // Reinhard operator: L / (1 + L)
     float3 mapped = hdr.rgb / (1.0 + hdr.rgb);
-    
-    // Gamma correction
-    float invGamma = 1.0 / gamma;
+
+    // Gamma correction with safety clamp to prevent divide-by-zero
+    float safeGamma = max(gamma, 0.001);
+    float invGamma = 1.0 / safeGamma;
     mapped = pow(mapped, float3(invGamma));
     
     // Clamp to valid range
@@ -125,10 +137,14 @@ kernel void simpleExposureBlend(
     texture2d<float, access::write> output [[texture(3)]],
     uint2 gid [[thread_position_in_grid]]
 ) {
-    if (gid.x >= output.get_width() || gid.y >= output.get_height()) {
+    // Validate all texture dimensions to prevent OOB access
+    if (gid.x >= output.get_width() || gid.y >= output.get_height() ||
+        gid.x >= lowExposure.get_width() || gid.y >= lowExposure.get_height() ||
+        gid.x >= normalExposure.get_width() || gid.y >= normalExposure.get_height() ||
+        gid.x >= highExposure.get_width() || gid.y >= highExposure.get_height()) {
         return;
     }
-    
+
     float4 low = lowExposure.read(gid);
     float4 normal = normalExposure.read(gid);
     float4 high = highExposure.read(gid);

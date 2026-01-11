@@ -520,6 +520,15 @@ class AndroidCameraController(
     }
   }
 
+  /**
+   * Rebind the camera with current configuration.
+   * This is useful when plugin state changes (e.g., HDR enabled/disabled)
+   * require camera rebinding to apply new extensions.
+   */
+  fun rebindCamera() {
+    bindCamera()
+  }
+
   fun addAnalyzer(analyzer: ImageAnalysis.Analyzer) {
     analyzers.add(analyzer)
     updateImageAnalysis()
