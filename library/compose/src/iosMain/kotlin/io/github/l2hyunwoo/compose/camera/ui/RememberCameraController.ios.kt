@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
 import io.github.l2hyunwoo.compose.camera.core.CameraController
+import io.github.l2hyunwoo.compose.camera.core.CameraControllerScope
 import io.github.l2hyunwoo.compose.camera.core.IOSCameraController
 
 /**
@@ -33,4 +34,16 @@ actual fun rememberCameraController(
   configuration: CameraConfiguration,
 ): CameraController = remember {
   IOSCameraController(initialConfiguration = configuration)
+}
+
+/**
+ * iOS implementation of [rememberCameraController] with DSL configuration.
+ * Creates and remembers an [IOSCameraController] instance with extensions,
+ * plugins, and custom use cases.
+ */
+@Composable
+actual fun rememberCameraController(
+  block: CameraControllerScope.() -> Unit,
+): CameraController = remember {
+  CameraControllerScope().apply(block).build()
 }

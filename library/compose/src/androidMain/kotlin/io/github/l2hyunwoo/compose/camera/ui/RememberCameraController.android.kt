@@ -20,8 +20,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import io.github.l2hyunwoo.compose.camera.core.AndroidCameraController
+import io.github.l2hyunwoo.compose.camera.core.AndroidCameraControllerContext
 import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
 import io.github.l2hyunwoo.compose.camera.core.CameraController
+import io.github.l2hyunwoo.compose.camera.core.CameraControllerScope
 
 /**
  * Android implementation of [rememberCameraController].
@@ -46,5 +48,30 @@ actual fun rememberCameraController(
       lifecycleOwner = lifecycleOwner,
       initialConfiguration = configuration,
     )
+  }
+}
+
+/**
+ * Android implementation of [rememberCameraController] with DSL configuration.
+ * Creates and remembers an [AndroidCameraController] instance with extensions,
+ * plugins, and custom use cases.
+ *
+ * This implementation uses [LocalContext] and [LocalLifecycleOwner] to obtain
+ * the Android-specific dependencies required by CameraX, then applies the DSL
+ * configuration block.
+ */
+@Composable
+actual fun rememberCameraController(
+  block: CameraControllerScope.() -> Unit,
+): CameraController {
+  val context = LocalContext.current
+  val lifecycleOwner = LocalLifecycleOwner.current
+
+  return remember {
+    // Initialize context for factory usage
+    AndroidCameraControllerContext.initialize(context, lifecycleOwner)
+
+    // Build controller using DSL scope
+    CameraControllerScope().apply(block).build()
   }
 }

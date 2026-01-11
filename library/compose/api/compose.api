@@ -19,5 +19,6 @@ public final class io/github/l2hyunwoo/compose/camera/ui/FocusPointExtensionsKt 
 
 public final class io/github/l2hyunwoo/compose/camera/ui/RememberCameraController_androidKt {
 	public static final fun rememberCameraController (Lio/github/l2hyunwoo/compose/camera/core/CameraConfiguration;Landroidx/compose/runtime/Composer;II)Lio/github/l2hyunwoo/compose/camera/core/CameraController;
+	public static final fun rememberCameraController (Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;I)Lio/github/l2hyunwoo/compose/camera/core/CameraController;
 }
 

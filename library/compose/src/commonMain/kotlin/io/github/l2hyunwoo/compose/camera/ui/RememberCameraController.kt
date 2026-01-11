@@ -18,6 +18,7 @@ package io.github.l2hyunwoo.compose.camera.ui
 import androidx.compose.runtime.Composable
 import io.github.l2hyunwoo.compose.camera.core.CameraConfiguration
 import io.github.l2hyunwoo.compose.camera.core.CameraController
+import io.github.l2hyunwoo.compose.camera.core.CameraControllerScope
 
 /**
  * Creates and remembers a [CameraController] instance for use in Compose.
@@ -50,4 +51,48 @@ import io.github.l2hyunwoo.compose.camera.core.CameraController
 @Composable
 expect fun rememberCameraController(
   configuration: CameraConfiguration = CameraConfiguration(),
+): CameraController
+
+/**
+ * Creates and remembers a [CameraController] instance with DSL configuration.
+ *
+ * This overload allows configuring extensions, plugins, and custom use cases
+ * using the DSL syntax while properly integrating with the Compose lifecycle.
+ *
+ * Example:
+ * ```kotlin
+ * @Composable
+ * fun CameraScreen() {
+ *     val controller = rememberCameraController {
+ *         configuration = CameraConfiguration(lens = CameraLens.BACK)
+ *
+ *         extensions {
+ *             +ExposureLockExtension()
+ *             +ManualFocusExtension()
+ *         }
+ *
+ *         plugins {
+ *             +QRScannerPlugin()
+ *         }
+ *
+ *         imageCaptureUseCase = CustomImageCaptureUseCase()
+ *     }
+ *
+ *     LaunchedEffect(controller) {
+ *         controller.initialize()
+ *     }
+ *
+ *     CameraPreview(
+ *         controller = controller,
+ *         modifier = Modifier.fillMaxSize()
+ *     )
+ * }
+ * ```
+ *
+ * @param block DSL block for configuring the controller
+ * @return A remembered CameraController instance
+ */
+@Composable
+expect fun rememberCameraController(
+  block: CameraControllerScope.() -> Unit,
 ): CameraController
