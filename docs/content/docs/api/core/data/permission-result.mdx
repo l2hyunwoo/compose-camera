@@ -1,0 +1,20 @@
+---
+title: PermissionResult
+description: Documentation for PermissionResult data class.
+---
+
+# `PermissionResult`
+
+Encapsulates the result of a multiple permission request.
+
+```kotlin
+data class PermissionResult(
+    val permissions: Map<CameraPermission, Boolean>
+)
+```
+
+## Properties
+
+| Property      | Type                             | Description                                                                                            |
+| :------------ | :------------------------------- | :----------------------------------------------------------------------------------------------------- |
+| `permissions` | `Map<CameraPermission, Boolean>` | A map where the key is the requested permission and the value is `true` if granted, `false` otherwise. |

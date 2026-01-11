@@ -1,0 +1,24 @@
+---
+title: FocusPoint
+description: Documentation for FocusPoint data class.
+---
+
+# `FocusPoint`
+
+Represents a normalized point of interest on the sensor, used for focus and metering.
+
+```kotlin
+data class FocusPoint(
+    val x: Float,
+    val y: Float
+)
+```
+
+## Properties
+
+| Property | Type    | Description                                         |
+| :------- | :------ | :-------------------------------------------------- |
+| `x`      | `Float` | The horizontal component of the point (0.0 to 1.0). |
+| `y`      | `Float` | The vertical component of the point (0.0 to 1.0).   |
+
+Coordinates are typically normalized where (0,0) is top-left and (1,1) is bottom-right relative to the preview.

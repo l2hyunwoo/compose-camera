@@ -1,0 +1,26 @@
+---
+title: CaptureConfig
+description: Documentation for CaptureConfig data class.
+---
+
+# `CaptureConfig`
+
+Encapsulates the configuration options for a specific image capture request.
+
+```kotlin
+data class CaptureConfig(
+    val flashMode: FlashMode,
+    val resolution: Resolution,
+    val outputFormat: ImageFormat,
+    val extras: Map<String, Any>
+)
+```
+
+## Properties
+
+| Property       | Type               | Description                                         |
+| :------------- | :----------------- | :-------------------------------------------------- |
+| `flashMode`    | `FlashMode`        | The flash mode to use for this specific capture.    |
+| `resolution`   | `Resolution`       | The target resolution for the captured image.       |
+| `outputFormat` | `ImageFormat`      | The file format (JPEG, PNG) for the output.         |
+| `extras`       | `Map<String, Any>` | Additional platform-specific options or parameters. |

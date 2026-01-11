@@ -1,0 +1,63 @@
+---
+title: Custom Preview
+description: Using the Core module with a custom UI (no Compose UI module).
+---
+
+# Custom Preview (Core Only)
+
+If you need complete control over the UI or are building a custom viewfinder, you can use the `core` module directly without `compose-camera-ui`.
+
+## Android: `CameraXViewfinder`
+
+On Android, you can use the official `androidx.camera:camera-viewfinder-compose` library (or the View-based `PreviewView`) to render the stream.
+
+```kotlin
+// Android Implementation
+@Composable
+fun AndroidCustomCamera(controller: CameraController) {
+    // 1. Observe the SurfaceRequest
+    val surfaceRequest by controller.surfaceRequestFlow.collectAsState()
+
+    surfaceRequest?.let { request ->
+        // 2. Render using CameraX Viewfinder
+        CameraXViewfinder(
+            surfaceRequest = request,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+```
+
+## iOS: `AVCaptureVideoPreviewLayer`
+
+On iOS, you can access the `AVCaptureSession` and attach a `AVCaptureVideoPreviewLayer` to your view hierarchy.
+
+```kotlin
+// iOS Implementation
+@Composable
+fun IOSCustomCamera(controller: CameraController) {
+    UIKitView(
+        factory = {
+            val view = UIView()
+
+            // 1. Get the session
+            val session = (controller as IOSCameraController).captureSession
+
+            // 2. Create the layer
+            val previewLayer = AVCaptureVideoPreviewLayer(session = session)
+            previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
+            previewLayer.frame = view.bounds
+
+            // 3. Add to view
+            view.layer.addSublayer(previewLayer)
+            view
+        },
+        modifier = Modifier.fillMaxSize(),
+        onResize = { view, rect ->
+            view.layer.sublayers?.firstOrNull()?.let { layer ->
+                (layer as CALayer).frame = rect
+            }
+        }
+    )
+}
+```

@@ -15,7 +15,11 @@ implementation("io.github.l2hyunwoo:compose-camera-core:1.2.2")
 
 ## Key Components
 
-- **[CameraController](./core/camera-controller)**: The main entry point for controlling the camera (taking pictures, recording video, etc.).
-- **[CameraConfiguration](./core/camera-configuration)**: Data class defining the desired camera state (lens, flash mode, etc.).
-- **[CameraControl](./core/camera-control)**: Interface for runtime camera adjustments (zoom, focus, exposure).
-- **[CameraInfo](./core/camera-info)**: Provides read-only information about the active camera (capabilities, state).
+- **[CameraController](./core/camera-controller)**: The main entry point for controlling the camera.
+- **[CameraConfiguration](./core/camera-configuration)**: Data class defining the desired camera state.
+- **[CameraControl](./core/camera-control)**: Interface for runtime camera adjustments.
+- **[CameraInfo](./core/camera-info)**: Read-only observable camera state.
+- **[Enums](./core/enums/camera-lens)**: Definitions for `CameraLens`, `FlashMode`, etc.
+- **[Data Classes](./core/data/resolution)**: `Resolution`, `FocusPoint`, etc.
+- **[Exceptions](./core/exceptions/camera-exception)**: Error handling.
+- **[Plugin Interfaces](./core/plugins)**: Base interfaces for extending functionality.

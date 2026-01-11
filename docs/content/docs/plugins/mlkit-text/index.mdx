@@ -1,0 +1,52 @@
+---
+title: Overview
+description: Recognize text using Google ML Kit.
+---
+
+# MLKit Text
+
+The `mlkit-text` plugin enables real-time text recognition (OCR) on the camera feed.
+
+## Installation
+
+```kotlin
+implementation("io.github.l2hyunwoo:camera-plugin-mlkit-text:1.0.0")
+```
+
+## Usage
+
+### 1. Create the Plugin
+
+```kotlin
+val textRecognizer = remember { TextRecognizer() }
+```
+
+### 2. Register with CameraController
+
+**Using DSL:**
+
+```kotlin
+val controller = rememberCameraController {
+    plugins {
+        +textRecognizer
+    }
+}
+```
+
+### 3. Observe Results
+
+The plugin exposes a `text` StateFlow that emits the recognition results.
+
+```kotlin
+LaunchedEffect(textRecognizer) {
+    textRecognizer.text.collect { result ->
+        result?.let {
+            println("Full Text: ${it.text}")
+
+            it.blocks.forEach { block ->
+                println("Block: ${block.text}")
+            }
+        }
+    }
+}
+```

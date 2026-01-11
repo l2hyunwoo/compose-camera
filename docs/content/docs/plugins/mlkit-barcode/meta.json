@@ -1,0 +1,9 @@
+{
+  "title": "MLKit Barcode",
+  "pages": [
+    "index",
+    "api/barcode-scanner",
+    "api/barcode",
+    "api/barcode-format"
+  ]
+}

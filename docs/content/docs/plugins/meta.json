@@ -1,0 +1,7 @@
+{
+  "title": "Plugins",
+  "pages": [
+    "mlkit-barcode",
+    "mlkit-text"
+  ]
+}

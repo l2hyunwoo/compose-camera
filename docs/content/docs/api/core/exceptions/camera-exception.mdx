@@ -1,0 +1,15 @@
+---
+title: CameraException
+description: Documentation for CameraException.
+---
+
+# `CameraException`
+
+The base class for all exceptions thrown by the Compose Camera library. All specific errors inherit from this class.
+
+```kotlin
+open class CameraException(
+    message: String? = null,
+    cause: Throwable? = null
+) : Exception(message, cause)
+```

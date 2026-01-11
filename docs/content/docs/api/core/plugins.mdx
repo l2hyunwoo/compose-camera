@@ -1,0 +1,57 @@
+---
+title: Plugin Interfaces
+description: Interfaces for building custom camera plugins.
+---
+
+# Plugin Interfaces
+
+The Core module defines interfaces for creating plugins that extend camera functionality.
+
+## `CameraPlugin`
+
+The base interface for all plugins.
+
+```kotlin
+interface CameraPlugin {
+    val id: String
+    fun onAttach(controller: CameraController)
+    fun onDetach()
+}
+```
+
+## `FrameAnalyzerPlugin<T>`
+
+A plugin that processes image frames from the camera preview stream (e.g., for ML analysis).
+
+```kotlin
+interface FrameAnalyzerPlugin<T> : CameraPlugin {
+    // Returns a Flow of results
+    fun analyze(frame: CameraFrame): Flow<T>
+
+    fun start()
+    fun stop()
+    val isRunning: Boolean
+}
+```
+
+### `CameraFrame`
+
+Represents a single frame to be processed.
+
+- `data`: Raw byte array.
+- `width`: Frame width.
+- `height`: Frame height.
+- `format`: Pixel format (e.g., NV21, YUV_420_888).
+- `rotation`: Image rotation in degrees.
+- `timestamp`: Capture timestamp.
+- `nativeImage`: Platform-specific image object (`ImageProxy` on Android, `CMSampleBuffer` on iOS).
+
+## `ImageCapturePlugin`
+
+A plugin that intercepts captured images.
+
+```kotlin
+interface ImageCapturePlugin : CameraPlugin {
+    fun onImageCaptured(imageData: ByteArray, width: Int, height: Int)
+}
+```

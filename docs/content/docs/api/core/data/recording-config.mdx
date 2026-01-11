@@ -1,0 +1,28 @@
+---
+title: RecordingConfig
+description: Documentation for RecordingConfig data class.
+---
+
+# `RecordingConfig`
+
+Encapsulates the configuration options for a video recording session.
+
+```kotlin
+data class RecordingConfig(
+    val quality: VideoQuality,
+    val enableAudio: Boolean,
+    val maxDurationMs: Long?,
+    val maxFileSizeBytes: Long?,
+    val extras: Map<String, Any>
+)
+```
+
+## Properties
+
+| Property           | Type               | Description                                              |
+| :----------------- | :----------------- | :------------------------------------------------------- |
+| `quality`          | `VideoQuality`     | The target quality/resolution for the video (e.g., FHD). |
+| `enableAudio`      | `Boolean`          | Whether to record audio along with the video.            |
+| `maxDurationMs`    | `Long?`            | Optional limit for recording duration in milliseconds.   |
+| `maxFileSizeBytes` | `Long?`            | Optional limit for the output file size in bytes.        |
+| `extras`           | `Map<String, Any>` | Additional platform-specific options or parameters.      |

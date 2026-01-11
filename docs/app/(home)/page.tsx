@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Camera, Layers, Smartphone, Ban, ArrowRight, CheckCircle2, Terminal } from 'lucide-react';
+import { Camera, Layers, Smartphone, Ban, ArrowRight, CheckCircle2, Terminal, Code2, Puzzle, Sliders } from 'lucide-react';
 
 export default function HomePage() {
   return (
@@ -102,8 +102,8 @@ export default function HomePage() {
 
            {/* Card 2: Permissions */}
            <div className="p-8 rounded-3xl bg-fd-card border border-fd-border/50 hover:border-fd-foreground/20 transition-all shadow-sm hover:shadow-md">
-                <div className="w-12 h-12 rounded-2xl bg-fd-secondary flex items-center justify-center mb-6 text-fd-foreground">
-                  <CheckCircle2 className="w-6 h-6" />
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-6 text-white">
+                  <Code2 className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">Unified API</h3>
                 <p className="text-fd-muted-foreground">
@@ -113,8 +113,8 @@ export default function HomePage() {
            
            {/* Card 3: Plugins */}
            <div className="p-8 rounded-3xl bg-fd-card border border-fd-border/50 hover:border-fd-foreground/20 transition-all shadow-sm hover:shadow-md">
-                <div className="w-12 h-12 rounded-2xl bg-fd-secondary flex items-center justify-center mb-6 text-fd-foreground">
-                  <Layers className="w-6 h-6" />
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mb-6 text-white">
+                  <Puzzle className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">Extensible Architecture</h3>
                 <p className="text-fd-muted-foreground">
@@ -126,7 +126,7 @@ export default function HomePage() {
            <div className="md:col-span-2 p-8 rounded-3xl bg-fd-card border border-fd-border/50 hover:border-fd-foreground/20 transition-all shadow-sm hover:shadow-md relative overflow-hidden group">
              <div className="relative z-10">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform">
-                  <Camera className="w-6 h-6" />
+                  <Sliders className="w-6 h-6" />
                 </div>
                 <h3 className="text-2xl font-bold mb-2">Declarative Control</h3>
                 <p className="text-fd-muted-foreground text-lg">
@@ -134,7 +134,7 @@ export default function HomePage() {
                 </p>
              </div>
               <div className="absolute right-0 bottom-0 opacity-10 group-hover:opacity-20 transition-opacity">
-               <Camera className="w-64 h-64 -mb-12 -mr-12" />
+               <Sliders className="w-64 h-64 -mb-12 -mr-12" />
              </div>
            </div>
         </div>

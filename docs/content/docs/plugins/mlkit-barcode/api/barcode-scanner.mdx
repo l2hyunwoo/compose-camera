@@ -1,0 +1,20 @@
+---
+title: BarcodeScanner
+description: API reference for BarcodeScanner class.
+---
+
+# `BarcodeScanner`
+
+The main plugin class for barcode scanning.
+
+```kotlin
+expect class BarcodeScanner : CameraPlugin {
+    val barcodes: StateFlow<List<Barcode>>
+}
+```
+
+## Properties
+
+| Property   | Type                       | Description                                                             |
+| :--------- | :------------------------- | :---------------------------------------------------------------------- |
+| `barcodes` | `StateFlow<List<Barcode>>` | A flow emitting the list of barcodes detected in the most recent frame. |

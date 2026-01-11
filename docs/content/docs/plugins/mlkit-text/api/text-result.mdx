@@ -1,0 +1,22 @@
+---
+title: TextResult
+description: API reference for TextResult data class.
+---
+
+# `TextResult`
+
+The top-level result of a recognition operation.
+
+```kotlin
+data class TextResult(
+    val text: String,
+    val blocks: List<TextBlock>
+)
+```
+
+## Properties
+
+| Property | Type              | Description                                      |
+| :------- | :---------------- | :----------------------------------------------- |
+| `text`   | `String`          | The complete confirmed text string.              |
+| `blocks` | `List<TextBlock>` | The list of text blocks identified in the image. |

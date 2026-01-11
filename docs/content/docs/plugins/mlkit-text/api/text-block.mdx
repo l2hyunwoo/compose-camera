@@ -1,0 +1,22 @@
+---
+title: TextBlock
+description: API reference for TextBlock data class.
+---
+
+# `TextBlock`
+
+Represents a logical block of text, such as a paragraph or column.
+
+```kotlin
+data class TextBlock(
+    val text: String,
+    val lines: List<TextLine>
+)
+```
+
+## Properties
+
+| Property | Type             | Description                                   |
+| :------- | :--------------- | :-------------------------------------------- |
+| `text`   | `String`         | The text content of the block.                |
+| `lines`  | `List<TextLine>` | The lines of text contained within the block. |

@@ -1,0 +1,54 @@
+---
+title: Overview
+description: Scan barcodes and QR codes using Google ML Kit.
+---
+
+# MLKit Barcode
+
+The `mlkit-barcode` plugin provides seamless integration with Google's ML Kit Barcode Scanning API, allowing you to detect and decoding barcodes in real-time.
+
+## Installation
+
+```kotlin
+implementation("io.github.l2hyunwoo:camera-plugin-mlkit-barcode:1.0.0")
+```
+
+## Usage
+
+### 1. Create the Plugin
+
+You can configure the scanner to detect specific formats for better performance.
+
+```kotlin
+// Scan all formats (default)
+val scanner = remember { BarcodeScanner() }
+
+// Or specify formats (e.g., only QR codes)
+// Note: Constructor parameters for formats are coming in next version
+```
+
+### 2. Register with CameraController
+
+**Using DSL:**
+
+```kotlin
+val controller = rememberCameraController {
+    plugins {
+        +scanner
+    }
+}
+```
+
+### 3. Observe Results
+
+The plugin exposes a `barcodes` StateFlow that emits a list of detected barcodes.
+
+```kotlin
+LaunchedEffect(scanner) {
+    scanner.barcodes.collect { barcodes ->
+        barcodes.forEach { barcode ->
+            println("Scanned: ${barcode.displayValue}")
+        }
+    }
+}
+```

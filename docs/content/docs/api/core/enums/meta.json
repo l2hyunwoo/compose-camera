@@ -1,0 +1,12 @@
+{
+  "title": "Enums",
+  "pages": [
+    "camera-lens",
+    "flash-mode",
+    "capture-mode",
+    "video-quality",
+    "directory",
+    "image-format",
+    "permission-status"
+  ]
+}

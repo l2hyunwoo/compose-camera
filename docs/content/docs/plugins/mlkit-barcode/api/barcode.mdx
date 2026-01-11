@@ -1,0 +1,24 @@
+---
+title: Barcode
+description: API reference for Barcode data class.
+---
+
+# `Barcode`
+
+Represents a single detected barcode.
+
+```kotlin
+data class Barcode(
+    val rawValue: String,
+    val format: BarcodeFormat,
+    val displayValue: String? = null
+)
+```
+
+## Properties
+
+| Property       | Type            | Description                                        |
+| :------------- | :-------------- | :------------------------------------------------- |
+| `rawValue`     | `String`        | The raw string value encoded in the barcode.       |
+| `format`       | `BarcodeFormat` | The format of the barcode (e.g., QR_CODE, EAN_13). |
+| `displayValue` | `String?`       | A more human-readable value, if available.         |

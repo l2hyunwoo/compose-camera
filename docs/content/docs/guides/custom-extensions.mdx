@@ -1,0 +1,111 @@
+---
+title: Custom Extensions
+description: Extending camera functionality with custom control logic.
+---
+
+# Custom Extensions
+
+While **Plugins** are designed for frame analysis and data processing (like QR scanning or OCR), **Extensions** (`CameraControlExtension`) are intended for controlling camera state, hardware features, or encapsulating complex logic that interacts with the `CameraController`.
+
+## `CameraControlExtension` Interface
+
+To create a custom extension, implement the `CameraControlExtension` interface:
+
+```kotlin
+interface CameraControlExtension {
+    val id: String
+    fun onAttach(controller: CameraController)
+    fun onDetach()
+
+    // Optional Lifecycle methods
+    fun onCameraReady() {}
+    fun onCameraReleased() {}
+}
+```
+
+## Example: Manual Focus Extension
+
+A powerful use case for extensions is accessing low-level platform APIs. For instance, on Android, you might want to use Camera2 Interop to control focus distance manually—something the standard CameraX API doesn't expose directly.
+
+Here is a simplified version of a `ManualFocusExtension` (from the Sample App):
+
+```kotlin
+@OptIn(ExperimentalCamera2Interop::class)
+class ManualFocusExtension : CameraControlExtension {
+    override val id: String = "manual-focus"
+
+    private var controller: AndroidCameraController? = null
+    private var camera2Control: Camera2CameraControl? = null
+
+    // State exposed to UI
+    private val _focusDistance = MutableStateFlow(0f)
+    val focusDistance: StateFlow<Float> = _focusDistance.asStateFlow()
+
+    override fun onAttach(controller: CameraController) {
+        if (controller is AndroidCameraController) {
+            this.controller = controller
+        }
+    }
+
+    override fun onCameraReady() {
+        val ctrl = controller ?: return
+
+        // Access underlying Camera object via reflection or internal API
+        // Then get Camera2CameraControl
+        val camera = ctrl.camera // implementation detail
+        camera2Control = Camera2CameraControl.from(camera.cameraControl)
+    }
+
+    fun setFocusDistance(distance: Float) {
+        val control = camera2Control ?: return
+
+        val options = CaptureRequestOptions.Builder()
+            .setCaptureRequestOption(
+                CaptureRequest.CONTROL_AF_MODE,
+                CaptureRequest.CONTROL_AF_MODE_OFF
+            )
+            .setCaptureRequestOption(
+                CaptureRequest.LENS_FOCUS_DISTANCE,
+                distance
+            )
+            .build()
+
+        control.captureRequestOptions = options
+        _focusDistance.value = distance
+    }
+
+    override fun onDetach() {
+        controller = null
+        camera2Control = null
+    }
+}
+```
+
+## Registering Extensions
+
+### Using DSL
+
+You can register extensions easily using the `extensions` block in `rememberCameraController`.
+
+```kotlin
+val manualFocus = remember { ManualFocusExtension() }
+
+val controller = rememberCameraController {
+    extensions {
+        +manualFocus
+    }
+}
+```
+
+### Accessing Extensions
+
+If you register the extension internally or need to access it later, you can retrieve it by ID:
+
+```kotlin
+val extension = controller.getExtension<ManualFocusExtension>("manual-focus")
+extension?.setFocusDistance(0.5f)
+```
+
+## Advanced Use Case: Vendor Extensions
+
+This API is particularly useful for platform-specific features. For example, if you are building an Android-specific extension to handle a unique vendor API, you can cast the `CameraController` to `AndroidCameraController` inside `onAttach` and check for specific device capabilities.
