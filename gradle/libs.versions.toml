@@ -7,7 +7,7 @@ android-compileSdk = "36"
 vanniktechMavenPublish = "0.35.0"
 
 # Compose
-compose-multiplatform = "1.9.3"
+compose-multiplatform = "1.10.0"
 navigation-compose = "2.9.1"
 
 # CameraX
