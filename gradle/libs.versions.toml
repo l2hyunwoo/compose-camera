@@ -41,7 +41,7 @@ androidx-core-ktx = "1.17.0"
 coil3 = "3.3.0"
 
 # Compose BOM
-compose-bom = "2025.12.01"
+compose-bom = "2026.01.00"
 
 # Kotest
 kotest = "6.0.7"
