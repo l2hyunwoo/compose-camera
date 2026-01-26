@@ -201,10 +201,10 @@
     "@formatjs/fast-memoize" "3.0.3"
     tslib "^2.8.0"
 
-"@fumadocs/ui@16.4.6":
-  version "16.4.6"
-  resolved "https://registry.yarnpkg.com/@fumadocs/ui/-/ui-16.4.6.tgz#a86f0e6112795a1a1a90c2daee2aad1ab4738cbc"
-  integrity sha512-/skIjySh9mVNMZBkc2kdGjajGQIorFUCTUp/QSSEtdMOVIdW7776YGLvV4CFxa8hf5FuRO4xrOi8vhQqnhqwVQ==
+"@fumadocs/ui@16.4.9":
+  version "16.4.9"
+  resolved "https://registry.yarnpkg.com/@fumadocs/ui/-/ui-16.4.9.tgz#c2e885f5f0bf1711c4c3fb9f1c51f565b713078c"
+  integrity sha512-MRIwJHm3SObwwPYqsMX4DfY71PYCtuXyBRI+g7NjbhdOD4HNnB2cOZf81I44+DCDvlRlnx6nf/SgsESSY/7cxQ==
   dependencies:
     next-themes "^0.4.6"
     postcss-selector-parser "^7.1.1"
@@ -1420,12 +1420,12 @@ fumadocs-mdx@^14.2.4:
     vfile "^6.0.3"
     zod "^4.2.1"
 
-fumadocs-ui@16.4.6:
-  version "16.4.6"
-  resolved "https://registry.yarnpkg.com/fumadocs-ui/-/fumadocs-ui-16.4.6.tgz#6a1e804c8a15b992e7e4655b93947b750bd1401c"
-  integrity sha512-WQD+rj2AMd5umu8cB+Q2pMl/EnCXT1MAeSb4UoEZKuoiv6zOkUiBHFemNVliijuPD2dX+18HzJlgDEk4PMVDUQ==
+fumadocs-ui@16.4.9:
+  version "16.4.9"
+  resolved "https://registry.yarnpkg.com/fumadocs-ui/-/fumadocs-ui-16.4.9.tgz#28148b7479808e31c7f3c4a3d174bcea81ef0023"
+  integrity sha512-6OY9zAHz8FUkE/jQ5C1YI540j3UIMIjS40woF4TYSGyTVSzR5cYTQ8Bf1IfjvRzaUR0nv7A6tR3CWX+Kfv6pDQ==
   dependencies:
-    "@fumadocs/ui" "16.4.6"
+    "@fumadocs/ui" "16.4.9"
     "@radix-ui/react-accordion" "^1.2.12"
     "@radix-ui/react-collapsible" "^1.1.12"
     "@radix-ui/react-dialog" "^1.1.15"
@@ -1437,7 +1437,7 @@ fumadocs-ui@16.4.6:
     "@radix-ui/react-slot" "^1.2.4"
     "@radix-ui/react-tabs" "^1.1.13"
     class-variance-authority "^0.7.1"
-    lucide-react "^0.562.0"
+    lucide-react "^0.563.0"
     next-themes "^0.4.6"
     react-medium-image-zoom "^5.4.0"
     scroll-into-view-if-needed "^3.1.0"
@@ -1669,6 +1669,11 @@ lucide-react@^0.562.0:
   version "0.562.0"
   resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.562.0.tgz#217796c2f57624f012b484ea7f08505067c90d51"
   integrity sha512-82hOAu7y0dbVuFfmO4bYF1XEwYk/mEbM5E+b1jgci/udUBEE/R7LF5Ip0CCEmXe8AybRM8L+04eP+LGZeDvkiw==
+
+lucide-react@^0.563.0:
+  version "0.563.0"
+  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.563.0.tgz#9a660d6f009942914a0df42391cf7d7d4dbcc713"
+  integrity sha512-8dXPB2GI4dI8jV4MgUDGBeLdGk8ekfqVZ0BdLcrRzocGgG75ltNEmWS+gE7uokKF/0oSUuczNDT+g9hFJ23FkA==
 
 magic-string@^0.30.21:
   version "0.30.21"
