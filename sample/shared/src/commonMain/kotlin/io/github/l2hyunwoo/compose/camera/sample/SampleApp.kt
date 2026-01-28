@@ -24,6 +24,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.toRoute
@@ -57,57 +58,68 @@ fun SampleApp() {
   MaterialTheme(
     colorScheme = darkColorScheme(),
   ) {
-    if (!permissionChecked) {
-      Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-      ) {
-        Text("Checking permissions...", color = MaterialTheme.colorScheme.onBackground)
-      }
-    } else if (hasPermission) {
-      val navController = rememberNavController()
-
-      NavHost(
-        navController = navController,
-        startDestination = Destination.Camera,
-      ) {
-        composable<Destination.Camera> {
-          CameraScreen(
-            onGalleryClick = { navController.navigate(Destination.Gallery) },
-            onBarcodeScannerClick = { navController.navigate(Destination.BarcodeScanner) },
+    Box(
+      modifier = Modifier.applyTestTagsAsResourceId(),
+    ) {
+      if (!permissionChecked) {
+        Box(
+          modifier = Modifier.fillMaxSize(),
+          contentAlignment = Alignment.Center,
+        ) {
+          Text(
+            text = "Checking permissions...",
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.testTag("permission_checking"),
           )
         }
+      } else if (hasPermission) {
+        val navController = rememberNavController()
 
-        composable<Destination.Gallery> {
-          GalleryScreen(
-            onBack = { navController.popBackStack() },
-            onItemClick = { item -> navController.navigate(Destination.MediaDetail(item)) },
-          )
-        }
+        NavHost(
+          navController = navController,
+          startDestination = Destination.Camera,
+        ) {
+          composable<Destination.Camera> {
+            CameraScreen(
+              onGalleryClick = { navController.navigate(Destination.Gallery) },
+              onBarcodeScannerClick = { navController.navigate(Destination.BarcodeScanner) },
+            )
+          }
 
-        composable<Destination.MediaDetail>(
-          typeMap = mapOf(typeOf<MediaItem>() to MediaItemNavType),
-        ) { backStackEntry ->
-          val detail = backStackEntry.toRoute<Destination.MediaDetail>()
-          MediaDetailScreen(
-            item = detail.item,
-            onBack = { navController.popBackStack() },
-          )
-        }
+          composable<Destination.Gallery> {
+            GalleryScreen(
+              onBack = { navController.popBackStack() },
+              onItemClick = { item -> navController.navigate(Destination.MediaDetail(item)) },
+            )
+          }
 
-        composable<Destination.BarcodeScanner> {
-          BarcodeScannerScreen(
-            onBack = { navController.popBackStack() },
-          )
+          composable<Destination.MediaDetail>(
+            typeMap = mapOf(typeOf<MediaItem>() to MediaItemNavType),
+          ) { backStackEntry ->
+            val detail = backStackEntry.toRoute<Destination.MediaDetail>()
+            MediaDetailScreen(
+              item = detail.item,
+              onBack = { navController.popBackStack() },
+            )
+          }
+
+          composable<Destination.BarcodeScanner> {
+            BarcodeScannerScreen(
+              onBack = { navController.popBackStack() },
+            )
+          }
         }
-      }
-    } else {
-      Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-      ) {
-        Button(onClick = { permissionManager.openAppSettings() }) {
-          Text("Open Camera Permission Settings")
+      } else {
+        Box(
+          modifier = Modifier.fillMaxSize(),
+          contentAlignment = Alignment.Center,
+        ) {
+          Button(
+            onClick = { permissionManager.openAppSettings() },
+            modifier = Modifier.testTag("permission_settings_button"),
+          ) {
+            Text("Open Camera Permission Settings")
+          }
         }
       }
     }
