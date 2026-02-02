@@ -1208,9 +1208,9 @@ debug@^4.0.0:
     ms "^2.1.3"
 
 decode-named-character-reference@^1.0.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/decode-named-character-reference/-/decode-named-character-reference-1.2.0.tgz#25c32ae6dd5e21889549d40f676030e9514cc0ed"
-  integrity sha512-c6fcElNV6ShtZXmsgNgFFV5tVX2PaV4g+MOAkb8eXHvn6sryJBrZa9r0zV6+dtTyoCKxtDy5tyQ5ZwQuidtd+Q==
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/decode-named-character-reference/-/decode-named-character-reference-1.3.0.tgz#3e40603760874c2e5867691b599d73a7da25b53f"
+  integrity sha512-GtpQYB283KrPp6nRw50q3U9/VfOutZOe103qlN7BPP6Ad27xYnOIWv4lPzo8HCAL+mMZofJ9KEy30fq6MfaK6Q==
   dependencies:
     character-entities "^2.0.0"
 
@@ -1398,9 +1398,9 @@ fumadocs-core@16.4.6:
     unist-util-visit "^5.0.0"
 
 fumadocs-mdx@^14.2.4:
-  version "14.2.4"
-  resolved "https://registry.yarnpkg.com/fumadocs-mdx/-/fumadocs-mdx-14.2.4.tgz#a2689f69236c2c3b9a3679f2483cca399ebf3ba5"
-  integrity sha512-YuDgzTopMuOOQmOhvOUfmXn2RryZY5Ev+9uwAzTBEYcLIpxIBxZl0/jHaLoYdlOMBM65AO6OBngA2SucC2hkIQ==
+  version "14.2.6"
+  resolved "https://registry.yarnpkg.com/fumadocs-mdx/-/fumadocs-mdx-14.2.6.tgz#d3aa6397392501c65c08e41627a5f4e8dc7438cb"
+  integrity sha512-T8i5IllZ6OGaZ3/4Wwjl1zovvypSsr6Cco9ZACvoABLqpqTQ2TDfrW1nBt1o9YUKyfzkwDnjKdrnrq/nDexfcg==
   dependencies:
     "@mdx-js/mdx" "^3.1.1"
     "@standard-schema/spec" "^1.1.0"
@@ -1418,7 +1418,7 @@ fumadocs-mdx@^14.2.4:
     unist-util-remove-position "^5.0.0"
     unist-util-visit "^5.0.0"
     vfile "^6.0.3"
-    zod "^4.2.1"
+    zod "^4.3.5"
 
 fumadocs-ui@16.4.6:
   version "16.4.6"
@@ -2762,9 +2762,9 @@ unist-util-visit-parents@^6.0.0:
     unist-util-is "^6.0.0"
 
 unist-util-visit@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/unist-util-visit/-/unist-util-visit-5.0.0.tgz#a7de1f31f72ffd3519ea71814cccf5fd6a9217d6"
-  integrity sha512-MR04uvD+07cwl/yhVuVWAtw+3GOR/knlL55Nd/wAdblk27GCVt3lqpTivy/tkJcZoNPzTwS1Y+KMojlLDhoTzg==
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/unist-util-visit/-/unist-util-visit-5.1.0.tgz#9a2a28b0aa76a15e0da70a08a5863a2f060e2468"
+  integrity sha512-m+vIdyeCOpdr/QeQCu2EzxX/ohgS8KbnPDgFni4dQsfSCtpz8UqDyY5GjRru8PDKuYn7Fq19j1CQ+nJSsGKOzg==
   dependencies:
     "@types/unist" "^3.0.0"
     unist-util-is "^6.0.0"
@@ -2806,10 +2806,10 @@ vfile@^6.0.0, vfile@^6.0.3:
     "@types/unist" "^3.0.0"
     vfile-message "^4.0.0"
 
-zod@^4.2.1:
-  version "4.3.5"
-  resolved "https://registry.yarnpkg.com/zod/-/zod-4.3.5.tgz#aeb269a6f9fc259b1212c348c7c5432aaa474d2a"
-  integrity sha512-k7Nwx6vuWx1IJ9Bjuf4Zt1PEllcwe7cls3VNzm4CQ1/hgtFUK2bRNG3rvnpPUhFjmqJKAKtjV576KnUkHocg/g==
+zod@^4.3.5:
+  version "4.3.6"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-4.3.6.tgz#89c56e0aa7d2b05107d894412227087885ab112a"
+  integrity sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==
 
 zwitch@^2.0.0, zwitch@^2.0.4:
   version "2.0.4"
